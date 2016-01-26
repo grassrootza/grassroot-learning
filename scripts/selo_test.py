@@ -1,10 +1,17 @@
+#!/usr/bin/env python
+
 import requests, time, psycopg2, csv, re, os
 from slacker import Slacker
 
 csv_filename = "ussd_date_entry_" + time.strftime('%b%d') + '.csv'
-global last_month_filename
-last_month_filename= 'hist/selo_errors.txt'
-global this_month_filename
+
+# handle jan/dec case
+if int(time.strftime('%m')) - 1 != 0:
+    last_month_filename= 'hist/selo_errors_' + str(int(time.strftime('%m')) - 1) + '.txt'
+else: 
+    last_month_filename= 'hist/selo_errors_' + str(12) + '.txt'    
+
+this_month_filename = 'hist/selo_errors_' + str(int(time.strftime('%m'))) + '.txt'
 
 slack = Slacker(os.environ['SLACK_AUTH_TOKEN'])
 
@@ -37,7 +44,6 @@ def parse_file(filename):
 def get_results_file(log_file):
     with open(log_file) as infile, open(this_month_filename, 'w') as outfile:
         for line in infile:
-            # u = 'http://52.210.114.216:9000/parse?phrase=' + line
             url = 'http://localhost:9000/parse?phrase=' + line
             data = requests.get(url)
 
@@ -58,14 +64,8 @@ def get_differences_from_last_month(this_month, last_month):
 def main():
     get_log_from_db()
     get_results_file(parse_file(csv_filename))
-    get_results_file(parse_file('ussd_date_entry_aug14.csv'))
     get_differences_from_last_month(this_month_filename, last_month_filename)
     slack.files.upload(this_month_filename, channels='#learning')
 
 
-while True:
-    this_month_filename = 'hist/selo_errors_' + time.strftime('%b%d') + '.txt'
-    main()
-    last_month_filename = this_month_filename
-    print ':D'
-    time.sleep(2592000)
+main()

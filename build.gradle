@@ -1,0 +1,67 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+jar {
+    baseName = 'gs-rest-service'
+    version =  '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    // tag::jetty[]
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-devtools")
+    compile("com.fasterxml.jackson.core:jackson-databind")
+
+    //TODO see if jetty is necessary
+    compile("org.springframework.boot:spring-boot-starter-jetty")
+    // end::jetty[]
+    // tag::actuator[]
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    // end::actuator[]
+    testCompile("junit:junit")
+
+	//TODO set up all dependencies via maven, if possible
+    //TODO add sl4j
+	// https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
+	compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0'
+	//compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0', classifier: 'models'
+
+    // need jar file with custom SUTime rules
+    compile files('src/main/libs/stanford-corenlp-3.6.0-models.jar')
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+group 'grassroot'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

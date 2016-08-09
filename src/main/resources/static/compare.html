@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style type="text/css">
+    </style>
+
+    <title>Compare Parses</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- Bootstrap Material Design -->
+    <link href="dist/css/bootstrap-material-design.min.css" rel="stylesheet">
+    <link href="dist/css/ripples.css" rel="stylesheet">
+
+
+    <script src="dist/js/material.min.js"></script>
+
+
+    <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+
+<body>
+
+<div>
+	<h1>Compare Parses</h1>
+</div>
+
+<div> 	
+	<form class="form-horizontal" role="form">
+        <div style="width: 600px; margin: 0 auto;" class="form-group form-group-lg">
+                <input type="text" style="width: 400px; display:inline-block;" class="form-control" id="phrase" placeholder="Enter phrase here">
+                <span class="input-group-btn" style="display:inline-block; padding-left: 20px; width: 50pxS">
+        			<button type="button" id="input-btn" class="btn btn-raised btn-lg ripple-effect btn-primary">Enter</button>
+      			</span>
+        </div>
+      
+
+</div>
+
+
+
+<div style="padding-bottom: 80px"></div>
+
+<script src="dist/js/material.min.js"></script>
+<script src="dist/js/ripples.min.js"></script>
+
+
+<script type="text/javascript">
+    $(function() {
+        $.material.init();
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $('#input-btn').click(
+                function() {
+                    var num = checkAndParsePhone();
+                    if(sendNumber(num)) alert("Message sent successfully");
+                }
+        );
+    });
+    function sendNumber(num) {
+
+        var data = "number=" + num;
+
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                console.log(this.responseText);
+            }
+        });
+
+        xhr.open("POST", "/phone");
+        xhr.setRequestHeader("cache-control", "no-cache");
+        xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+
+        xhr.send(data);
+    }
+
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-74697595-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+</body>
+</html>

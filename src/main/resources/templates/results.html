@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style type="text/css">
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="stylesheets/style.css"/>
+
+    <style>
+html, body { height: 100%; margin: 0 auto; padding: 0;}
+body {
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    margin: 0 auto;
+    max-width: 50em;
+}
+
+div {
+    display: block;
+    height: 100px;
+}
+
+.smaller {
+    height: 50px;
+}
+
+h1 {
+    font-size: 40px;
+    font-family: Lato, Helvetica, Arial, sans-serif;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 90px;
+}
+
+h2 {
+    font-size: 20px;
+    font-family: Lato, Helvetica, Arial, sans-serif;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
+    vertical-align: middle;
+}
+
+    </style>
+</head>
+
+<body>
+
+<div class="smaller">
+	<h1>Results:</h1>
+</div>  
+
+<div class="smaller">
+    <h2>Original: </h2>
+    <h2 th:text="${originalPhrase}">Original: {originalPhrase}</h2>
+</div>
+
+<div class="smaller">
+    <h2>Selo: </h2>
+    <h2 th:text="${seloParse}">Selo: {parsed}</h2>
+</div>
+
+<div>
+    <h2> Natty:</h2>
+    <h2 th:text="${nattyParse}">Natty: {natty}</h2>
+</div>
+
+</body>
+</html>

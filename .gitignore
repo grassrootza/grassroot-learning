@@ -1,0 +1,49 @@
+# Package Files #
+*.jar
+*.war
+*.ear
+
+*.class
+
+#gradle
+.gradle
+/build/
+
+### Intellij ###
+# User-specific stuff:
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# Sensitive or high-churn files:
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
+
+## File-based project format:
+*.iws
+
+## Plugin-specific files:
+
+# IntelliJ
+/out/
+
+# mpeltonen/sbt-idea plugin
+.idea/**
+.idea_modules/
+
+*.iml
+# modules.xml
+
+*.txt
+
+#classifier
+*.ser.gz

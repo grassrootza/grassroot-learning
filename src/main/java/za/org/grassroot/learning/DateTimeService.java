@@ -1,15 +1,15 @@
 package za.org.grassroot.learning;
 
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,12 +23,17 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.ie.crf.*;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.util.Triple;
+import org.apache.tomcat.jni.Local;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Created by shakka on 7/28/16.
  */
 public class DateTimeService {
+
+    private static final Logger log = LoggerFactory.getLogger(DateTimeService.class);
 
     private String unparsed;
     private String parsed;
@@ -91,33 +96,42 @@ public class DateTimeService {
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
         pipeline.annotate(annotation);
         List<CoreMap> timexAnnsAll = annotation.get(TimeAnnotations.TimexAnnotations.class);
-        for (CoreMap cm : timexAnnsAll) {
-            List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
+        String parse = "";
 
-            //TODO 2 tokens -> need to concatenate into 1
-            //TODO return LocalDateTime object
-            //Calendar calendar = cm.get(TimeAnnotations.TimexAnnotation.class).getDate();
-            // look at LocalDateTime adjustInto(Temporal temporal)
-            // LocalDateTime withHour, withMinute
-            return cm.get(TimeExpression.Annotation.class).getTemporal().toString();
-        }
-        return "";
-    }
+        if (timexAnnsAll.size() > 1) {
+            List<LocalDateTime> dt = new ArrayList<>();
+            for (CoreMap cm : timexAnnsAll) {
+                List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
 
-    private static void readFromFile(AnnotationPipeline pipeline, AbstractSequenceClassifier ner, String filename) throws IOException{
+                SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
+                LocalDateTime dateTime = temporalToLocalDateTime(temporal);
+                dt.add(dateTime);
+            }
+            //assumes user enters date and then time
+            LocalDate date = dt.get(0).toLocalDate();
+            LocalTime time = dt.get(1).toLocalTime();
+            LocalDateTime combo = LocalDateTime.of(date, time);
 
-        ArrayList<String> datetimes = new ArrayList<String>();
+            log.info("date: {}", date.toString());
+            log.info("time: {}", time.toString());
+            log.info("combo: {}", combo.toString());
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String sutime = getSUTimeStr(pipeline, getEditedStr(ner, line));
-                datetimes.add(line + " | " + sutime);
+            parse = combo.toString();
+
+        } else {
+            for (CoreMap cm : timexAnnsAll) {
+                List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
+
+                log.info("num tokens: {}", tokens.size());
+
+                SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
+                LocalDateTime dateTime = temporalToLocalDateTime(temporal);
+
+                parse = dateTime.toString();
             }
         }
 
-        Path file  = Paths.get("datetime-results.txt");
-        Files.write(file, datetimes, Charset.forName("UTF-8"));
+        return parse;
     }
 
     private void initPipelineAndNER(){
@@ -130,5 +144,31 @@ public class DateTimeService {
 
         String serializedClassifier = "src/main/resources/classifiers/ner-model-datetime.ser.gz";
         this.ner = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
+    }
+
+    private static LocalDateTime temporalToLocalDateTime(SUTime.Temporal temporal) {
+        String iso = temporal.toISOString();
+
+        log.info("temporal str: {}", iso);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        if (!temporal.getTime().hasTime()) {
+            iso = temporal.toISOString() + "T" + LocalTime.now().toString().substring(0, 5);
+            log.info("temporal str: {}", iso);
+        }
+        LocalDateTime dateTime;
+
+        try {
+            dateTime = LocalDateTime.parse(iso, formatter);
+        } catch (DateTimeParseException e) {
+            dateTime = LocalDateTime.now();
+        }
+        log.info("datetime str: {}", dateTime.toString());
+
+        if ( (dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)
+                && (dateTime.compareTo(LocalDateTime.now().minusWeeks(1)) > 0))
+            dateTime = dateTime.plusWeeks(1);
+
+        log.info("datetime str: {}", dateTime.toString());
+        return dateTime;
     }
 }

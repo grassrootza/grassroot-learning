@@ -83,9 +83,12 @@ public class DateTimeService {
     }
 
     private static String getSUTimeStr(AnnotationPipeline pipeline, String edited) {
-        // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
         //TODO further testing, do this the right way
+        // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
         edited = edited.replace("/16 ", "/2016 ");
+
+        // Case: Date and time are one token e.g. tomorrow@5
+        edited = edited.replace("tomorrow@", "tomorrow @");
 
         Annotation annotation = new Annotation(edited);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
@@ -93,8 +96,6 @@ public class DateTimeService {
         List<CoreMap> timexAnnsAll = annotation.get(TimeAnnotations.TimexAnnotations.class);
         String parse = "";
 
-        log.info("list size: {}", timexAnnsAll.size());
-        log.info("list: {}", timexAnnsAll.toString());
         if (timexAnnsAll.size() > 1) {
             List<LocalDateTime> dt = new ArrayList<>();
             for (CoreMap cm : timexAnnsAll) {
@@ -116,9 +117,6 @@ public class DateTimeService {
                 CoreMap cm = timexAnnsAll.get(0);
 
                 List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
-
-                log.info("num tokens: {}", tokens.size());
-                log.info("tokens: {}", tokens.toString());
 
                 SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
                 LocalDateTime dateTime = temporalToLocalDateTime(temporal);
@@ -147,11 +145,9 @@ public class DateTimeService {
     private static LocalDateTime temporalToLocalDateTime(SUTime.Temporal temporal) {
         String iso = temporal.toISOString();
 
-        log.info("temporal str: {}", iso);
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         if (!temporal.getTime().hasTime()) {
             iso = temporal.toISOString() + "T" + LocalTime.now().toString().substring(0, 5);
-            log.info("temporal str: {}", iso);
         }
         LocalDateTime dateTime;
 
@@ -160,13 +156,11 @@ public class DateTimeService {
         } catch (DateTimeParseException e) {
             dateTime = LocalDateTime.now();
         }
-        log.info("datetime str: {}", dateTime.toString());
 
         if ( (dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)
                 && (dateTime.compareTo(LocalDateTime.now().minusWeeks(1)) > 0))
             dateTime = dateTime.plusWeeks(1);
 
-        log.info("datetime str: {}", dateTime.toString());
         return dateTime;
     }
 }

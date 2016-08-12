@@ -52,19 +52,11 @@ public class DatetimeController {
             String nattyJson = restTemplate.getForObject(url, String.class);
 
             NattyData nattyData = nattyValue.getData();
-            log.info("Natty JSON = " + nattyJson);
 
             LocalDateTime natty = LocalDateTime.of(nattyData.getYear(), nattyData.getMonthValue(), nattyData.getDayOfMonth(),
                     nattyData.getHour(), nattyData.getMinute());
 
             model.addAttribute("nattyParse", natty.toString());
-            log.info("NattyData monthValue: {}", nattyData.getMonthValue());
-            log.info("NattyData year: {}", nattyData.getYear());
-            log.info("NattyData dayOfMonth: {}", nattyData.getDayOfMonth());
-
-            log.info("NattyData: {}", nattyData.toString());
-
-            log.info("Natty URL: {}", url);
             log.info("Natty parse: {}", natty.toString());
         } catch (RestClientException e) {
             log.info("Natty unable to parse");
@@ -115,7 +107,7 @@ public class DatetimeController {
             }
         }
 
-        Path file  = Paths.get("selo-natty-results2.txt");
+        Path file  = Paths.get("selo-natty-results3.txt");
         Files.write(file, datetimes, Charset.forName("UTF-8"));
 
     }

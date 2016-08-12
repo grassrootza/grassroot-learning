@@ -1,19 +1,11 @@
 package za.org.grassroot.learning;
 
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.time.LocalDateTime;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.FileReader;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -23,7 +15,6 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.ie.crf.*;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.util.Triple;
-import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,12 +83,18 @@ public class DateTimeService {
     }
 
     private static String getSUTimeStr(AnnotationPipeline pipeline, String edited) {
+        // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
+        //TODO further testing, do this the right way
+        edited = edited.replace("/16 ", "/2016 ");
+
         Annotation annotation = new Annotation(edited);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
         pipeline.annotate(annotation);
         List<CoreMap> timexAnnsAll = annotation.get(TimeAnnotations.TimexAnnotations.class);
         String parse = "";
 
+        log.info("list size: {}", timexAnnsAll.size());
+        log.info("list: {}", timexAnnsAll.toString());
         if (timexAnnsAll.size() > 1) {
             List<LocalDateTime> dt = new ArrayList<>();
             for (CoreMap cm : timexAnnsAll) {
@@ -112,22 +109,23 @@ public class DateTimeService {
             LocalTime time = dt.get(1).toLocalTime();
             LocalDateTime combo = LocalDateTime.of(date, time);
 
-            log.info("date: {}", date.toString());
-            log.info("time: {}", time.toString());
-            log.info("combo: {}", combo.toString());
-
             parse = combo.toString();
 
         } else {
-            for (CoreMap cm : timexAnnsAll) {
+            try {
+                CoreMap cm = timexAnnsAll.get(0);
+
                 List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
 
                 log.info("num tokens: {}", tokens.size());
+                log.info("tokens: {}", tokens.toString());
 
                 SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
                 LocalDateTime dateTime = temporalToLocalDateTime(temporal);
 
                 parse = dateTime.toString();
+            } catch (IndexOutOfBoundsException e) {
+                parse = LocalDateTime.now().toString();
             }
         }
 

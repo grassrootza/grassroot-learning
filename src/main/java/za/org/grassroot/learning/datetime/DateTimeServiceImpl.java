@@ -1,4 +1,4 @@
-package za.org.grassroot.learning;
+package za.org.grassroot.learning.datetime;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,66 +16,40 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.ie.crf.*;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.util.Triple;
+import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 
 /**
  * Created by shakka on 7/28/16.
  */
-public class DateTimeService {
+
+@Service
+public class DateTimeServiceImpl implements DateTimeService {
 
     private static final int currentYear = Year.now().getValue() % 1000;
     private static final int nextYear = Year.now().getValue() % 1000 + 1;
 
-    // TODO turn into Spring Service Bean
+    private static final Logger log = LoggerFactory.getLogger(DateTimeServiceImpl.class);
 
-    private static final Logger log = LoggerFactory.getLogger(DateTimeService.class);
-
-    private String unparsed;
-    private String parsed;
     private AnnotationPipeline pipeline;
     private AbstractSequenceClassifier ner;
 
-    public DateTimeService(String unparsed){
 
-        // needs to be lower case for classifier to work properly
-        this.unparsed = unparsed.toLowerCase();
-        this.parsed = "";
-
+    public DateTimeServiceImpl() {
         initPipelineAndNER();
     }
 
-    public DateTimeService() {
-        this.unparsed = "";
-        this.parsed = "";
+    public LocalDateTime parse(String phrase) {
+        String edited = getNerParse(ner, phrase.toLowerCase());
 
-        initPipelineAndNER();
+        return getSUTimeParse(pipeline, edited);
     }
 
-
-    public String getUnparsed() { return unparsed; }
-
-    public String getParsed() {return parsed; }
-
-    public void setParsed(String p) {
-        parsed = p;
-    }
-
-    public void setUnparsed(String p) {unparsed = p.toLowerCase();}
-
-
-    public String parseDatetime() {
-
-        String edited = getEditedStr(ner, unparsed);
-        String sutime = getSUTimeStr(pipeline, edited);
-
-        setParsed(sutime);
-
-        return sutime;
-    }
-
-    private static String getEditedStr(AbstractSequenceClassifier ner, String original) {
+    public String getNerParse(AbstractSequenceClassifier ner, String original) {
+        original = original.toLowerCase();
         // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
         original = original.replace("/" + currentYear + " ", "/20" + currentYear + " ");
         original = original.replace("/" + nextYear + " ", "/20" + nextYear + " ");
@@ -94,12 +68,13 @@ public class DateTimeService {
         return edited;
     }
 
-    private static String getSUTimeStr(AnnotationPipeline pipeline, String edited) {
+    public LocalDateTime getSUTimeParse(AnnotationPipeline pipeline, String edited) {
+        edited = edited.toLowerCase();
         Annotation annotation = new Annotation(edited);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
         pipeline.annotate(annotation);
         List<CoreMap> timexAnnsAll = annotation.get(TimeAnnotations.TimexAnnotations.class);
-        String parse = "";
+        LocalDateTime parse;
 
         if (timexAnnsAll.size() > 1) {
             List<LocalDateTime> dt = new ArrayList<>();
@@ -113,9 +88,7 @@ public class DateTimeService {
             //assumes user enters date and then time
             LocalDate date = dt.get(0).toLocalDate();
             LocalTime time = dt.get(1).toLocalTime();
-            LocalDateTime combo = LocalDateTime.of(date, time);
-
-            parse = combo.toString();
+            parse = LocalDateTime.of(date, time);
 
         } else {
             try {
@@ -124,11 +97,10 @@ public class DateTimeService {
                 List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
 
                 SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
-                LocalDateTime dateTime = temporalToLocalDateTime(temporal);
 
-                parse = dateTime.toString();
+                parse = temporalToLocalDateTime(temporal);
             } catch (IndexOutOfBoundsException e) {
-                parse = LocalDateTime.now().toString();
+                parse = LocalDateTime.now();
             }
         }
 
@@ -147,7 +119,7 @@ public class DateTimeService {
         this.ner = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
     }
 
-    private static LocalDateTime temporalToLocalDateTime(SUTime.Temporal temporal) {
+    public LocalDateTime temporalToLocalDateTime(SUTime.Temporal temporal) {
         String iso = temporal.toISOString();
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;

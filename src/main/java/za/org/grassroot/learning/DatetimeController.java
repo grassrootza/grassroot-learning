@@ -1,13 +1,18 @@
-package za.org.grassroot.learning;
+package za.org.grassroot.learning.datetime;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import za.org.grassroot.learning.NattyData;
+import za.org.grassroot.learning.NattyValue;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,31 +32,27 @@ public class DatetimeController {
 
     private static final Logger log = LoggerFactory.getLogger(DatetimeController.class);
 
+    @Autowired
+    private DateTimeServiceImpl selo;
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String compare(Model model) {
-        log.info("Heap size before selo: {}", Runtime.getRuntime().totalMemory());
-        DateTimeService selo = new DateTimeService();
-        log.info("Selo starts...{}", Runtime.getRuntime().totalMemory());
-        model.addAttribute("selo", selo);
-
         return "compare";
     }
 
     @RequestMapping(value = "/results", method = RequestMethod.POST)
-    public String datetimeService(@ModelAttribute(value="selo") DateTimeService selo, Model model) throws Exception {
+    public String datetimeService(@RequestParam("phrase") String phrase, Model model) throws Exception {
 
-        log.info("Original string: {}", selo.getUnparsed());
-        model.addAttribute("originalPhrase", selo.getUnparsed());
-        log.info("Pre-parse: {}", Runtime.getRuntime().totalMemory());
-        long start = System.currentTimeMillis();
-        model.addAttribute("seloParse", selo.parseDatetime());
-        log.info("time: {}ms", System.currentTimeMillis() - start);
-        log.info("Selo parse: {}", selo.parseDatetime());
-        log.info("After a parse: {}", Runtime.getRuntime().totalMemory());
+        log.info("Original string: {}", phrase);
+        model.addAttribute("originalPhrase", phrase);
+
+        String seloParse = selo.parse(phrase).toString();
+        model.addAttribute("seloParse", seloParse);
+        log.info("Selo parse: {}", seloParse);
 
         RestTemplate restTemplate = new RestTemplate();
 
-        String url = "https://staging.grassroot.org.za/api/language/test/natty?inputString=" + selo.getUnparsed();
+        String url = "https://staging.grassroot.org.za/api/language/test/natty?inputString=" + phrase;
 
         try {
             NattyValue nattyValue = restTemplate.getForObject(url, NattyValue.class);
@@ -80,18 +81,17 @@ public class DatetimeController {
         ArrayList<String> datetimes = new ArrayList<String>();
         datetimes.add("Original \t | Selo \t | Natty");
         RestTemplate restTemplate = new RestTemplate();
-        DateTimeService selo = new DateTimeService();
+        DateTimeServiceImpl selo = new DateTimeServiceImpl();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = br.readLine()) != null) {
 
                 log.info("line: {}", line);
-                selo.setUnparsed(line);
-                log.info("Selo parse: {}", selo.parseDatetime());
+                log.info("Selo parse: {}", selo.parse(line).toString());
                 String compare = line;
 
-                compare = compare + "\t |" + selo.parseDatetime();
+                compare = compare + "\t |" + selo.parse(line).toString();
 
                 String url = "https://staging.grassroot.org.za/api/language/test/natty?inputString=" + line;
 

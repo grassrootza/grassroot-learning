@@ -84,8 +84,8 @@ button {
 <div>
     <div style="width: 600px; margin: 0 auto;" class="form-group form-group-lg">
 
-        <form action="#" th:action="@{/results}" th:object="${selo}" method="POST">
-            <input th:field="*{unparsed}" type="text"  class="form-control" id="phrase" placeholder="Enter phrase here"/>
+        <form action="#" th:action="@{/results}" method="POST">
+            <input type="text"  class="form-control" name="phrase" id="phrase" placeholder="Enter phrase here"/>
             <span class="input-group-btn" style="display:inline-block; padding-left: 20px; width: 50pxS">
     		  <button name = "parseButton" type="submit" id="input-btn" class="btn btn-raised btn-lg ripple-effect btn-primary">Enter</button>
       	     </span>

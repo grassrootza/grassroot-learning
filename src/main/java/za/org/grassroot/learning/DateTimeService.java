@@ -2,6 +2,7 @@ package za.org.grassroot.learning;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -23,6 +24,11 @@ import org.slf4j.LoggerFactory;
  * Created by shakka on 7/28/16.
  */
 public class DateTimeService {
+
+    private static final int currentYear = Year.now().getValue() % 1000;
+    private static final int nextYear = Year.now().getValue() % 1000 + 1;
+
+    // TODO turn into Spring Service Bean
 
     private static final Logger log = LoggerFactory.getLogger(DateTimeService.class);
 
@@ -70,6 +76,12 @@ public class DateTimeService {
     }
 
     private static String getEditedStr(AbstractSequenceClassifier ner, String original) {
+        // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
+        original = original.replace("/" + currentYear + " ", "/20" + currentYear + " ");
+        original = original.replace("/" + nextYear + " ", "/20" + nextYear + " ");
+
+        // Case: Date and time are one token e.g. tomorrow@5
+        original = original.replaceAll("@", " @ ");
 
         List<Triple<String, Integer, Integer>> entities = ner.classifyToCharacterOffsets(original);
         String edited = original;
@@ -83,13 +95,6 @@ public class DateTimeService {
     }
 
     private static String getSUTimeStr(AnnotationPipeline pipeline, String edited) {
-        //TODO further testing, do this the right way
-        // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
-        edited = edited.replace("/16 ", "/2016 ");
-
-        // Case: Date and time are one token e.g. tomorrow@5
-        edited = edited.replace("tomorrow@", "tomorrow @");
-
         Annotation annotation = new Annotation(edited);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
         pipeline.annotate(annotation);

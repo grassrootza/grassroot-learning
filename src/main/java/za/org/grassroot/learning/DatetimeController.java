@@ -29,7 +29,9 @@ public class DatetimeController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String compare(Model model) {
+        log.info("Heap size before selo: {}", Runtime.getRuntime().totalMemory());
         DateTimeService selo = new DateTimeService();
+        log.info("Selo starts...{}", Runtime.getRuntime().totalMemory());
         model.addAttribute("selo", selo);
 
         return "compare";
@@ -40,8 +42,12 @@ public class DatetimeController {
 
         log.info("Original string: {}", selo.getUnparsed());
         model.addAttribute("originalPhrase", selo.getUnparsed());
+        log.info("Pre-parse: {}", Runtime.getRuntime().totalMemory());
+        long start = System.currentTimeMillis();
         model.addAttribute("seloParse", selo.parseDatetime());
+        log.info("time: {}ms", System.currentTimeMillis() - start);
         log.info("Selo parse: {}", selo.parseDatetime());
+        log.info("After a parse: {}", Runtime.getRuntime().totalMemory());
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -62,7 +68,7 @@ public class DatetimeController {
             log.info("Natty unable to parse");
         }
 
-        //compareNattySeloResults("/home/shakka/Projects/Grassroot/grassroot-learning/src/main/resources/extracted_dates.txt");
+        //compareNattySeloResults("/home/shakka/Projects/Grassroot/grassroot-learning/src/main/resources/aug14_extracted_dates.txt");
         return "results";
     }
 
@@ -107,7 +113,7 @@ public class DatetimeController {
             }
         }
 
-        Path file  = Paths.get("selo-natty-results4.txt");
+        Path file  = Paths.get("selo-natty-results-aug14.txt");
         Files.write(file, datetimes, Charset.forName("UTF-8"));
 
     }

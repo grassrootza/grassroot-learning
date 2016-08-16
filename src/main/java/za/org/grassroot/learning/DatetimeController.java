@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import za.org.grassroot.learning.NattyData;
@@ -35,7 +36,14 @@ public class DatetimeController {
     @Autowired
     private DateTimeServiceImpl selo;
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+
+    @RequestMapping(value="/parse", method = RequestMethod.GET)
+    public @ResponseBody String dateTime(@RequestParam(value="phrase", defaultValue = "") String phrase) {
+        log.info("String to be parsed: {}", phrase);
+        return selo.parse(phrase).toString();
+    }
+
+    @RequestMapping(value = "/compare", method = RequestMethod.GET)
     public String compare(Model model) {
         return "compare";
     }

@@ -115,7 +115,8 @@ public class DateTimeServiceImpl implements DateTimeService {
         pipeline.addAnnotator(new POSTaggerAnnotator(false));
         pipeline.addAnnotator(new TimeAnnotator("sutime", props));
 
-        String serializedClassifier = "src/main/resources/classifiers/ner-model-datetime.ser.gz";
+        String serializedClassifier = "../resources/classifiers/ner-model-datetime.ser.gz";
+
         this.ner = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
     }
 

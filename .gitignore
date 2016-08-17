@@ -47,3 +47,5 @@
 
 #classifier
 *.ser.gz
+
+nohup.out

@@ -12,7 +12,7 @@ permissions:
 hooks:
    BeforeInstall:
     - location: scripts/compilelearning.sh
-    - location: scripts/stopglearning.sh
+    - location: scripts/stoplearning.sh
       runas: root
    ApplicationStart:
     - location: scripts/startlearning.sh

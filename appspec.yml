@@ -1,0 +1,19 @@
+version: 0.0
+os: linux
+files:
+   - source: /
+     destination: /var/grassroot
+permissions:
+   - object: /var/grassroot
+     pattern: "**"
+     owner: root 
+     group: root 
+     mode: 755
+hooks:
+   BeforeInstall:
+    - location: scripts/compilelearning.sh
+    - location: scripts/stopglearning.sh
+      runas: root
+   ApplicationStart:
+    - location: scripts/startlearning.sh
+      runas: root

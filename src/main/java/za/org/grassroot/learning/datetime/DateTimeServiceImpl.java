@@ -43,9 +43,14 @@ public class DateTimeServiceImpl implements DateTimeService {
     }
 
     public LocalDateTime parse(String phrase) {
+        long start = System.currentTimeMillis();
         String edited = getNerParse(ner, phrase.toLowerCase());
+        log.info("Time to get NER parse: {}", System.currentTimeMillis() - start);
 
-        return getSUTimeParse(pipeline, edited);
+        start = System.currentTimeMillis();
+        LocalDateTime parsedDateTime = getSUTimeParse(pipeline, edited);
+        log.info("Time to get parsed LDT: {}", System.currentTimeMillis() - start);
+        return parsedDateTime;
     }
 
     public String getNerParse(AbstractSequenceClassifier ner, String original) {

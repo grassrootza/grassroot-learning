@@ -19,7 +19,11 @@ import edu.stanford.nlp.util.Triple;
 import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 
 /**
@@ -29,32 +33,49 @@ import org.springframework.stereotype.Service;
 @Service
 public class DateTimeServiceImpl implements DateTimeService {
 
+    private static final Logger log = LoggerFactory.getLogger(DateTimeServiceImpl.class);
+
     private static final int currentYear = Year.now().getValue() % 1000;
     private static final int nextYear = Year.now().getValue() % 1000 + 1;
 
-    private static final Logger log = LoggerFactory.getLogger(DateTimeServiceImpl.class);
+    @Autowired
+    Environment environment;
 
     private AnnotationPipeline pipeline;
     private AbstractSequenceClassifier ner;
 
+    @PostConstruct
+    public void initPipelineAndNER() {
+        this.pipeline = new AnnotationPipeline();
+        pipeline.addAnnotator(new TokenizerAnnotator(false));
+        pipeline.addAnnotator(new WordsToSentencesAnnotator(false));
+        pipeline.addAnnotator(new POSTaggerAnnotator(false));
+        pipeline.addAnnotator(new TimeAnnotator("sutime", new Properties()));
 
-    public DateTimeServiceImpl() {
-        initPipelineAndNER();
+        final String serializedClassifier = environment.getRequiredProperty("classifier.datetime.grassroot.path");
+        this.ner = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
     }
 
     public LocalDateTime parse(String phrase) {
-        long start = System.currentTimeMillis();
-        String edited = getNerParse(ner, phrase.toLowerCase());
-        log.info("Time to get NER parse: {}", System.currentTimeMillis() - start);
+        Objects.requireNonNull(phrase);
 
-        start = System.currentTimeMillis();
-        LocalDateTime parsedDateTime = getSUTimeParse(pipeline, edited);
-        log.info("Time to get parsed LDT: {}", System.currentTimeMillis() - start);
-        return parsedDateTime;
+        try {
+            long start = System.currentTimeMillis();
+            final String edited = getNerParse(ner, phrase);
+            log.info("Time to get NER parse: {} msecs", System.currentTimeMillis() - start);
+
+            start = System.currentTimeMillis();
+            LocalDateTime parsedDateTime = getSUTimeParse(pipeline, edited);
+            log.info("Time to get parsed LDT: {} msecs", System.currentTimeMillis() - start);
+            return parsedDateTime;
+        } catch (Exception e) {
+            throw new SeloParseException();
+        }
     }
 
-    public String getNerParse(AbstractSequenceClassifier ner, String original) {
-        original = original.toLowerCase();
+    public String getNerParse(AbstractSequenceClassifier ner, String passedString) {
+        String original = passedString.toLowerCase();
+
         // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
         original = original.replace("/" + currentYear + " ", "/20" + currentYear + " ");
         original = original.replace("/" + nextYear + " ", "/20" + nextYear + " ");
@@ -73,56 +94,32 @@ public class DateTimeServiceImpl implements DateTimeService {
         return edited;
     }
 
-    public LocalDateTime getSUTimeParse(AnnotationPipeline pipeline, String edited) {
-        edited = edited.toLowerCase();
-        Annotation annotation = new Annotation(edited);
+    public LocalDateTime getSUTimeParse(AnnotationPipeline pipeline, String editedInputString) {
+        Annotation annotation = new Annotation(editedInputString);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
         pipeline.annotate(annotation);
         List<CoreMap> timexAnnsAll = annotation.get(TimeAnnotations.TimexAnnotations.class);
-        LocalDateTime parse;
+        LocalDateTime parseResult;
 
         if (timexAnnsAll.size() > 1) {
-            List<LocalDateTime> dt = new ArrayList<>();
+            List<LocalDateTime> separateDateAndTime = new ArrayList<>();
             for (CoreMap cm : timexAnnsAll) {
-                List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
-
+                List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class); // todo :since we don't use this list, do we need the call?
                 SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
-                LocalDateTime dateTime = temporalToLocalDateTime(temporal);
-                dt.add(dateTime);
+                separateDateAndTime.add(temporalToLocalDateTime(temporal));
             }
-            //assumes user enters date and then time
-            LocalDate date = dt.get(0).toLocalDate();
-            LocalTime time = dt.get(1).toLocalTime();
-            parse = LocalDateTime.of(date, time);
-
+            //assumes user enters date and then time // todo : refine to handle reverse order
+            LocalDate date = separateDateAndTime.get(0).toLocalDate();
+            LocalTime time = separateDateAndTime.get(1).toLocalTime();
+            parseResult = LocalDateTime.of(date, time);
         } else {
-            try {
-                CoreMap cm = timexAnnsAll.get(0);
-
-                List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
-
-                SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
-
-                parse = temporalToLocalDateTime(temporal);
-            } catch (IndexOutOfBoundsException e) {
-                parse = LocalDateTime.now();
-            }
+            CoreMap cm = timexAnnsAll.get(0);
+            List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
+            SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
+            parseResult = temporalToLocalDateTime(temporal);
         }
 
-        return parse;
-    }
-
-    private void initPipelineAndNER(){
-        Properties props = new Properties();
-        this.pipeline = new AnnotationPipeline();
-        pipeline.addAnnotator(new TokenizerAnnotator(false));
-        pipeline.addAnnotator(new WordsToSentencesAnnotator(false));
-        pipeline.addAnnotator(new POSTaggerAnnotator(false));
-        pipeline.addAnnotator(new TimeAnnotator("sutime", props));
-
-        String serializedClassifier = "../grassroot-resources/classifiers/ner-model-datetime.ser.gz";
-
-        this.ner = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
+        return parseResult;
     }
 
     public LocalDateTime temporalToLocalDateTime(SUTime.Temporal temporal) {
@@ -137,7 +134,7 @@ public class DateTimeServiceImpl implements DateTimeService {
         try {
             dateTime = LocalDateTime.parse(iso, formatter);
         } catch (DateTimeParseException e) {
-            dateTime = LocalDateTime.now();
+            throw new SeloParseException();
         }
 
         if ( (dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)

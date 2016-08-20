@@ -1,4 +1,4 @@
-package za.org.grassroot.learning.datetime;
+package za.org.grassroot.learning;
 
 
 import org.slf4j.Logger;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import za.org.grassroot.learning.NattyData;
-import za.org.grassroot.learning.NattyValue;
+import za.org.grassroot.learning.datetime.DateTimeService;
+import za.org.grassroot.learning.datetime.SeloParseException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -34,13 +34,16 @@ public class DatetimeController {
     private static final Logger log = LoggerFactory.getLogger(DatetimeController.class);
 
     @Autowired
-    private DateTimeServiceImpl selo;
-
+    private DateTimeService selo;
 
     @RequestMapping(value="/parse", method = RequestMethod.GET)
     public @ResponseBody String dateTime(@RequestParam(value="phrase", defaultValue = "") String phrase) {
         log.info("String to be parsed: {}", phrase);
-        return selo.parse(phrase).toString();
+        try {
+            return selo.parse(phrase).toString();
+        } catch (SeloParseException e) {
+            return "ERROR_PARSING";
+        }
     }
 
     @RequestMapping(value = "/compare", method = RequestMethod.GET)
@@ -77,7 +80,6 @@ public class DatetimeController {
             log.info("Natty unable to parse");
         }
 
-        //compareNattySeloResults("/home/shakka/Projects/Grassroot/grassroot-learning/src/main/resources/aug14_extracted_dates.txt");
         return "results";
     }
 
@@ -89,7 +91,6 @@ public class DatetimeController {
         ArrayList<String> datetimes = new ArrayList<String>();
         datetimes.add("Original \t | Selo \t | Natty");
         RestTemplate restTemplate = new RestTemplate();
-        DateTimeServiceImpl selo = new DateTimeServiceImpl();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;

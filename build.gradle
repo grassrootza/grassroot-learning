@@ -25,15 +25,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    // tag::jetty[]
+
+    // todo : consider swapping to undertow (since can use light weight)
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-devtools")
     compile("com.fasterxml.jackson.core:jackson-databind")
 
-    //TODO see if jetty is necessary
-    compile("org.springframework.boot:spring-boot-starter-jetty")
-    // end::jetty[]
     // tag::actuator[]
     compile("org.springframework.boot:spring-boot-starter-actuator")
     // end::actuator[]
@@ -41,9 +39,7 @@ dependencies {
 
 	//TODO set up all dependencies via maven, if possible
     //TODO add sl4j
-	// https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
 	compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0'
-	//compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0', classifier: 'models'
 
     // need jar file with custom SUTime rules
     compile files('../grassroot-resources/libs/stanford-corenlp-3.6.0-models.jar')
@@ -53,6 +49,7 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
+
 group 'grassroot'
 version '1.0-SNAPSHOT'
 

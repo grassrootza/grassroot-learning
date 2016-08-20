@@ -10,6 +10,7 @@ import javax.servlet.Filter;
 
 /**
  * Created by luke on 2016/08/20.
+ * todo : wire up properly (also add path restrictions, static pages, and the like)
  */
 @Configuration
 @ControllerAdvice

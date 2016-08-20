@@ -26,6 +26,7 @@ targetCompatibility = 1.8
 
 dependencies {
 
+    // todo : consider swapping to undertow (since can use light weight)
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-devtools")
@@ -38,9 +39,7 @@ dependencies {
 
 	//TODO set up all dependencies via maven, if possible
     //TODO add sl4j
-	// https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
 	compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0'
-	//compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0', classifier: 'models'
 
     // need jar file with custom SUTime rules
     compile files('../grassroot-resources/libs/stanford-corenlp-3.6.0-models.jar')

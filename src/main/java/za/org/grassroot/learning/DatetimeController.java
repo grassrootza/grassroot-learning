@@ -36,7 +36,6 @@ public class DatetimeController {
     @Autowired
     private DateTimeServiceImpl selo;
 
-
     @RequestMapping(value="/parse", method = RequestMethod.GET)
     public @ResponseBody String dateTime(@RequestParam(value="phrase", defaultValue = "") String phrase) {
         log.info("String to be parsed: {}", phrase);

@@ -25,15 +25,12 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    // tag::jetty[]
+
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-devtools")
     compile("com.fasterxml.jackson.core:jackson-databind")
 
-    //TODO see if jetty is necessary
-    compile("org.springframework.boot:spring-boot-starter-jetty")
-    // end::jetty[]
     // tag::actuator[]
     compile("org.springframework.boot:spring-boot-starter-actuator")
     // end::actuator[]
@@ -53,6 +50,7 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
+
 group 'grassroot'
 version '1.0-SNAPSHOT'
 

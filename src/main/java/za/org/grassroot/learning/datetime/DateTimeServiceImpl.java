@@ -123,23 +123,28 @@ public class DateTimeServiceImpl implements DateTimeService {
         Annotation annotation = new Annotation(editedInputString);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
         pipeline.annotate(annotation);
-        List<CoreMap> timexAnnsAll = annotation.get(TimeAnnotations.TimexAnnotations.class);
         LocalDateTime parseResult;
 
-        if (timexAnnsAll.size() > 1) {
+        // generates a list of Timex annotations from editedInputString. these annotations are
+        // the temporal expressions found in editedInputString, along with some other information
+        // not used in this program.
+        // for more information see http://nlp.stanford.edu/software/sutime.shtml
+        List<CoreMap> timexAnnotations = annotation.get(TimeAnnotations.TimexAnnotations.class);
+
+        if (timexAnnotations.size() > 1) {
             List<LocalDateTime> separateDateAndTime = new ArrayList<>();
-            for (CoreMap cm : timexAnnsAll) {
-                SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
+            for (CoreMap coreMap : timexAnnotations) {
+                SUTime.Temporal temporal = coreMap.get(TimeExpression.Annotation.class).getTemporal();
                 separateDateAndTime.add(temporalToLocalDateTime(temporal));
             }
             //assumes user enters full date and then time e.g. 9 July 2016 4pm // todo : refine to handle reverse order
             LocalDate date = separateDateAndTime.get(0).toLocalDate();
             LocalTime time = separateDateAndTime.get(1).toLocalTime();
             parseResult = LocalDateTime.of(date, time);
-        } else if (!timexAnnsAll.isEmpty()){
-            CoreMap cm = timexAnnsAll.get(0);
-            List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
-            SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
+        } else if (!timexAnnotations.isEmpty()){
+            CoreMap coreMap = timexAnnotations.get(0);
+            List<CoreLabel> tokens = coreMap.get(CoreAnnotations.TokensAnnotation.class);
+            SUTime.Temporal temporal = coreMap.get(TimeExpression.Annotation.class).getTemporal();
             parseResult = temporalToLocalDateTime(temporal);
         } else {
             throw new SeloParseException();

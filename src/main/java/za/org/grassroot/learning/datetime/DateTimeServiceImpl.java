@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.time.LocalDateTime;
 
@@ -37,6 +38,7 @@ public class DateTimeServiceImpl implements DateTimeService {
 
     private static final int currentYear = Year.now().getValue() % 1000;
     private static final int nextYear = Year.now().getValue() % 1000 + 1;
+    private static final String NOW = "PRESENT_REF";
 
     @Autowired
     Environment environment;
@@ -73,6 +75,18 @@ public class DateTimeServiceImpl implements DateTimeService {
         }
     }
 
+    /**
+     * Created by shakka on 7/28/16.
+     *
+     * Pre-processes the passed string before it is fed into SUTime. Pre-processing includes toLowerCase(), which helps
+     * selo parse it, and replace methods to make the string fit into established SUTime parse cases. After pre-processing,
+     * selo parses the string, removing any misspelled days of week or months and replacing them with correctly spelled
+     * variants.
+     *
+     * @param ner selo  Used to replace misspelled days of week or months with the correctly spelled version
+     * @param passedString  The string to be parsed by selo
+     * @return  an edited version of passedString with correctly spelled days of week and months
+     */
     public String getNerParse(AbstractSequenceClassifier ner, String passedString) {
         String original = passedString.toLowerCase();
 
@@ -86,6 +100,7 @@ public class DateTimeServiceImpl implements DateTimeService {
         List<Triple<String, Integer, Integer>> entities = ner.classifyToCharacterOffsets(original);
         String edited = original;
 
+        // replace misspelled word in original string with correctly spelled version
         for (int i = entities.size() - 1; i > -1; i--) {
             Triple t = entities.get(i);
             edited = edited.replace(edited.substring((Integer)t.second(),(Integer)t.third()), t.first().toString());
@@ -94,6 +109,16 @@ public class DateTimeServiceImpl implements DateTimeService {
         return edited;
     }
 
+    /**
+     * Created by shakka on 7/28/16.
+     *
+     * Uses a custom-build version of Stanford's SUTime to parse the editedInputString into a SUTime Temporal object
+     * This temporal is fed into another function that converts it into a LocalDateTime.
+     *
+     * @param pipeline  Used to feed the string into SUTime
+     * @param editedInputString  The string to be passed into SUTime, previously parsed by selo
+     * @return  a LocalDateTime based on the editedInputString
+     */
     public LocalDateTime getSUTimeParse(AnnotationPipeline pipeline, String editedInputString) {
         Annotation annotation = new Annotation(editedInputString);
         annotation.set(CoreAnnotations.DocDateAnnotation.class, LocalDateTime.now().toString());
@@ -104,19 +129,20 @@ public class DateTimeServiceImpl implements DateTimeService {
         if (timexAnnsAll.size() > 1) {
             List<LocalDateTime> separateDateAndTime = new ArrayList<>();
             for (CoreMap cm : timexAnnsAll) {
-                List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class); // todo :since we don't use this list, do we need the call?
                 SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
                 separateDateAndTime.add(temporalToLocalDateTime(temporal));
             }
-            //assumes user enters date and then time // todo : refine to handle reverse order
+            //assumes user enters full date and then time e.g. 9 July 2016 4pm // todo : refine to handle reverse order
             LocalDate date = separateDateAndTime.get(0).toLocalDate();
             LocalTime time = separateDateAndTime.get(1).toLocalTime();
             parseResult = LocalDateTime.of(date, time);
-        } else {
+        } else if (!timexAnnsAll.isEmpty()){
             CoreMap cm = timexAnnsAll.get(0);
             List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
             SUTime.Temporal temporal = cm.get(TimeExpression.Annotation.class).getTemporal();
             parseResult = temporalToLocalDateTime(temporal);
+        } else {
+            throw new SeloParseException();
         }
 
         return parseResult;
@@ -124,22 +150,28 @@ public class DateTimeServiceImpl implements DateTimeService {
 
     public LocalDateTime temporalToLocalDateTime(SUTime.Temporal temporal) {
         String iso = temporal.toISOString();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-        if (!temporal.getTime().hasTime()) {
-            iso = temporal.toISOString() + "T" + LocalTime.now().toString().substring(0, 5);
-        }
         LocalDateTime dateTime;
 
-        try {
-            dateTime = LocalDateTime.parse(iso, formatter);
-        } catch (DateTimeParseException e) {
-            throw new SeloParseException();
-        }
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-        if ( (dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)
-                && (dateTime.compareTo(LocalDateTime.now().minusWeeks(1)) > 0))
-            dateTime = dateTime.plusWeeks(1);
+        if (temporal.toString().equals(NOW)) {
+            dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        } else if (!temporal.getTime().hasTime()) {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE;
+            dateTime = LocalDateTime.of(LocalDate.parse(iso, dateFormatter), LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
+            //iso = temporal.toISOString() + "T" + LocalTime.now().toString().substring(0, 5);
+        } else {
+
+            try {
+                dateTime = LocalDateTime.parse(iso, formatter);
+            } catch (DateTimeParseException e) {
+                throw new SeloParseException();
+            }
+
+            if ((dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)
+                    && (dateTime.compareTo(LocalDateTime.now().minusWeeks(1)) > 0))
+                dateTime = dateTime.plusWeeks(1);
+        }
 
         return dateTime;
     }

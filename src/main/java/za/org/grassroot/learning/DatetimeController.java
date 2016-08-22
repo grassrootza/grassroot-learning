@@ -42,6 +42,7 @@ public class DatetimeController {
         try {
             return selo.parse(phrase).toString();
         } catch (SeloParseException e) {
+            log.info("Error with {}", phrase);
             return "ERROR_PARSING";
         }
     }

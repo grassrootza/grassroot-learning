@@ -16,4 +16,6 @@ hooks:
       runas: root
    ApplicationStart:
     - location: scripts/startlearning.sh
+    - location: scripts/selo_test.py
+
       runas: root

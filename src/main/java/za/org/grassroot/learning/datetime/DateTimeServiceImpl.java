@@ -97,6 +97,12 @@ public class DateTimeServiceImpl implements DateTimeService {
         // Case: Date and time are one token e.g. tomorrow@5
         original = original.replaceAll("@", " @ ");
 
+        // Case: multiple numbers followed by month, e.g. 29July
+        // TODO: Fix to include August, April, and May
+        original = original.replaceAll("(\\d+)([a-z&&[^dh:/st|am|pm/]])", "$1 $2");
+
+        log.info("orig: {}", original);
+
         List<Triple<String, Integer, Integer>> entities = ner.classifyToCharacterOffsets(original);
         String edited = original;
 
@@ -105,6 +111,8 @@ public class DateTimeServiceImpl implements DateTimeService {
             Triple t = entities.get(i);
             edited = edited.replace(edited.substring((Integer)t.second(),(Integer)t.third()), t.first().toString());
         }
+
+        log.info("ner parse: {}", edited);
 
         return edited;
     }

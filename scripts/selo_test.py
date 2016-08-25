@@ -13,12 +13,9 @@ else:
 
 this_month_filename = 'hist/selo_errors_' + str(int(time.strftime('%m'))) + '.txt'
 
-slack = Slacker(os.environ['SLACK_AUTH_TOKEN'])
 
-
-def get_log_from_db():
-    conn_string = os.environ['CONN_STR']
-    conn = psycopg2.connect(conn_string)
+def get_log_from_db(DB, USER, PWD, HOST, PORT):
+    conn = psycopg2.connect(database=DB, user=USER, password=PWD, host=HOST, port=PORT)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM selo_read_only.date_time_logs')
     records = cursor.fetchall()
@@ -62,9 +59,13 @@ def get_differences_from_last_month(this_month, last_month):
 
 
 def main():
-    get_log_from_db()
+    resources = [line.rstrip() for line in open('../grassroot-resources/test_config.txt')]
+    slack = Slacker(resources[0])
+
+    get_log_from_db(resources[1], resources[2], resources[3], resources[4], resources[5])
     get_results_file(parse_file(csv_filename))
     get_differences_from_last_month(this_month_filename, last_month_filename)
+
     slack.files.upload(this_month_filename, channels='#learning')
 
 

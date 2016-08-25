@@ -13,7 +13,7 @@ def get_log_from_db():
     conn_string = os.environ['CONN_STR']
     conn = psycopg2.connect(conn_string)
     cursor = conn.cursor()
-    cursor.execute(os.environ['QUERY_STR'])
+    cursor.execute('SELECT * FROM selo_read_only.date_time_logs')
     records = cursor.fetchall()
 
     with open(csv_filename, 'w') as f:

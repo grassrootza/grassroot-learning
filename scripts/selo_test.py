@@ -7,11 +7,11 @@ csv_filename = "../grassroot-resources/logs/ussd_date_entry_" + time.strftime('%
 
 # handle jan/dec case
 if int(time.strftime('%m')) - 1 != 0:
-    last_month_filename= 'hist/selo_errors_' + str(int(time.strftime('%m')) - 1) + '.txt'
+    last_month_filename= '../grassroot-resources/testing/hist/selo_errors_' + str(int(time.strftime('%m')) - 1) + '.txt'
 else: 
-    last_month_filename= 'hist/selo_errors_' + str(12) + '.txt'    
+    last_month_filename= '../grassroot-resources/testing/hist/selo_errors_' + str(12) + '.txt'    
 
-this_month_filename = 'hist/selo_errors_' + str(int(time.strftime('%m'))) + '.txt'
+this_month_filename = '../grassroot-resources/testing/hist/selo_errors_' + str(int(time.strftime('%m'))) + '.txt'
 
 
 def get_log_from_db(DB, USER, PWD, HOST, PORT):
@@ -27,7 +27,7 @@ def get_log_from_db(DB, USER, PWD, HOST, PORT):
 
 
 def parse_file(filename):
-    with open(filename) as infile, open('tmp/parsed_logs.txt', 'w') as outfile:
+    with open(filename) as infile, open('../grassroot-resources/testing/tmp/parsed_logs.txt', 'w') as outfile:
         for line in infile:
             d = re.search('input: [[a-zA-Z0-9.-@ ]*]*', line)
             if d:
@@ -35,7 +35,7 @@ def parse_file(filename):
                 date = d[7:]
                 outfile.write(date)
                 outfile.write('\n')
-    return 'tmp/parsed_logs.txt'
+    return '../grassroot-resources/testing/tmp/parsed_logs.txt'
 
 
 def get_results_file(log_file):
@@ -60,7 +60,7 @@ def get_differences_from_last_month(this_month, last_month):
 
 def main():
     resources = []
-    with open('../grassroot-resources/test_config.properties') as f:
+    with open('../grassroot-resources/testing/test_config.properties') as f:
         for line in f:
             resources.append(re.search('=[a-zA-Z0-9.-@ -]*', line.strip()).group(0)[1:])
     

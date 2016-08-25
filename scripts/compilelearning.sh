@@ -1,4 +1,4 @@
 #!/bin/bash
 . /etc/environment
-cd /opt/codedeploy-agent/deployment-root/${DEPLOYMENT_GROUP_ID}/${DEPLOYMENT_ID}/deployment-archive
+cd /var/grassroot-learning
 gradle clean build

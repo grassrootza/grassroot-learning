@@ -3,7 +3,7 @@
 import requests, time, psycopg2, csv, re, os
 from slacker import Slacker
 
-csv_filename = "ussd_date_entry_" + time.strftime('%b%d') + '.csv'
+csv_filename = "../grassroot-resources/logs/ussd_date_entry_" + time.strftime('%b%d') + '.csv'
 
 # handle jan/dec case
 if int(time.strftime('%m')) - 1 != 0:
@@ -59,7 +59,11 @@ def get_differences_from_last_month(this_month, last_month):
 
 
 def main():
-    resources = [line.rstrip() for line in open('../grassroot-resources/test_config.txt')]
+    resources = []
+    with open('../grassroot-resources/test_config.txt') as f:
+        for line in f:
+            resources.append(re.search('=[a-zA-Z0-9.-@ -]*', line.strip()).group(0)[1:])
+    
     slack = Slacker(resources[0])
 
     get_log_from_db(resources[1], resources[2], resources[3], resources[4], resources[5])

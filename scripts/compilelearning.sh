@@ -1,4 +1,4 @@
 #!/bin/bash
 . /etc/environment
-cd /var/grassroot
+cd /var/grassroot-learning
 gradle clean build

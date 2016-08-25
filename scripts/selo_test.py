@@ -60,7 +60,7 @@ def get_differences_from_last_month(this_month, last_month):
 
 def main():
     resources = []
-    with open('../grassroot-resources/test_config.txt') as f:
+    with open('../grassroot-resources/test_config.properties') as f:
         for line in f:
             resources.append(re.search('=[a-zA-Z0-9.-@ -]*', line.strip()).group(0)[1:])
     

@@ -3,7 +3,7 @@
 import requests, time, psycopg2, csv, re, os
 from slacker import Slacker
 
-csv_filename = "../grassroot-resources/logs/ussd_date_entry_" + time.strftime('%b%d') + '.csv'
+csv_filename = "../grassroot-resources/testing/ussd_date_entry_" + time.strftime('%b%d') + '.csv'
 
 # handle jan/dec case
 if int(time.strftime('%m')) - 1 != 0:

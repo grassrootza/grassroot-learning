@@ -11,8 +11,11 @@ permissions:
      mode: 755
 hooks:
    BeforeInstall:
-    - location: scripts/compilelearning.sh
     - location: scripts/stoplearning.sh
+    - location: scripts/archivelearning.sh
+      runas: root
+   AfterInstall:
+    - location: scripts/compilelearning.sh
       runas: root
    ApplicationStart:
     - location: scripts/startlearning.sh

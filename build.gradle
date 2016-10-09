@@ -26,10 +26,14 @@ targetCompatibility = 1.8
 
 dependencies {
 
+    // todo : clean up / standardize syntax
+
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-devtools")
     compile("com.fasterxml.jackson.core:jackson-databind")
+
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
     // tag::actuator[]
     compile("org.springframework.boot:spring-boot-starter-actuator")

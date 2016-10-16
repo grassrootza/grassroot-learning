@@ -15,15 +15,44 @@ public class DistanceMeasurer {
 
     private static final Logger logger = LoggerFactory.getLogger(DistanceMeasurer.class);
 
-    public void readInVector() {
-        try {
-            SimpleMatrix simpleMatrix = SimpleMatrix.loadCSV("csvFile.txt"); // todo : read this location from properties file
-            RealVector apacheCommonsRealVector = new ArrayRealVector();
-        } catch (IOException e) {
-            logger.info("Error loading matrix from file!");
-            e.printStackTrace();
-        }
+    public void main() { // Example test
+		HashMap<String, Integer> vocab = new HashMap<String, Integer>();
+	    HashMap<Integer, String> ivocab = new HashMap<Integer, String>();
+	    long startTime=System.currentTimeMillis();
+		RealMatrix W = generate(vocab, ivocab);
+	    long endTime=System.currentTimeMillis();
+	    System.out.println("Build time: " + (endTime - startTime) / 1000);
+	    Set<String> a = new HashSet<String>();
+	    distance(W, vocab, ivocab, "hello");
     }
+    
+	private static void distance(RealMatrix W, HashMap<String, Integer> vocab, HashMap<Integer, String> ivocab, 
+			String input_term) {
+		
+		RealVector vec_result = null;
+		if(vocab.containsKey(input_term)) {
+			System.out.println("Word: " + input_term + ", Position in vocabulary: " + vocab.get(input_term));
+			vec_result = W.getRowVector(vocab.get(input_term));
+		} else {
+			System.out.println("Word outside of dictionary!");
+		}
+		RealVector vec_norm = vec_result.copy();
+		double d = vec_result.getNorm();
+		vec_result = vec_result.mapDivideToSelf(d);
+		ArrayList<Double> dist = new ArrayList<Double>();
+		ArrayList<Double> negativeDist = new ArrayList<Double>();
+		for(int i = 0; i < W.getRowDimension(); i++) {
+			dist.add(i, W.getRowVector(i).dotProduct(vec_result) * -1);
+			negativeDist.add(-1 * dist.get(i));
+		}
+		int[] a = IntStream.range(0, dist.size())
+                .boxed().sorted((i, j) -> dist.get(i).compareTo(dist.get(j)) )
+                .mapToInt(ele -> ele).toArray(); // http://stackoverflow.com/questions/4859261/get-the-indices-of-an-array-after-sorting
+		for(int i = 0; i < N; i++) {
+			int x = a[i];
+			System.out.println(ivocab.get(x) + " " + negativeDist.get(x));
+		}
+	}
 
 	private static RealMatrix generate(HashMap<String, Integer> vocab, HashMap<Integer, String> ivocab) {
 		RealMatrix W = null;

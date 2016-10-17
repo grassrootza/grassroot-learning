@@ -56,7 +56,6 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 		}
 
 		// todo : purpose of vec_norm ?
-		RealVector vec_norm = vec_result.copy();
 		double d = vec_result.getNorm();
 		vec_result = vec_result.mapDivideToSelf(d);
 

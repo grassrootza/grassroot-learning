@@ -30,8 +30,12 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 
 	private RealMatrix W;
 
+	private final Environment environment;
+
 	@Autowired
-	private Environment environment;
+	public DistanceMeasurerImpl(Environment environment) {
+		this.environment = environment;
+	}
 
 	@PostConstruct
 	private void init() {
@@ -70,7 +74,12 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 		}
 		return matches;
 	}
-	
+
+	@Override
+	public Map<String, Double> findTermsWithinDistance(String searchTerm, double minDistance) {
+		return calculateDistances(searchTerm, minDistance);
+	}
+
 	public Map<String, Double> calculateDistances(String searchTerm, double minDist) {
 		List<Double> negativeDist = new ArrayList<>();
 

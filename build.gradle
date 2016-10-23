@@ -40,7 +40,6 @@ dependencies {
     // end::actuator[]
     testCompile("junit:junit")
 
-    //TODO add sl4j
 	compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0'
 
     // need jar file with custom SUTime rules

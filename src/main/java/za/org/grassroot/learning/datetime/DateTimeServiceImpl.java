@@ -47,11 +47,16 @@ public class DateTimeServiceImpl implements DateTimeService {
     private static final int nextYear = Year.now().getValue() % 1000 + 1;
     private static final String NOW = "PRESENT_REF";
 
-    @Autowired
+    private final
     Environment environment;
 
     private AnnotationPipeline pipeline;
     private AbstractSequenceClassifier ner;
+
+    @Autowired
+    public DateTimeServiceImpl(Environment environment) {
+        this.environment = environment;
+    }
 
     @PostConstruct
     public void initPipelineAndNER() {

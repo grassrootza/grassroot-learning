@@ -11,4 +11,5 @@ public interface DistanceMeasurer {
 
 	Map<String, Double> calculateDistances(String searchTerm, int N);
 
+    Map<String, Double> findTermsWithinDistance(String searchTerm, double minDistance);
 }

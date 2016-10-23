@@ -27,8 +27,12 @@ public class DatetimeController {
 
     private static final Logger log = LoggerFactory.getLogger(DatetimeController.class);
 
+    private final DateTimeService selo;
+
     @Autowired
-    private DateTimeService selo;
+    public DatetimeController(DateTimeService selo) {
+        this.selo = selo;
+    }
 
     @RequestMapping(value="/parse", method = RequestMethod.GET)
     public @ResponseBody String dateTime(@RequestParam(value="phrase", defaultValue = "") String phrase) {

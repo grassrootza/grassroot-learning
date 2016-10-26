@@ -15,7 +15,6 @@ import java.util.Map;
  * Created by luke on 2016/10/03.
  */
 @Controller
-@RequestMapping("/word_dist/")
 public class WordDistController {
 
     private static final Logger logger = LoggerFactory.getLogger(WordDistController.class);
@@ -29,7 +28,7 @@ public class WordDistController {
         this.distanceMeasurer = distanceMeasurer;
     }
 
-    @RequestMapping(value = "/similar_terms", method = RequestMethod.GET)
+    @RequestMapping(value = "/related", method = RequestMethod.GET)
     public @ResponseBody
     Map<String, Double> similarTerms(@RequestParam String term, @RequestParam(value = "minDist", required = false) Double cosineDistanceLimit) {
         logger.info("Looking up distances for term: " + term);

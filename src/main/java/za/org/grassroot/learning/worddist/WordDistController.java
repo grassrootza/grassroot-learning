@@ -28,6 +28,16 @@ public class WordDistController {
         this.distanceMeasurer = distanceMeasurer;
     }
 
+    @RequestMapping(value = "/loadwords")
+    public @ResponseBody String loadWordVectors() {
+        try {
+            distanceMeasurer.loadDistanceVectors();
+            return "loaded";
+        } catch (Exception e) {
+            return e.toString();
+        }
+    }
+
     @RequestMapping(value = "/related", method = RequestMethod.GET)
     public @ResponseBody
     Map<String, Double> similarTerms(@RequestParam String term, @RequestParam(value = "minDist", required = false) Double cosineDistanceLimit) {

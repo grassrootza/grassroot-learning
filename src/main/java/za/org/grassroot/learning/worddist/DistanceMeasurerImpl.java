@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -37,8 +36,8 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 		this.environment = environment;
 	}
 
-	@PostConstruct
-	private void init() {
+	@Override
+	public void loadDistanceVectors() {
 		logger.info("Building vectors for word distance service ...");
 		vocab = new HashMap<>();
 		iVocab = new HashMap<>();

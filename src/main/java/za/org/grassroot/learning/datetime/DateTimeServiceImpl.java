@@ -1,23 +1,16 @@
 package za.org.grassroot.learning.datetime;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Year;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.time.LocalDateTime;
-
+import edu.stanford.nlp.ie.AbstractSequenceClassifier;
+import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.time.*;
+import edu.stanford.nlp.time.SUTime;
+import edu.stanford.nlp.time.TimeAnnotations;
+import edu.stanford.nlp.time.TimeAnnotator;
+import edu.stanford.nlp.time.TimeExpression;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.ie.crf.*;
-import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.util.Triple;
-import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +18,19 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -62,6 +68,7 @@ public class DateTimeServiceImpl implements DateTimeService {
         Objects.requireNonNull(phrase);
 
         try {
+            log.info("parsing this string ... " + phrase);
             long start = System.currentTimeMillis();
             final String edited = getNerParse(ner, phrase);
             log.info("Time to get NER parse: {} msecs", System.currentTimeMillis() - start);
@@ -90,6 +97,8 @@ public class DateTimeServiceImpl implements DateTimeService {
     public String getNerParse(AbstractSequenceClassifier ner, String passedString) {
         String original = passedString.toLowerCase();
 
+        log.info("orig: {}", original);
+
         // Case: date with time not explicitly stated, e.g. 01/07/16 11:30
         original = original.replace("/" + currentYear + " ", "/20" + currentYear + " ");
         original = original.replace("/" + nextYear + " ", "/20" + nextYear + " ");
@@ -98,13 +107,19 @@ public class DateTimeServiceImpl implements DateTimeService {
         original = original.replaceAll("@", " @ ");
 
         // Case: multiple numbers followed by month, e.g. 29July
-        // TODO: Fix to include August, April, and May
-        original = original.replaceAll("(\\d+)([a-z&&[^dh:/st|am|pm/]])", "$1 $2");
+        // note : composite character exclusion of H is not working, hence the below (excluding h pattern and a)
+        final Matcher matcher = Pattern.compile("(\\d[b-g]|\\d[i-o]|\\d[q-z]|\\d[A-G]|\\d[I-Z]|[a-g]\\d|[i-z]\\d|[A-G]\\d|[I-Z]\\d)").matcher(original);
 
-        log.info("orig: {}", original);
+        int replacementIndex = 1;
+        while (matcher.find()) {
+            original = (new StringBuffer(original)).insert(matcher.start() + replacementIndex, " ").toString();
+            replacementIndex++;
+        }
 
         List<Triple<String, Integer, Integer>> entities = ner.classifyToCharacterOffsets(original);
         String edited = original;
+
+        log.info("transformed and edited string ... " + edited);
 
         // replace misspelled word in original string with correctly spelled version
         for (int i = entities.size() - 1; i > -1; i--) {

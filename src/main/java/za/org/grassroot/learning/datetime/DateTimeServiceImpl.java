@@ -173,6 +173,12 @@ public class DateTimeServiceImpl implements DateTimeService {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE;
             dateTime = LocalDateTime.of(LocalDate.parse(iso, dateFormatter), LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
             //iso = temporal.toISOString() + "T" + LocalTime.now().toString().substring(0, 5);
+
+            // case where referencing earlier day in the week
+            if ((dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)
+                    && (dateTime.compareTo(LocalDateTime.now().minusWeeks(1)) > 0))
+                dateTime = dateTime.plusWeeks(1);
+
         } else {
 
             try {
@@ -181,9 +187,14 @@ public class DateTimeServiceImpl implements DateTimeService {
                 throw new SeloParseException();
             }
 
+            // case where referencing earlier day in the week
             if ((dateTime.toLocalDate().compareTo(LocalDateTime.now().toLocalDate()) < 0)
                     && (dateTime.compareTo(LocalDateTime.now().minusWeeks(1)) > 0))
                 dateTime = dateTime.plusWeeks(1);
+
+            // case where referencing earlier time in day -> move date to tomorrow
+            else if (dateTime.toLocalTime().isBefore(LocalDateTime.now().toLocalTime()))
+                dateTime = dateTime.plusDays(1);
         }
 
         return dateTime;

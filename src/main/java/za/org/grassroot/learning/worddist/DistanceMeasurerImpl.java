@@ -7,6 +7,8 @@ import org.apache.commons.math3.linear.RealVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +38,8 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 		this.environment = environment;
 	}
 
-	@Override
-	public void loadDistanceVectors() {
+	@EventListener
+	public void handleApplicationStarted(ApplicationReadyEvent event) {
 		logger.info("Building vectors for word distance service ...");
 		vocab = new HashMap<>();
 		iVocab = new HashMap<>();
@@ -76,29 +78,32 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 
 	@Override
 	public Map<String, Double> findTermsWithinDistance(String searchTerm, double minDistance) {
-		return calculateDistances(searchTerm, minDistance);
-	}
+		if (!vocab.containsKey(searchTerm)) {
+			logger.info("Word not contained in vocab");
+			return new HashMap<>();
+		} else {
+			Objects.requireNonNull(searchTerm);
 
-	public Map<String, Double> calculateDistances(String searchTerm, double minDist) {
-		List<Double> negativeDist = new ArrayList<>();
+			List<Double> negativeDist = new ArrayList<>();
+			int[] sortedIndices = getSortedDistances(searchTerm, negativeDist);
+			logger.info("Found {} words within distance", sortedIndices.length);
 
-		int[] sortedIndices = getSortedDistances(searchTerm, negativeDist);
-
-		Map<String, Double> matches = new LinkedHashMap<String, Double>();
-		for(int i = 0; i < sortedIndices.length; i++) {
-			int wordID = sortedIndices[i]; 
-			String word = iVocab.get(wordID);
-			Double wordDistance = negativeDist.get(wordID);
-			if (wordDistance < minDist) {
-				break;
+			Map<String, Double> matches = new LinkedHashMap<>();
+			for (int wordID : sortedIndices) {
+				String word = iVocab.get(wordID);
+				Double wordDistance = negativeDist.get(wordID);
+				if (wordDistance < minDistance) {
+					logger.info("Dropped below minDistance of {}, after adding {} words", minDistance, matches.size());
+					break;
+				}
+				if (!universe.contains(word) || searchTerm.equalsIgnoreCase(word)) {
+					continue;
+				}
+				logger.debug(word + " " + wordDistance);
+				matches.put(word, wordDistance);
 			}
-			if (!universe.contains(word)) {
-				continue;
-			}
-			logger.info(word + " " + wordDistance);
-			matches.put(word, wordDistance);
+			return matches;
 		}
-		return matches;
 	}
 	
 	private int[] getSortedDistances(String searchTerm, List<Double> negativeDist) {
@@ -107,8 +112,7 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 			logger.info("Word: " + searchTerm + ", Position in vocabulary: " + vocab.get(searchTerm));
 			vec_result = W.getRowVector(vocab.get(searchTerm));
 		} else {
-			// todo : use a custom exception here ("SearchTermNotInVocabException")
-			throw new IllegalArgumentException("Word outside of dictionary!");
+			throw new IllegalArgumentException("Word outside of dictionary, should have been intercepted prior to this method");
 		}
 
 		double d = vec_result.getNorm();
@@ -121,12 +125,11 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 			negativeDist.add(-1 * dist.get(i));
 		}
 
-		int[] sortedIndices = IntStream.range(0, dist.size())
+		return IntStream.range(0, dist.size())
                 .boxed()
 				.sorted((i, j) -> dist.get(i).compareTo(dist.get(j)) )
                 .mapToInt(ele -> ele)
 				.toArray(); // http://stackoverflow.com/questions/4859261/get-the-indices-of-an-array-after-sorting
-		return sortedIndices;
 	}
 
 	private RealMatrix generate(String vocabFilePath, String vectorFilePath, String universeFilePath) {
@@ -201,5 +204,6 @@ public class DistanceMeasurerImpl implements DistanceMeasurer {
 	public void calculateDistances(String searchTerm) {
 		calculateDistances(searchTerm, 5);
 	}
+
 
 }

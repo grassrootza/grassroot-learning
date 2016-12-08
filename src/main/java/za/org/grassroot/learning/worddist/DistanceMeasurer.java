@@ -9,8 +9,6 @@ public interface DistanceMeasurer {
 
     void calculateDistances(String searchTerm);
 
-    void loadDistanceVectors();
-
 	Map<String, Double> calculateDistances(String searchTerm, int N);
 
     Map<String, Double> findTermsWithinDistance(String searchTerm, double minDistance);

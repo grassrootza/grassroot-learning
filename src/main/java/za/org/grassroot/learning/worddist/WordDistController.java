@@ -19,23 +19,13 @@ public class WordDistController {
 
     private static final Logger logger = LoggerFactory.getLogger(WordDistController.class);
 
-    private static final double DEFAULT_MIN_DISTANCE = 0.5;
+    private static final double DEFAULT_MIN_DISTANCE = 0.1;
 
     private final DistanceMeasurer distanceMeasurer;
 
     @Autowired
     public WordDistController(DistanceMeasurer distanceMeasurer) {
         this.distanceMeasurer = distanceMeasurer;
-    }
-
-    @RequestMapping(value = "/loadwords")
-    public @ResponseBody String loadWordVectors() {
-        try {
-            distanceMeasurer.loadDistanceVectors();
-            return "loaded";
-        } catch (Exception e) {
-            return e.toString();
-        }
     }
 
     @RequestMapping(value = "/related", method = RequestMethod.GET)

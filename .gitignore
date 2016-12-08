@@ -45,7 +45,9 @@
 
 *.txt
 
-#classifier
+# classifier
 *.ser.gz
 
 nohup.out
+.pid
+grassroot-learning.log

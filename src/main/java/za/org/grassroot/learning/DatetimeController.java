@@ -4,6 +4,7 @@ package za.org.grassroot.learning;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +22,17 @@ import java.time.LocalDateTime;
  * Created by shakka on 7/29/16.
  */
 @Controller
+@ConditionalOnProperty(name = "grassroot.classifier.enabled", havingValue = "true",  matchIfMissing = false)
 public class DatetimeController {
 
     private static final Logger log = LoggerFactory.getLogger(DatetimeController.class);
 
+    private final DateTimeService selo;
+
     @Autowired
-    private DateTimeService selo;
+    public DatetimeController(DateTimeService selo) {
+        this.selo = selo;
+    }
 
     @RequestMapping(value="/parse", method = RequestMethod.GET)
     public @ResponseBody String dateTime(@RequestParam(value="phrase", defaultValue = "") String phrase) {

@@ -18,13 +18,16 @@ def giveme(text):
                 '_id':uuid.uuid4(),
                 'model_found':None
                }
-    archives.insert_one(instance) # sticks the recieved text+other info into our db
+    entries.insert_one(instance) # sticks the recieved text+other info into our db
     # now send the text to our models and rasa    
       
-@app.route('/')
-def hello_world():
-    return 'Here we will put some things!'
-
+@app.route('/parse')
+def parse():
+    text = request.args.get('text','')
+    giveme(text)
+    
+with app.test_request_context():
+    print(url_for('parse', text='make your queries here'))
 
 if __name__ == '__main__':
     app.run()

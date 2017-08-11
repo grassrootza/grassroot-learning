@@ -1,7 +1,8 @@
 from flask import Flask
 from pymongo import MongoClient  # pymongo allows us to interact with our db
-import uuid
-import datetime
+from rasa_nlu.model import Metadata, Interpreter
+from rasa_nlu.config import RasaNLUConfig
+import uuid, datetime
 
 app = Flask(__name__)
 client  = MongoClient() # assumes you have a mongod instance
@@ -19,7 +20,9 @@ def giveme(text):
                 'model_found':None
                }
     entries.insert_one(instance) # sticks the recieved text+other info into our db
-    # now send the text to our models and rasa    
+    metadata = Metadata.load('/path/to/model_directory')
+    interpreter = Interpreter.load(metadata, RasaNLUConfig('/path/to/config_mitie.json'))
+    result = interpreter.parse(text) # returns a dict/json-like object parsed by rasa. 
       
 @app.route('/parse')
 def parse():

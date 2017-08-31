@@ -1,0 +1,11 @@
+li a {
+    color: green;
+}
+
+body {
+    background: white url("images/bg3.jpg") center;
+}
+
+h1 { font-family : Xpress SF,Impact,ColdSpaghetti BTN,Apple Boy BTN, Franklin Gothic;
+    padding-top: 1em 1em;
+}

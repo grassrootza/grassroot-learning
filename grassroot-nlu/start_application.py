@@ -12,7 +12,7 @@ collection = db.collection
 entries = db.entries
 
 #Rasa Settup
-metadata = Metadata.load('/home/frtnx/models/model_20170831-114540') #store these in a config file. no need to expose ourfiile system
+metadata = Metadata.load('/home/frtnx/models/model_20170831-114540')
 interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/anaconda3/lib/python3.6/site-packages/rasa_nlu/config_mitie.json'))
 
 #process management
@@ -31,6 +31,8 @@ def process_identifier(text):
             return 'update'
         else:
             return True
+    
+process_identified = []
 
 @app.route('/')
 def my_form():
@@ -64,6 +66,7 @@ def transformer(text, uid):
                 Uid.append(i)
         uidd = ''.join(Uid)
         x = entries.find_one({'text': uidd})
+        #return x
         old_text = x['text']
         new_text = old_text+ " " + text
         request_data = {'text': new_text}
@@ -71,6 +74,7 @@ def transformer(text, uid):
         return NQoutput("response.html", var1=new_parsed, var2=new_text)
     except:
         return str(uidd)
+        #return "No previous entry found"
 
 
 def NQoutput(template,var1=None, var2=None):
@@ -124,6 +128,10 @@ def check_database(text):
   
 with app.test_request_context():
     print(url_for('parse', text='make your queries here'))
+
+def render_sidebar_template(tmpl_name, **kwargs):
+    (var1,var2,var3) = generate_sidebar_data()
+    return render_template(tmpl_name, var1=var1, var2=var2, var3=var3, **kwargs)
 
 
 if __name__ == '__main__':

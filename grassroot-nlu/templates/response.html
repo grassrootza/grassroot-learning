@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--link rel=stylesheet type=text/css href="{{url_for('static', filename='style.css') }}"-->
+<body>
+    {% if var1 %}
+    <h5>{{ var1 }}</h5>
+    {% endif %}
+    <form action="." method="POST">
+        <input type="text" name="text">
+        <input type="submit" name="my-form" value="Send">
+        <input type="hidden" name="uid" value="{{ var2 }}"/>
+    </form>
+    <h5>{{ var2 }}</h5>
+    <h4>Is this what you wanted?</h4>
+    <h4>(If not enter 'no' or if partially wrong enter the correct value and I'll see what I can do)</h4>
+</body>
+</html>

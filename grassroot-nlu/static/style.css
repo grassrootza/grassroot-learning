@@ -2,10 +2,10 @@ li a {
     color: green;
 }
 
-body {
+/*body {
     background: white url("images/bg3.jpg") center;
-}
+}*/
 
-h1 { font-family : Xpress SF,Impact,ColdSpaghetti BTN,Apple Boy BTN, Franklin Gothic;
+h1,h2,h3,h4,h5 { font-family : Xpress SF,Impact,ColdSpaghetti BTN,Apple Boy BTN, Franklin Gothic;
     padding-top: 1em 1em;
 }

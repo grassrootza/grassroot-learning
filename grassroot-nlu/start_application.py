@@ -1,42 +1,24 @@
 from flask import Flask,request, url_for, render_template
 import pymongo
-from pymongo import MongoClient
-from rasa_nlu.config import RasaNLUConfig
-from rasa_nlu.model import Interpreter, Metadata
+from config import interpreter, entries
 import uuid, time, datetime, pprint
 from duckling import Duckling
 huidini = Duckling()
 huidini.load()
 
-
-# Mongo Settup
-client = MongoClient()
-db = client.database
-collection = db.collection
-entries = db.entries
-
-#Rasa Settup
-metadata = Metadata.load('/home/frtnx/models/model_20170902-181024')
-interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/anaconda3/lib/python3.6/site-packages/rasa_nlu/config_mitie.json'))
-
-#process management
-#timer = []
-
 app = Flask(__name__)
 
 def process_identifier(text):
     x = interpreter.parse(text)
-    value1 = x['intent']['name']
-    value2 = x['entities']
-    if value1 == 'affirm':
+    value = x['intent']['name']
+    if value == 'affirm':
         return 'affirm'
     else:
-        if value1 == 'None':
+        if value == 'None':
             return 'update'
         else:
             return True
     
-process_identified = []
 
 @app.route('/')
 def my_form():
@@ -46,14 +28,12 @@ def my_form():
 def parse():
     text_data = request.form['text']
     uid = request.form['uid']
-    #return str(text_data)
     prcss = process_identifier(text_data)
     x = None
     if prcss == True:   
         request_data = {'text': text_data}
-        x = identifier(**request_data) #which returns parsed data + uid + date
-        datap = x['uid']
-        data = datap
+        x = identifier(**request_data)
+        data = x['uid']
         return NQoutput("response.html",var1=str(x), var2=data)
     elif prcss == 'affirm':
         x = "Your request is being processed..."
@@ -65,24 +45,22 @@ def parse():
 def transformer(text, uid):
     try:
         x = entries.find_one({'uid': uid})
-        #return x
         old_text = x['text']
         new_text = old_text+ " " + text
         request_data = {'text': new_text}
         new_parsed = identifier(**request_data)
+        new_parsed['past_lives'].append(old_text)
+        update_database(new_parsed) 
         data = new_parsed['uid']
         return NQoutput("response.html", var1=new_parsed, var2=data)
     except:
-        return str(uidd)
-        #return "No previous entry found"
+        return "I'm not buying it"
 
 
 def NQoutput(template,var1=None, var2=None):
     return render_template(template, var1=var1, var2=var2) 
 
-def identifier(**request_data):                  # request debuts here
-    #start = time.time()
-    #timer.append(start)
+def identifier(**request_data):                  
     recall = check_database(request_data['text'])
     if recall != False:
         return recall                            # suitable entry exists. Return said entry. Process complete.
@@ -90,26 +68,23 @@ def identifier(**request_data):                  # request debuts here
         new_entry = {
                      'text': request_data['text'],
                      '_id' : str(uuid.uuid4()),
-                     'date': str(datetime.datetime.utcnow())
+                     'date': str(datetime.datetime.now()),
+                     'past_lives': []
 	                }
         entries.insert_one(new_entry)
         uid = new_entry['_id']
-        x = parser(new_entry['text'],uid,new_entry['date']) # down the
+        x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives']) # down the
         return x
 
-def parser(text, uid, date_time):
+def parser(text, uid, date_time,past_life):
     parse = interpreter.parse(text)
     parsed = time_formalizer(parse)
-    #end = time.time()
-    #timer.append(end)
-    #process_time = timer[1] - timer[0]
-    #timer.clear()
-    parsed_data = {'parsed': parsed, 'uid': uid, 'date': date_time} # insert process time here
+    parsed_data = {'parsed': parsed, 'uid': uid, 'date': date_time, 'past_lives': past_life} # insert process time here
     with open("event_listener.txt", "a") as myfile:        
         myfile.write(str(parsed_data)+"\n\n")              
     res = update_database(parsed_data)               
-    #parsed_data.pop('process_time')
-    return parsed_data                                 # rabbit hole we go. I find the return process beautiful.
+    return parsed_data
+    #return res                                 # rabbit hole we go. I find the return process beautiful.
     
 def update_database(new_data):
     entries.update_one({'_id': new_data['uid']}, {"$set": new_data}, upsert=False)

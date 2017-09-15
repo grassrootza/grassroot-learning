@@ -8,7 +8,7 @@ import schedule
 import time
 import json
 from examples import *
-
+import os
 
 client = MongoClient()
 db = client.database
@@ -17,11 +17,25 @@ entries = db.entries
 stub = db.stub
 common_examples = db.common_examples
 
-metadata = Metadata.load('/home/frtnx/models/model_20170904-171724')
+
+def find_latest_model(model_dir):
+    instances = os.listdir(model_dir)
+    leng = len(instances)
+    latest = 0
+    pro = ''
+    for i in range(0, leng):
+        raw = instances[i][6:21]
+        clean = raw.replace('-','.')
+        if float(clean) > latest:
+            latest = float(clean)
+            pro = instances[i]
+    return model_dir+pro
+
+
+metadata = Metadata.load(find_latest_model('/home/frtnx/models/')) 
 interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/anaconda3/lib/python3.6/site-packages/rasa_nlu/config_mitie.json'))
 
 def generate_training_data():
-    #wipe_db = db.entries.delete_many({})
     new_stub = []
     for i in stub.find():
         i.pop('_id')
@@ -61,9 +75,8 @@ def accuracy_check():
     avg = the_sum/length
     maxi = max(results)
     print("max: %2.10f\nmin: %2.10f\navg: %2.10f" % (maxi, min(results), avg))
-
-schedule.every().day.at("13:55").do(generate_training_data)
-#schedule.every().sunday.do(generate_training_data)
+    
+schedule.every().day.at("14:13").do(generate_training_data)
 
 def start_training():
     schedule.run_pending()

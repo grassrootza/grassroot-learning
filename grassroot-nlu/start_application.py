@@ -7,40 +7,67 @@ huidini = Duckling()
 huidini.load()
 
 app = Flask(__name__)
-
-def process_identifier(text):
-    x = interpreter.parse(text)
-    value = x['intent']['name']
-    if value == 'affirm':
-        return 'affirm'
-    else:
-        if value == 'None':
-            return 'update'
-        else:
-            return True
     
 
 @app.route('/')
-def my_form():
+def index():
     return render_template("textbox.html")
 
 @app.route('/', methods=["POST"])
 def parse():
     text_data = request.form['text']
     uid = request.form['uid']
-    prcss = process_identifier(text_data)
-    x = None
-    if prcss == True:   
+    ret_val = process_identifier(text_data)
+    if ret_val == True:   
         request_data = {'text': text_data}
-        x = identifier(**request_data)
-        data = x['uid']
-        return NQoutput("response.html",var1=str(x), var2=data)
-    elif prcss == 'affirm':
-        x = "Your request is being processed..."
-        return NQoutput("processing.html",var1=x)
+        user_bound = goldenGates(**request_data)
+        data = user_bound['uid']
+        return pep_talk("response.html",var1=str(user_bound), var2=data)
+    elif ret_val == 'affirm':
+        user_bound = "Your request is being processed..."
+        return pep_talk("processing.html",var1=user_bound)
+    elif ret_val == 'kamikaze':
+        return render_template("textbox.html")
+    elif ret_val == 'update':
+        user_bound = transformer(text_data, uid)
+        return str(user_bound)
     else:
-        x = transformer(text_data, uid)
-        return str(x)
+        user_bound = osiris(ret_val, uid)
+        return str(user_bound)
+
+
+def process_identifier(text):
+    x = interpreter.parse(text)
+    value = x['intent']['name']
+    if value == 'affirm':
+        return value
+    elif value == 'None':
+        return 'update'
+    elif value == 'negation':
+        if x['entities']  != []:
+            return x['entities'][0]['value']
+        else:
+            return 'kamikaze'
+    else:
+        return True
+
+def osiris(new_value, uid):
+    try:
+        x = entries.find_one({'uid':uid})
+        old_text = x['past_lives'][0]
+        new_text = old_text + " " + new_value
+        request_data = {'text': new_text}
+        new_parsed = goldenGates(**request_data)
+        if new_parsed['past_lives'] != []:
+            if new_parsed['past_lives'][0] != old_text:
+                new_parsed['past_lives'].append(old_text)
+        else:
+            new_parsed['past_lives'].append(old_text)
+        update_database(new_parsed)
+        data = new_parsed['uid']
+        return pep_talk("response.html", var1=new_parsed, var2=data)
+    except:
+        return "Patience and perseverence."
 
 def transformer(text, uid):
     try:
@@ -48,19 +75,22 @@ def transformer(text, uid):
         old_text = x['text']
         new_text = old_text+ " " + text
         request_data = {'text': new_text}
-        new_parsed = identifier(**request_data)
-        new_parsed['past_lives'].append(old_text)
+        new_parsed = goldenGates(**request_data)
+        if new_parsed['past_lives'] != []:
+            if new_parsed['past_lives'][0] != old_text:
+                new_parsed['past_lives'].append(old_text)
+        else:
+            new_parsed['past_lives'].append(old_text)
         update_database(new_parsed) 
         data = new_parsed['uid']
-        return NQoutput("response.html", var1=new_parsed, var2=data)
-    except:
-        return "I'm not buying it"
+        return pep_talk("response.html", var1=new_parsed, var2=data)
+    except Exception as e:
+        return str(e)
 
-
-def NQoutput(template,var1=None, var2=None):
+def pep_talk(template,var1=None, var2=None):
     return render_template(template, var1=var1, var2=var2) 
 
-def identifier(**request_data):                  
+def goldenGates(**request_data):                  
     recall = check_database(request_data['text'])
     if recall != False:
         return recall                            # suitable entry exists. Return said entry. Process complete.
@@ -105,9 +135,6 @@ def check_database(text):
 with app.test_request_context():
     print(url_for('parse', text='make your queries here'))
 
-def render_sidebar_template(tmpl_name, **kwargs):
-    (var1,var2,var3) = generate_sidebar_data()
-    return render_template(tmpl_name, var1=var1, var2=var2, var3=var3, **kwargs)
 
 def time_formalizer(parsed_data):
     for i in range(0, len(parsed_data['entities'])):
@@ -128,4 +155,3 @@ def formalizer_helper(time_string):
 
 if __name__ == '__main__':
     app.run()
-   

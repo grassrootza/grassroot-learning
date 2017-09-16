@@ -9,6 +9,7 @@ import time
 import json
 from examples import *
 import os
+import shutil
 
 client = MongoClient()
 db = client.database
@@ -16,9 +17,11 @@ collection = db.collection
 entries = db.entries
 stub = db.stub
 common_examples = db.common_examples
+threshold = 0.6
 
+# The below function returns the latest model in a directory of many models.
 
-def find_latest_model(model_dir):
+"""def find_latest_model(model_dir):
     instances = os.listdir(model_dir)
     leng = len(instances)
     latest = 0
@@ -30,9 +33,9 @@ def find_latest_model(model_dir):
             latest = float(clean)
             pro = instances[i]
     return model_dir+pro
+"""
 
-
-metadata = Metadata.load(find_latest_model('/home/frtnx/models/')) 
+metadata = Metadata.load('/home/frtnx/current_model')
 interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/anaconda3/lib/python3.6/site-packages/rasa_nlu/config_mitie.json'))
 
 def generate_training_data():
@@ -52,19 +55,15 @@ def generate_training_data():
 
 
 def auto_trainer():
-    accuracy_check()
     print('\n\n')
     training_data = load_data('/home/frtnx/grassroot-nlu/training_data.json')
     trainer = Trainer(RasaNLUConfig('/home/frtnx/grassroot-nlu/config_mitie.json'))
     trainer.train(training_data)
     model_directory = trainer.persist('/home/frtnx/models')
-    global metadata
-    global interpreter
-    metadata = Metadata.load(model_directory)
-    interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/grassroot-nlu/config_mitie.json'))
-    accuracy_check()
+    model = {'dir': model_directory}
+    accuracy_check(**model)
 
-def accuracy_check():
+def accuracy_check(**model_directory):
     results = []
     for i in examples:
         instance = interpreter.parse(i)
@@ -75,10 +74,39 @@ def accuracy_check():
     avg = the_sum/length
     maxi = max(results)
     print("max: %2.10f\nmin: %2.10f\navg: %2.10f" % (maxi, min(results), avg))
-    
-schedule.every().day.at("14:13").do(generate_training_data)
+    stored_model_score = '/home/frtnx/grassroot-nlu/current_model_score.txt'
+    f = open(stored_model_score, 'r')
+    value = f.read()
+    if value == '':
+        f = open(stored_model_score,'w')
+        f.write('0.0')
+        f.close()
+    f = open(stored_model_score, 'r')
+    current_model_score = float(f.read())
+    f.close()
+    if avg > current_model_score:
+        f = open(stored_model_score,'w')
+        f.write(str(avg))
+        print('new model successfuly written')
+        if model_directory:
+            src = model_directory['dir']
+            dest = '/home/frtnx/current_model/'
+            if 'current_model' in os.listdir('/home/frtnx'):
+                shutil.rmtree('/home/frtnx/current_model/')
+            shutil.copytree(src,dest)
+            print('new model successfuly generated. Ready for main script reinitialisation') 
+        else:
+            print('No model specified')
+    else:
+        if model_directory:
+            print("our new model isn't better than the one currently in use. Sustained.")
+
+this_moment = "11:53"
+  
+schedule.every().day.at(this_moment).do(generate_training_data)
 
 def start_training():
     schedule.run_pending()
     time.sleep(1)
 
+ 

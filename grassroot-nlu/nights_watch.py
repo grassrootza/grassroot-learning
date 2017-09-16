@@ -5,9 +5,9 @@ import time
 while True:
     timer = str(datetime.datetime.now())
     timer = timer[11:16]
-    if timer == '13:55':
+    if timer == this_moment:
         print("Here we go...")
         start_training()
     else:
-        time.sleep(0.5)
+        time.sleep(1)
         pass

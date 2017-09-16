@@ -1,6 +1,6 @@
 from flask import Flask,request, url_for, render_template
 import pymongo
-from config import interpreter, entries
+from config import interpreter, entries, threshold
 import uuid, time, datetime, pprint
 from duckling import Duckling
 huidini = Duckling()
@@ -103,18 +103,17 @@ def goldenGates(**request_data):
 	                }
         entries.insert_one(new_entry)
         uid = new_entry['_id']
-        x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives']) # down the
+        x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives']) 
         return x
 
 def parser(text, uid, date_time,past_life):
     parse = interpreter.parse(text)
     parsed = time_formalizer(parse)
-    parsed_data = {'parsed': parsed, 'uid': uid, 'date': date_time, 'past_lives': past_life} # insert process time here
+    parsed_data = {'parsed': parsed, 'uid': uid, 'date': date_time, 'past_lives': past_life} 
     with open("event_listener.txt", "a") as myfile:        
         myfile.write(str(parsed_data)+"\n\n")              
     res = update_database(parsed_data)               
     return parsed_data
-    #return res                                 # rabbit hole we go. I find the return process beautiful.
     
 def update_database(new_data):
     entries.update_one({'_id': new_data['uid']}, {"$set": new_data}, upsert=False)
@@ -127,7 +126,7 @@ def check_database(text):
         return False
     else:
         self_confidence = previous_entry['parsed']['intent']['confidence']
-        if self_confidence > 0.4:
+        if self_confidence > threshold:
             return previous_entry
         else:
             return False
@@ -155,3 +154,4 @@ def formalizer_helper(time_string):
 
 if __name__ == '__main__':
     app.run()
+   

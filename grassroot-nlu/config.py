@@ -1,9 +1,8 @@
-from pymongo import MongoClient
-import pprint
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.converters import load_data
 from rasa_nlu.model import Interpreter, Metadata, Trainer
-from pymongo import MongoClient
+from poly_database import *
+from poly_Mongo import *
 import schedule
 import time
 import json
@@ -11,14 +10,9 @@ from examples import *
 import os
 import shutil
 
-client = MongoClient()
-db = client.database
-collection = db.collection
-entries = db.entries
-stub = db.stub
-common_examples = db.common_examples
-threshold = 0.6
 
+threshold = 0.6
+new_model_checker = []
 # The below function returns the latest model in a directory of many models.
 
 """def find_latest_model(model_dir):
@@ -34,18 +28,19 @@ threshold = 0.6
             pro = instances[i]
     return model_dir+pro
 """
+database = MongoDB
 
 metadata = Metadata.load('/home/frtnx/current_model')
-interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/anaconda3/lib/python3.6/site-packages/rasa_nlu/config_mitie.json'))
+interpreter = Interpreter.load(metadata, RasaNLUConfig('/home/frtnx/grassroot-nlu/config_mitie.json'))
 
 def generate_training_data():
     new_stub = []
-    for i in stub.find():
+    for i in find(database, stub):
         i.pop('_id')
         new_stub.append(i)
     new_stub = new_stub[0]
     ce = new_stub['rasa_nlu_data']['common_examples']
-    for i in common_examples.find():
+    for i in find(MongoDB, common_examples):
         i.pop('_id')
         ce.append(i)
     new_stub = json.dumps(new_stub)
@@ -94,19 +89,19 @@ def accuracy_check(**model_directory):
             if 'current_model' in os.listdir('/home/frtnx'):
                 shutil.rmtree('/home/frtnx/current_model/')
             shutil.copytree(src,dest)
-            print('new model successfuly generated. Ready for main script reinitialisation') 
+            print('new model successfuly generated. Ready for main script reinitialisation')
+            new_model_checker.append(1) 
         else:
             print('No model specified')
     else:
         if model_directory:
             print("our new model isn't better than the one currently in use. Sustained.")
 
-this_moment = "11:53"
+this_moment = "17:55"
   
 schedule.every().day.at(this_moment).do(generate_training_data)
 
 def start_training():
     schedule.run_pending()
     time.sleep(1)
-
- 
+    

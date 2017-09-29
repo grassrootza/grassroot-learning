@@ -1,4 +1,4 @@
-from config import *
+from config import this_moment,start_training
 import datetime
 import time
 

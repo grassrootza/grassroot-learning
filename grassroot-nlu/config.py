@@ -111,7 +111,7 @@ def accuracy_check(**model_directory):
             print("our new model isn't better than the one currently in use. Sustained.")
 
 
-this_moment = "14:30"
+this_moment = "00:30"
 
   
 schedule.every().day.at(this_moment).do(generate_training_data)

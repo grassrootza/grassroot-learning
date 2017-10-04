@@ -1,0 +1,73 @@
+# Grassroot NLU 
+
+A nlu component that takes in text input and returns parsed entity values.
+
+## Getting Started
+
+Open a terminal in the directory with start_application.py. Enter the following lines:
+
+ ~$ export PATH_TO_MITIE=/enter/your/path/to/mitie's/total_word_feature_extractor.dat
+
+ ~$ export FLASK_APP=start_application.py
+
+ ~$ flask run
+
+This will start a flask server on 127.0.0.1:5000/
+ 
+Note: Make sure to have the appropriate database instance running in the background.
+
+### Prerequisites
+
+MongoDB or other compatible database
+Python 3.6 and its standard library as well as the following additional libraries:
+   pymongo(when using MongoDB)
+   flask
+   rasa_nlu
+   mitie
+   duckling
+   schedule
+
+
+## Deployment
+
+Make sure all environment variables are set correctly.
+
+This API includes an auto-training routine aimed at making the results better over time. This feature may be turned on or off at anytime without affecting the main program. to activate auto-training (which commences by default at 00:30 every night),
+simply open a new terminal window in the same directory that contains the start_application.py file and type:
+
+  ~$ python nights_watch.py
+
+The script will come to life at the designated time. Kill this script should you wish auto-training to stop. You will not need to restart the main script. 
+
+## Built With
+
+* [flask](http://flask.pocoo.org/) - The web framework used
+* [rasa_nlu](http://rasa.ai/) - The nlu processor
+* [mitie](https://https://github.com/mit-nlp/MITIE) - rasa_nlu backend
+* [MongoDB](https://www.mongodb.com/) - Default database
+* [DynamoDB](https://aws.amazon.com/dynamodb/)
+* [Amazon s3](https://aws.amazon.com/s3‎/)
+
+
+## Authors
+
+* **Luke Jordan** - *Lead developer*
+
+* **FRTNX** - *Supporting work* 
+
+See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the BSD-3 Clause License
+
+## Acknowledgments
+
+* I would like thank the grassroot team, without their support, encouragement, and good company this little engine would have never got off the ground. At least not by  my hand.
+* My appreciation also goes out to the Python community and all the teams around the world forever providing kick-ass libraries ensuring this beautiful language's survival.
+
+
+See you all soon.
+
+
+  ~FRTNX

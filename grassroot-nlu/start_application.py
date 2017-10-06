@@ -1,5 +1,5 @@
 from flask import Flask,request, url_for, render_template
-from config import interpreter, threshold,new_model_checker#, runtime_training_data  # MongoDB table
+from config import interpreter, new_model_checker
 import uuid, time, datetime, pprint
 from duckling import Duckling
 from databases.poly_database import *
@@ -18,8 +18,6 @@ app = Flask(__name__)
 database = DynamoDB
 MongoDB = 'optional database'
 
-
-#db_helper = DbMongo() # once properly built, changing this line will suffice to switch all methods
 
 @app.route('/')
 def index():

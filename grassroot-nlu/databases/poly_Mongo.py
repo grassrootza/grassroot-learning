@@ -7,6 +7,7 @@ common_examples = db.common_examples
 stub = db.stub
 runtime_training_data = db.runtime_training_data
 
+threshold = 0.7
 
 class MongoDB(object):
     def db_find(self, table):

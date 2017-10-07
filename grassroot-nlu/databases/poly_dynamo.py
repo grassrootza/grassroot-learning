@@ -15,8 +15,8 @@ class DynamoDB(object):
     def db_find_one(self, table, key_val):
         val = key_val['uid']
         return ddb_find(table, val)
-    def db_insert_one(self, table, doc):
-        create_new(table, doc)
+    def db_insert_one(self, doc):
+        create_new('entries', doc)
     def load_old_Text(self, key_val):
         x = ddb_find('entries',key_val['uid'])[0]['payload']
         y = x.replace("'",'"')

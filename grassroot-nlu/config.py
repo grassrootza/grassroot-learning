@@ -20,7 +20,7 @@ MongoDB = 'an alternative database. Use as the value of the database var.'
 
 client = boto3.client('s3')
 s3 = boto3.resource('s3')
-"""files = ['entity_extractor.dat',
+files = ['entity_extractor.dat',
          'entity_synonyms.json',
          'intent_classifier.dat',
          'metadata.json',
@@ -29,7 +29,7 @@ s3 = boto3.resource('s3')
 for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
-"""
+
 metadata = Metadata.load('./current_model')
 
 

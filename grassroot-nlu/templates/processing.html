@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--link rel=stylesheet type=text/css href="{{url_for('static', filename='style.css') }}"-->
+<body>
+    {% if var1 %}
+    <h5>{{ var1 }}</h5>
+    {% endif %}
+    <form action="." method="POST">
+        <input type="text" name="text">
+        <input type="submit" name="my-form" value="Send">
+    </form>
+    <h5>thank you for using our service</h5>
+</body>
+</html>

@@ -1,1 +1,0 @@
-{"pipeline": "mitie", "mitie_file": "/home/frtnx/anaconda3/lib/python3.6/site-packages/rasa_nlu/MITIE-models/english/total_word_feature_extractor.dat", "path": "./models", "data": "./training_data.json"}

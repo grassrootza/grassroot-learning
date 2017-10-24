@@ -53,7 +53,7 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
-dynamodb = boto3.resource('dynamodb', region_name='us-west-2', endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
+dynamodb = boto3.resource('dynamodb', region_name='eu-west-1', endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
 
 def str_to_dict(string):
     x = string.replace("'",'"')

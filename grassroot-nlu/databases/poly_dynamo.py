@@ -19,9 +19,8 @@ class DynamoDB(object):
         create_new('entries', doc)
     def load_old_Text(self, key_val):
         x = ddb_find('entries',key_val['uid'])[0]['payload']
-        y = x.replace("'",'"')
-        x = json.loads(y)
-        old_text = x['past_lives'][0]
+        y = str_to_dict(x)
+        old_text = y['past_lives'][0]
         return old_text
     def find_previous_Entry(self, key_val):
         return ddb_find('entries',key_val['uid'])[0]
@@ -37,8 +36,7 @@ class DynamoDB(object):
         for entry in entries:
             if entry['text'] == text:
                 payload = entry['payload']
-                x = payload.replace("'",'"')
-                entry = json.loads(x)
+                entry = str_to_dict(payload)
                 if entry['parsed']['intent']['confidence'] > 0.6:
                     return entry
         return False
@@ -55,12 +53,15 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
-dynamodb = boto3.resource('dynamodb', region_name='us-west-2', endpoint_url="http://localhost:8000")
+dynamodb = boto3.resource('dynamodb', region_name='eu-west-1', endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
+
+def str_to_dict(string):
+    x = string.replace("'",'"')
+    return json.loads(x) 
 
 
 def create_new(t_name, doc):
     table = dynamodb.Table(t_name)
-    #if t_name == 'entries':
     response = table.put_item(
         Item={
             'uid': doc['_id'],

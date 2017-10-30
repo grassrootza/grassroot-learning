@@ -5,8 +5,6 @@ from duckling import Duckling
 from databases.poly_database import *
 from databases.poly_Mongo import *
 from databases.poly_dynamo import *
-huidini = Duckling()
-huidini.load()
 import os
 import sys
 import psutil
@@ -17,7 +15,6 @@ app = Flask(__name__)
     
 database = DynamoDB
 MongoDB = 'optional database'
-
 
 @app.route('/')
 def index():
@@ -145,6 +142,9 @@ with app.test_request_context():
     print(url_for('parse', text='make your queries here'))
 
 
+huidini = Duckling()
+huidini.load()
+
 def time_formalizer(parsed_data):
     for i in range(0, len(parsed_data['entities'])):
         if parsed_data['entities'][i]['entity'] == 'date_time':
@@ -177,4 +177,3 @@ def restart_program():
 
 if __name__ == '__main__':
     app.run()
-

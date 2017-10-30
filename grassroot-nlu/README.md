@@ -6,15 +6,17 @@ A nlu component that takes in text input and returns parsed entity values.
 
 Open a terminal in the directory with start_application.py. Enter the following lines:
 
- ~$ export PATH_TO_MITIE=/enter/your/path/to/mitie's/total_word_feature_extractor.dat
-
- ~$ export FLASK_APP=start_application.py
-
- ~$ flask run
+ ~$ bash activate_me.sh
 
 This will start a flask server on 127.0.0.1:5000/
  
 Note: Make sure to have the appropriate database instance running in the background.
+
+To kill the program:
+
+ ~$ bash kill_me.sh
+
+This will grant you instant, localised.. death. To the program.
 
 ### Prerequisites
 

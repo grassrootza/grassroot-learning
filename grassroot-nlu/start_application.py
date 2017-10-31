@@ -1,5 +1,5 @@
 from flask import Flask,request, url_for, render_template
-from config import interpreter, new_model_checker
+from config import interpreter, database
 import uuid, time, datetime, pprint
 from duckling import Duckling
 from databases.poly_database import *
@@ -13,13 +13,9 @@ import logging
 
 app = Flask(__name__)
     
-database = DynamoDB
-MongoDB = 'optional database'
 
 @app.route('/')
 def index():
-    if new_model_checker != []:
-        restart_program()
     return render_template("textbox.html")
 
 
@@ -126,6 +122,7 @@ def parser(text, uid, date_time,past_life):
     with open("./nsa/event_listener.txt", "a") as myfile:        
         myfile.write(str(parsed_data)+"\n\n")              
     res = update_database(parsed_data)
+    print('This is what I have put in the database', parsed_data)
     parsed = time_formalizer(parse)
     parsed_data['parsed'] = parsed               
     return parsed_data
@@ -142,8 +139,8 @@ with app.test_request_context():
     print(url_for('parse', text='make your queries here'))
 
 
-huidini = Duckling()
-huidini.load()
+houdini = Duckling()
+houdini.load()
 
 def time_formalizer(parsed_data):
     for i in range(0, len(parsed_data['entities'])):
@@ -155,24 +152,12 @@ def time_formalizer(parsed_data):
 
 
 def formalizer_helper(time_string):
-    parsed = huidini.parse(time_string)
+    parsed = houdini.parse(time_string)
     for i in range(0,len(parsed)):
         if parsed[i]['dim'] == 'time':
             new_value = parsed[i]['value']['value']
             return new_value
   
-
-def restart_program():
-    try:
-        p = psutil.Process(os.getpid())
-        for i in p.open_files + p.connections:
-            os.close(i.fd)
-    except Exception as e:
-        logging.error(e)
-    python = sys.executable
-    print("restarting...")
-    new_model_checker.clear()
-    os.execl(python,python, *sys.argv)
 
 
 if __name__ == '__main__':

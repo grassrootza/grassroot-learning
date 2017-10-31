@@ -4,6 +4,7 @@ import json
 import decimal
 from boto3.dynamodb.conditions  import Key, Attr
 from botocore.exceptions import ClientError
+import re
 
 
 class DynamoDB(object):
@@ -53,7 +54,7 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
-dynamodb = boto3.resource('dynamodb', region_name='eu-west-1', endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
+dynamodb = boto3.resource('dynamodb', region_name='eu-west-1', endpoint_url="http://localhost:8000") # endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
 
 def str_to_dict(string):
     x = string.replace("'",'"')
@@ -182,10 +183,25 @@ def clean_and_save(uid):
                 except:
                     pass
             else:
-                return
+                date_str = cleansed['entities'][i]['value']
+                match = re.search(r'(\d+-\d+-\d+T)', date_str)
+                if match:
+                    return "value contains suboptimal formats. Instance not saved in training data."
         cleansed = {'_id': uid,
                     'text': 'runtime_training_data',
                     'date': str(datetime.datetime.now()),
                     'past_lives': [],
                     'payload': cleansed}
         create_new('runtime_training_data', cleansed)
+
+
+try:
+    create_table('entries')
+except:
+    pass
+
+try:
+    create_table('runtime_training_data')
+except:
+    pass
+    

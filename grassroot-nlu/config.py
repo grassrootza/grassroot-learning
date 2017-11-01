@@ -14,9 +14,8 @@ import shutil
 import boto3
 
 threshold = 0.6
-new_model_checker = []
 database = DynamoDB
-MongoDB = 'an alternative database. Use as the value of the database var.'
+#database = MongoDB
 
 client = boto3.client('s3')
 s3 = boto3.resource('s3')
@@ -38,7 +37,11 @@ def configure():
     try:
         os.environ['PATH_TO_MITIE']
     except KeyError as e:
-        raise
+        print("Mitie-model file and env var not found. Downloading and setting...")
+        os.system('wget -P /home https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2')
+        os.system('tar xvjf MITIE-models-v0.2.tar.bz2')
+        os.environ['PATH_TO_MITIE'] = '/home/MITIE-models/english/total_word_feature_extractor.dat'        
+
 
     configuration = {
                      "pipeline": "mitie",
@@ -63,9 +66,9 @@ def generate_training_data():
         for i in find(database, common_examples):
             i.pop('_id')
             ce.append(i)
-        #for i in find(database, runtime_training_data):
-        #    i.pop('_id')
-        #    ce.append(i)   need to resolve the date_time format
+        for i in find(database, runtime_training_data):
+            i.pop('_id')
+            ce.append(i)   need to resolve the date_time format
         new_stub = json.dumps(new_stub)
         f = open('training_data.json', 'w')
         f.write(new_stub)
@@ -137,7 +140,8 @@ def accuracy_check(**model_directory):
             shutil.copytree(src,dest)
             print('Ready for main script reinitialisation')
             shutil.rmtree('./models')
-            new_model_checker.append(1) 
+            os.system('bash restart.sh')
+            print('Successfuly reininitialised script with new model.')
         else:
             print('No model specified')
     else:

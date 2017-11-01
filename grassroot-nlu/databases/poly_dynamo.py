@@ -4,6 +4,7 @@ import json
 import decimal
 from boto3.dynamodb.conditions  import Key, Attr
 from botocore.exceptions import ClientError
+import re
 
 
 class DynamoDB(object):
@@ -182,10 +183,25 @@ def clean_and_save(uid):
                 except:
                     pass
             else:
-                return
+                date_str = cleansed['entities'][i]['value']
+                match = re.search(r'(\d+-\d+-\d+T)', date_str)
+                if match:
+                    return "value contains suboptimal formats. Instance not saved in training data."
         cleansed = {'_id': uid,
                     'text': 'runtime_training_data',
                     'date': str(datetime.datetime.now()),
                     'past_lives': [],
                     'payload': cleansed}
         create_new('runtime_training_data', cleansed)
+
+
+try:
+    create_table('entries')
+except:
+    pass
+
+try:
+    create_table('runtime_training_data')
+except:
+    pass
+    

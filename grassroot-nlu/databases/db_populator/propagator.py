@@ -54,7 +54,6 @@ class DecimalEncoder(json.JSONEncoder):
 
 dynamodb = boto3.resource('dynamodb', region_name='eu-west-1', endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
 
-
 def create_new(t_name, doc):
     table = dynamodb.Table(t_name)
     response = table.put_item(

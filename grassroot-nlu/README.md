@@ -17,6 +17,12 @@ To kill the program:
  ~$ bash kill_me.sh
 
 
+To kill the program:
+
+ ~$ bash kill_me.sh
+
+This will grant you instant, localised.. death. To the program.
+
 ### Prerequisites
 
 All dependencies(save for python and mongodb) can be installed by running this in the main directory:

@@ -68,7 +68,7 @@ def generate_training_data():
             ce.append(i)
         for i in find(database, runtime_training_data):
             i.pop('_id')
-            ce.append(i)   need to resolve the date_time format
+            ce.append(i)
         new_stub = json.dumps(new_stub)
         f = open('training_data.json', 'w')
         f.write(new_stub)

@@ -6,15 +6,15 @@ A nlu component that takes in text input and returns parsed entity values.
 
 Open a terminal in the directory with start_application.py. Enter the following lines as root:
 
- ~$ bash activate_me.sh
+ ~$ sudo bash activate_me.sh
 
-This will start a flask server on 127.0.0.1:5000/
+This will start a flask server on 0.0.0.0:5000/ (where '0.0.0.0' is the hosts machine's ip)
  
-Note: For your own convenience, run all commands as root.
+Note: For your own convenience, sudo all commands.
 
 To kill the program:
 
- ~$ bash kill_me.sh
+ ~$ sudo bash kill_me.sh
 
 
 ### Prerequisites
@@ -60,7 +60,7 @@ simply open the activate_me.sh file and comment out:
 
 Then run:
 
- $ bash restart.sh
+ $ sudo bash restart.sh
 
 
 ## Built With

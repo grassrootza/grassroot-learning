@@ -25,11 +25,11 @@ files = ['entity_extractor.dat',
          'metadata.json',
          'regex_featurizer.json',
          'training_data.json']
-
+"""
 for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
-
+"""
 metadata = Metadata.load('./current_model')
 
 
@@ -37,10 +37,12 @@ def configure():
     try:
         os.environ['PATH_TO_MITIE']
     except KeyError as e:
-        print("Mitie-model file and env var not found. Downloading and setting...")
-        os.system('wget -P /home https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2')
-        os.system('tar xvjf MITIE-models-v0.2.tar.bz2')
-        os.environ['PATH_TO_MITIE'] = '/home/MITIE-models/english/total_word_feature_extractor.dat'        
+        if os.listdir('./model') == ['est.txt']:
+            print("Mitie-model file and env var not found. Downloading and setting...")
+            if 'MITIE-models-v0.2.tar.bz2' not in os.listdir():
+                os.system('wget -P ./ https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2')
+            os.system('tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./model/')
+        os.environ['PATH_TO_MITIE'] = './model/MITIE-models/english/total_word_feature_extractor.dat'        
 
 
     configuration = {

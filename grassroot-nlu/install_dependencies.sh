@@ -14,6 +14,8 @@ pip install duckling
 
 pip install git+https://github.com/mit-nlp/MITIE.git
 
+pip install psutil
+
 wget -P ./ https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2
 
 tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./model/

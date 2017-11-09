@@ -9,6 +9,7 @@ import os
 import sys
 import psutil
 import logging
+import json
 
 
 app = Flask(__name__)
@@ -28,7 +29,7 @@ def parse():
         request_data = {'text': text_data}
         user_bound = goldenGates(**request_data)
         data = user_bound['uid']
-        return pep_talk("response.html",var1=str(user_bound), var2=data)
+        return pep_talk("response.html",var1=str(user_bound['parsed']), var2=data)
     elif ret_val == 'affirm':
         user_bound = "Your request is being processed..."
         save_as_training_instance(uid)
@@ -41,6 +42,28 @@ def parse():
     else:
         user_bound = osiris(ret_val, uid)
         return str(user_bound)
+
+
+@app.route('/parse/')
+def date():
+    d_string = request.args.get('date_string')
+    date_string = '"'+d_string+'"'
+    try:
+        raw_output =  os.popen("""curl -XPOST 'https://nlu.playground.feersum.io:443/nlu/v2/date_parsers/generic/retrieve' \
+        -H 'Content-Type: application/json' \
+        -H 'Accept: application/json' \
+        -H 'AUTH_TOKEN: %s' \
+        -d '{"text": %s}'""" % (os.environ['AUTH_TOKEN'],date_string)).read()
+        json_list = json.loads(raw_output)
+        if len(json_list) == 1:
+            value = json_list[0]['date']
+        else:
+            if len(json_list) == 2:
+                value = json_list[0]['date']
+        ret_val = value.replace(' ', 'T')
+        return ret_val[:16]
+    except Exception as e:
+        print(e)
 
 
 def process_identifier(text):
@@ -72,7 +95,7 @@ def osiris(new_value, uid):
             new_parsed['past_lives'].append(old_text)
         update_database(new_parsed)
         data = new_parsed['uid']
-        return pep_talk("response.html", var1=new_parsed, var2=data)
+        return pep_talk("response.html", var1=new_parsed['parsed'], var2=data)
     except:
         return "Patience and perseverence."
 
@@ -91,7 +114,7 @@ def transformer(text, uid):
             new_parsed['past_lives'].append(old_text)
         update_database(new_parsed) 
         data = new_parsed['uid']
-        return pep_talk("response.html", var1=new_parsed, var2=data)
+        return pep_talk("response.html", var1=new_parsed['parsed'], var2=data)
     except Exception as e:
         return str(e)
 
@@ -122,7 +145,6 @@ def parser(text, uid, date_time,past_life):
     with open("./nsa/event_listener.txt", "a") as myfile:        
         myfile.write(str(parsed_data)+"\n\n")              
     res = update_database(parsed_data)
-    print('This is what I have put in the database', parsed_data)
     parsed = time_formalizer(parse)
     parsed_data['parsed'] = parsed               
     return parsed_data
@@ -136,8 +158,9 @@ def save_as_training_instance(uid):
     find_clean_and_save(database, {'uid': uid})
   
 with app.test_request_context():
-    print(url_for('parse', text='make your queries here'))
+    print(url_for('parse', text='make your text queries here'))
 
+os.environ['AUTH_TOKEN'] = "GR-231b9-2674-41da-9e38-deb5f3ab34e3"  
 
 houdini = Duckling()
 houdini.load()
@@ -161,4 +184,4 @@ def formalizer_helper(time_string):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run()

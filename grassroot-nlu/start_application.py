@@ -29,7 +29,7 @@ def parse():
         request_data = {'text': text_data}
         user_bound = goldenGates(**request_data)
         data = user_bound['uid']
-        return pep_talk("response.html",var1=str(user_bound['parsed']), var2=data)
+        return pep_talk("response.html",var1=json.dumps(user_bound['parsed']), var2=data)
     elif ret_val == 'affirm':
         user_bound = "Your request is being processed..."
         save_as_training_instance(uid)
@@ -44,7 +44,7 @@ def parse():
         return str(user_bound)
 
 
-@app.route('/parse/')
+@app.route('/parse')
 def date():
     d_string = request.args.get('date_string')
     date_string = '"'+d_string+'"'
@@ -63,7 +63,7 @@ def date():
         ret_val = value.replace(' ', 'T')
         return ret_val[:16]
     except Exception as e:
-        print(e)
+        return e
 
 
 def process_identifier(text):
@@ -95,7 +95,7 @@ def osiris(new_value, uid):
             new_parsed['past_lives'].append(old_text)
         update_database(new_parsed)
         data = new_parsed['uid']
-        return pep_talk("response.html", var1=new_parsed['parsed'], var2=data)
+        return pep_talk("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
     except:
         return "Patience and perseverence."
 
@@ -114,13 +114,16 @@ def transformer(text, uid):
             new_parsed['past_lives'].append(old_text)
         update_database(new_parsed) 
         data = new_parsed['uid']
-        return pep_talk("response.html", var1=new_parsed['parsed'], var2=data)
+        return pep_talk("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
     except Exception as e:
         return str(e)
 
 
 def pep_talk(template,var1=None, var2=None):
     return render_template(template, var1=var1, var2=var2) 
+
+
+purgables = ["extractor"]
 
 
 def goldenGates(**request_data):                  
@@ -146,7 +149,11 @@ def parser(text, uid, date_time,past_life):
         myfile.write(str(parsed_data)+"\n\n")              
     res = update_database(parsed_data)
     parsed = time_formalizer(parse)
-    parsed_data['parsed'] = parsed               
+    parsed_data['parsed'] = parsed
+    if parsed_data['parsed']['entities'] != []:
+        for i in range(0,len(parsed_data['parsed']['entities'])):
+            if "extractor" in parsed_data['parsed']['entities'][i]:
+                parsed_data['parsed']['entities'][i].pop('extractor')              
     return parsed_data
 
     
@@ -159,8 +166,6 @@ def save_as_training_instance(uid):
   
 with app.test_request_context():
     print(url_for('parse', text='make your text queries here'))
-
-os.environ['AUTH_TOKEN'] = "GR-231b9-2674-41da-9e38-deb5f3ab34e3"  
 
 houdini = Duckling()
 houdini.load()

@@ -20,14 +20,14 @@ def index():
     return render_template("textbox.html")
 
 
+# emulator/tester
 @app.route('/', methods=["POST"])
-def parse():
+def parse_view():
     text_data = request.form['text']
     uid = request.form['uid']
     ret_val = process_identifier(text_data)
     if ret_val == 'new_entry':   
-        request_data = {'text': text_data}
-        user_bound = goldenGates(**request_data)
+        user_bound = goldenGates(text_data)
         data = user_bound['uid']
         return pep_talk("response.html",var1=json.dumps(user_bound['parsed']), var2=data)
     elif ret_val == 'affirm':
@@ -37,14 +37,28 @@ def parse():
     elif ret_val == 'reset':
         return render_template("textbox.html")
     elif ret_val == 'update':
-        user_bound = transformer(text_data, uid)
-        return str(user_bound)
+        new_parsed = transformer(text_data, uid)
+        return pep_talk("response.html", var1=json.dumps(new_parsed['parsed']), var2=new_parsed['uid'])
     else:
         user_bound = osiris(ret_val, uid)
         return str(user_bound)
 
 
-@app.route('/parse')
+# REST method
+@app.route('/parse', methods=["GET"])
+def parse_rest():
+    text_data = request.args.get('text')
+    uid = request.args.get('uid')
+    ret_val = process_identifier(text_data)
+    if ret_val == 'new_entry':
+        return goldenGates(text_data)
+    elif ret_val == 'update':
+        return transformer(text_data, uid)
+    else:
+        return "Error, didn't know what to do"
+
+
+@app.route('/datetime')
 def date():
     d_string = request.args.get('date_string')
     date_string = '"'+d_string+'"'
@@ -53,7 +67,7 @@ def date():
         -H 'Content-Type: application/json' \
         -H 'Accept: application/json' \
         -H 'AUTH_TOKEN: %s' \
-        -d '{"text": %s}'""" % (os.environ['AUTH_TOKEN'],date_string)).read()
+        -d '{"text": %s}'""" % (os.environ['FEERSUM_AUTH_TOKEN'],date_string)).read()
         json_list = json.loads(raw_output)
         if len(json_list) == 1:
             value = json_list[0]['date']
@@ -86,8 +100,7 @@ def osiris(new_value, uid):
     try:
         old_text = load_old_text(database, {'uid':uid})
         new_text = old_text + " " + new_value
-        request_data = {'text': new_text}
-        new_parsed = goldenGates(**request_data)
+        new_parsed = goldenGates(new_text)
         if new_parsed['past_lives'] != []:
             if new_parsed['past_lives'][0] != old_text:
                 new_parsed['past_lives'].append(old_text)
@@ -105,16 +118,14 @@ def transformer(text, uid):
         entry = find_previous_entry(database, {'uid':uid})
         old_text = entry['text']
         new_text = old_text+ " " + text
-        request_data = {'text': new_text}
-        new_parsed = goldenGates(**request_data)
+        new_parsed = goldenGates(new_text)
         if new_parsed['past_lives'] != []:
             if new_parsed['past_lives'][0] != old_text:
                 new_parsed['past_lives'].append(old_text)
         else:
             new_parsed['past_lives'].append(old_text)
         update_database(new_parsed) 
-        data = new_parsed['uid']
-        return pep_talk("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
+        return new_parsed
     except Exception as e:
         return str(e)
 
@@ -126,13 +137,13 @@ def pep_talk(template,var1=None, var2=None):
 purgables = ["extractor"]
 
 
-def goldenGates(**request_data):                  
-    recall = check_database(database, request_data['text'])
+def goldenGates(text_to_parse):
+    recall = check_database(database, text_to_parse)
     if recall != False:
         return recall                            # suitable entry exists. Return said entry. Process complete.
     else:
         new_entry = {
-                     'text': request_data['text'],
+                     'text': text_to_parse,
                      '_id' : str(uuid.uuid4()),
                      'date': str(datetime.datetime.now()),
                      'past_lives': []
@@ -141,6 +152,7 @@ def goldenGates(**request_data):
         uid = new_entry['_id']
         x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives']) 
         return x
+
 
 def parser(text, uid, date_time,past_life):
     parse = interpreter.parse(text)

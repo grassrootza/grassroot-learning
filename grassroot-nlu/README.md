@@ -6,16 +6,17 @@ A nlu component that takes in text input and returns parsed entity values.
 
 Open a terminal in the directory with start_application.py. Enter the following lines as root:
 
- ~$ bash activate_me.sh
+ ~$ export AUTH_TOKEN='enter your feersum authorisation token'
 
-This will start a flask server on 127.0.0.1:5000/
+ ~$ sudo bash activate_me.sh
+
+This will start a flask server on 0.0.0.0:5000/ (where '0.0.0.0' is the hosts machine's ip)
  
-Note: For your own convenience, run all commands as root.
+Note: For your own convenience, sudo all commands.
 
 To kill the program:
 
- ~$ bash kill_me.sh
-
+ ~$ sudo bash kill_me.sh
 
 ### Prerequisites
 
@@ -60,7 +61,7 @@ simply open the activate_me.sh file and comment out:
 
 Then run:
 
- $ bash restart.sh
+ $ sudo bash restart.sh
 
 
 ## Built With
@@ -70,6 +71,16 @@ Then run:
 * [MongoDB](https://www.mongodb.com/)
 * [DynamoDB](https://aws.amazon.com/dynamodb/)
 * [Amazon s3](https://aws.amazon.com/s3‎/)
+
+
+# DateTime parser
+
+This API also includes a date-time parser for formalising date values. For example an input of 'tomorrow at 5 in the evening' will return 'YYYY-MM-DDT17:00'.
+To call this API and pass values to it:
+
+  /parse?date_string=tomorrow at 5 in the evening
+
+The base url is http://hostmachineIP where 'hostmachineIP' is as advertised, your host machines IP. To utilise this service you will need to have a Feersum nlu authorisation token. See [here](http://feersum.io/).
 
 
 ## Authors

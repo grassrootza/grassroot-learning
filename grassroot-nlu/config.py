@@ -25,11 +25,11 @@ files = ['entity_extractor.dat',
          'metadata.json',
          'regex_featurizer.json',
          'training_data.json']
-
+"""
 for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
-
+"""
 metadata = Metadata.load('./current_model')
 
 

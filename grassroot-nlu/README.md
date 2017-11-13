@@ -18,7 +18,6 @@ To kill the program:
 
  ~$ sudo bash kill_me.sh
 
-
 ### Prerequisites
 
 All dependencies(save for python and mongodb) can be installed by running this in the main directory:

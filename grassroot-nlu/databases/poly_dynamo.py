@@ -35,7 +35,7 @@ class DynamoDB(object):
         table = dynamodb.Table('entries')
         entries = table.scan()['Items']
         for entry in entries:
-            if entry['text'] == text:
+            if entry['text'] == text and 'payload' in entry:
                 payload = entry['payload']
                 entry = str_to_dict(payload)
                 if entry['parsed']['intent']['confidence'] > 0.6:

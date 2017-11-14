@@ -45,15 +45,21 @@ def parse_view():
 
 
 # REST method
-@app.route('/parse', methods=["GET"])
+@app.route('/parse')
 def parse_rest():
     text_data = request.args.get('text')
     uid = request.args.get('uid')
+    print("received a parse request, text = " + text_data)
     ret_val = process_identifier(text_data)
+    print("return type = " + ret_val)
     if ret_val == 'new_entry':
-        return goldenGates(text_data)
+        entity_to_return = goldenGates(text_data)
+        print("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))      
+        return app.response_class(json.dumps(entity_to_return), content_type='application/json')
     elif ret_val == 'update':
-        return transformer(text_data, uid)
+        entity_to_return = transformer(text_data, uid)
+        print("returning entity: " + "\n" + json.dumps(entity_to_return, indent=1))
+        return app.response_class(entity_to_return, content_type='application/json')
     else:
         return "Error, didn't know what to do"
 
@@ -176,8 +182,8 @@ def update_database(new_data):
 def save_as_training_instance(uid):
     find_clean_and_save(database, {'uid': uid})
   
-with app.test_request_context():
-    print(url_for('parse', text='make your text queries here'))
+#with app.test_request_context():
+#    print(url_for('parse', text='make your text queries here'))
 
 houdini = Duckling()
 houdini.load()

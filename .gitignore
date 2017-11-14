@@ -2,6 +2,7 @@
 *.jar
 *.war
 *.ear
+*.pyc
 
 #gradle
 .gradle
@@ -41,3 +42,9 @@ nohup.out
 grassroot-learning.log
 
 src/main/libs/
+
+# MITIE models
+
+**/current_model/
+**/model/
+**MITIE**

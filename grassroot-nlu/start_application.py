@@ -5,6 +5,7 @@ from duckling import Duckling
 from databases.poly_database import *
 from databases.poly_Mongo import *
 from databases.poly_dynamo import *
+from distance import *
 import os
 import sys
 import psutil
@@ -84,6 +85,13 @@ def date():
         return ret_val[:16]
     except Exception as e:
         return e
+
+
+@app.route('/distance')
+def w_distance():
+    text = request.args.get('text')
+    return json.dumps(distance(text))
+
 
 
 def process_identifier(text):

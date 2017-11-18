@@ -75,13 +75,18 @@ Then run:
 
 # DateTime parser
 
-This API also includes a date-time parser for formalising date values. For example an input of 'tomorrow at 5 in the evening' will return 'YYYY-MM-DDT17:00'.
+This API includes a date-time parser for formalising date values. For example an input of 'tomorrow at 5 in the evening' will return 'YYYY-MM-DDT17:00'.
 To call this API and pass values to it:
 
   /parse?date_string=tomorrow at 5 in the evening
 
 The base url is http://hostmachineIP where 'hostmachineIP' is as advertised, your host machines IP. To utilise this service you will need to have a Feersum nlu authorisation token. See [here](http://feersum.io/).
 
+# Word Distance
+
+Also included is a word distance function accessed with the following postfix:
+
+  /distance?text=water
 
 ## Authors
 

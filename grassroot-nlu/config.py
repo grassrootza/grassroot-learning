@@ -17,8 +17,20 @@ threshold = 0.6
 database = DynamoDB
 #database = MongoDB
 
+
 client = boto3.client('s3')
 s3 = boto3.resource('s3')
+
+current_files = os.listdir('./')
+
+word_distance_files = ["vocab.txt", "vectors.txt"]
+
+for file in word_distance_files:
+    if file not in current_files:
+        s3.Bucket('grassroot-nlu').download_file('word_distance/%s' % file, 
+                                                 '%s' % file)
+
+
 files = ['entity_extractor.dat',
          'entity_synonyms.json',
          'intent_classifier.dat',
@@ -26,9 +38,11 @@ files = ['entity_extractor.dat',
          'regex_featurizer.json',
          'training_data.json']
 
+
 for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
+
 
 metadata = Metadata.load('./current_model')
 
@@ -37,11 +51,6 @@ def configure():
     try:
         os.environ['PATH_TO_MITIE']
     except KeyError as e:
-        if os.listdir('./model') == ['est.txt']:
-            print("Mitie-model file and env var not found. Downloading and setting...")
-            if 'MITIE-models-v0.2.tar.bz2' not in os.listdir():
-                os.system('wget -P ./ https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2')
-            os.system('tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./model/')
         os.environ['PATH_TO_MITIE'] = './model/MITIE-models/english/total_word_feature_extractor.dat'        
 
 

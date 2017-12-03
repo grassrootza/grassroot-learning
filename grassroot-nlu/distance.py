@@ -58,10 +58,12 @@ def distance(input_term, W=W, vocab=vocab, ivocab=ivocab):
 
     a = np.argsort(-dist)[:N]
 
-   
+    f = open('grassroot-universe-terms.txt', 'r')
+    universe = f.read().split()
     ret_val = {}
     for x in a:
-        new_val = {ivocab[x]: dist[x]}
-        ret_val = {**ret_val, **new_val}
+        if ivocab[x] in universe:
+            new_val = {ivocab[x]: dist[x]}
+            ret_val = {**ret_val, **new_val}
     return ret_val
 

@@ -6,6 +6,10 @@ A nlu component that takes in text input and returns parsed entity values.
 
 Open a terminal in the directory with start_application.py. Enter the following lines as root:
 
+ ~$ bash install_dependencies.sh
+
+ At this point make sure to have your AWS services properly configured.
+
  ~$ export AUTH_TOKEN='enter your feersum authorisation token'
 
  ~$ sudo bash activate_me.sh
@@ -20,11 +24,7 @@ To kill the program:
 
 ### Prerequisites
 
-All dependencies(save for python and mongodb) can be installed by running this in the main directory:
-
- ~$bash install_dependencies.sh
-
-But if you want to go at it old school then here's the dependency list: 
+All dependencies should already be handled by the install_dependencies.sh file, however, for the sake of transparency (and anticipation of the unkown), here's a look under the hood:
 
 * DynamoDB or MongoDB (preferably both)
 * Python 3.6.1 and its standard library as well as the following additional libraries:
@@ -63,22 +63,16 @@ Then run:
 
  $ sudo bash restart.sh
 
+Should you find the training data collected at runtime suboptimal you can also train a new model remotely. The most effective way to do this would be to copy the already existing training_data.json in the current_models directory, add as many more instances to it as required, then train a new model (make sure rasa_nlu is installed and configured on the training machine), and finally upload the new model to s3 (You'll have to delete the contents of 'model/current_model/' and replace them with your newly generated model).
 
-## Built With
-
-* [flask](http://flask.pocoo.org/)
-* [rasa_nlu](http://rasa.ai/)
-* [MongoDB](https://www.mongodb.com/)
-* [DynamoDB](https://aws.amazon.com/dynamodb/)
-* [Amazon s3](https://aws.amazon.com/s3‎/)
-
+ To do all of this in stealth mode, you could alternatively clone this repo, run 'bash install_dependencies.sh', copy your edited training_data.json to the main directory (the one with config.py), open a python3 console and type in 'from config import *' (this will download the current model in use from s3 so it might take a few minutes), and after this command completes type 'auto_trainer()'. This will train a new model based on the newly passed training data and automatically upload the model to s3 (if our new model has better performance than the old one).
 
 # DateTime parser
 
 This API includes a date-time parser for formalising date values. For example an input of 'tomorrow at 5 in the evening' will return 'YYYY-MM-DDT17:00'.
 To call this API and pass values to it:
 
-  /parse?date_string=tomorrow at 5 in the evening
+  /datetime?date_string=tomorrow at 5 in the evening
 
 The base url is http://hostmachineIP where 'hostmachineIP' is as advertised, your host machines IP. To utilise this service you will need to have a Feersum nlu authorisation token. See [here](http://feersum.io/).
 
@@ -87,6 +81,20 @@ The base url is http://hostmachineIP where 'hostmachineIP' is as advertised, you
 Also included is a word distance function accessed with the following postfix:
 
   /distance?text=water
+
+# Docker
+
+Should wish to put this API in a docker container (though at time of print this has already been done), you will need the Grassroot docker credentials. Having acquired them, you may then open a terminal in this directory and type in 'sudo docker login',
+enter the required information, and then run 'sudo docker build -t whateveryouwanttocallyourimage .' (Note the period at the end of the command, it is part of the command syntax). Should you wish to add more functionality to the API, make sure that system dependencies are properly added to the Dockerfile and any new API dependencies are properly added to the depends.sh file. 
+
+## Built With
+
+* [flask](http://flask.pocoo.org/)
+* [rasa_nlu](http://rasa.ai/)
+* [MongoDB](https://www.mongodb.com/)
+* [DynamoDB](https://aws.amazon.com/dynamodb/)
+* [Amazon s3](https://aws.amazon.com/s3‎/)
+* [feersum_nlu](https://feersum.io)
 
 ## Authors
 

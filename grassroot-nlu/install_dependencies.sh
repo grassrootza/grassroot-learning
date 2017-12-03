@@ -5,7 +5,7 @@ sudo apt-get update
 if hash pip; then 
     echo "pip is installed"
 else
-    sudo apt install python-pip3
+    sudo apt install python3-pip
 fi
 
 if hash git; then 

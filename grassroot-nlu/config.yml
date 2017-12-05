@@ -8,14 +8,14 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: grassrootdocker/terafirm:alpha
+      - image: circleci/python:3.6.1
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-    working_directory: ~/app
+    working_directory: ~/repo
 
     steps:
       - checkout
@@ -23,7 +23,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "depends.sh" }}
+          - v1-dependencies-{{ checksum "install_dependencies.sh" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
@@ -32,12 +32,12 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            bash depends.sh
+            bash install_dependencies.sh
 
       - save_cache:
           paths:
             - ./venv
-          key: v1-dependencies-{{ checksum "depends.sh" }}
+          key: v1-dependencies-{{ checksum "install_dependencies.sh" }}
         
       # run tests!
       - run:
@@ -49,3 +49,4 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+          

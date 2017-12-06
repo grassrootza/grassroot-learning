@@ -1,0 +1,7 @@
+general:
+  build_dir: grassroot-nlu
+test:
+  override:
+    - bash activate_me.sh
+    - python tests.py
+  

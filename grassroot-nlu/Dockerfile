@@ -1,7 +1,7 @@
 #Download base image ubuntu 16.04
 FROM grassrootdocker/main_image:part1
 
-RUN echo 'y'| apt-get install build-essential
+RUN apt-get update && apt-get install -y build-essential
 
 RUN echo 'y'| add-apt-repository ppa:jonathonf/python-3.6
 RUN echo 'y'| apt-get update
@@ -44,7 +44,5 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 ENV LANG en_US.UTF-8  
 ENV LANGUAGE en_US:en  
 ENV LC_ALL en_US.UTF-8
-
-ENV FEERSUM_AUTH_TOKEN ""
 
 CMD bash activate_me.sh

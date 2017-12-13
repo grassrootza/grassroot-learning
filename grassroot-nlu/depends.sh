@@ -31,3 +31,4 @@ pip3 install boto3
  
 
 tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./model/
+

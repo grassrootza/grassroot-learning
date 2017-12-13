@@ -89,7 +89,7 @@ def date():
 
 @app.route('/distance')
 def w_distance():
-    text = request.args.get('text')
+    text = request.args.get('text').lower().strip()
     return json.dumps(distance(text))
 
 
@@ -168,7 +168,7 @@ def goldenGates(text_to_parse):
         return x
 
 
-def parser(text, uid, date_time,past_life):
+def parser(text, uid, date_time, past_life):
     parse = interpreter.parse(text)
     parsed_data = {'parsed': parse, 'uid': uid, 'date': date_time, 'past_lives': past_life} 
     with open("./nsa/event_listener.txt", "a") as myfile:        

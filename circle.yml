@@ -1,5 +1,5 @@
-#general:
-#  build_dir: grassroot-nlu
+general:
+  build_dir: grassroot-nlu
 
 machine:
   python:

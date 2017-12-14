@@ -30,4 +30,5 @@ pip3 install boto3
  MITIE-models-v0.2.tar.bz2" || wget -P ./ https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2
  
 
-tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./model/
+tar xvjf MITIE-models-v0.2.tar.bz2 --no-same-owner --directory ./model/
+

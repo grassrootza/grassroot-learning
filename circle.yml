@@ -1,7 +1,28 @@
-general:
-  build_dir: grassroot-nlu
-test:
-  override:
-    - bash activate_me.sh
-    - python tests.py
-  
+#general:
+#  build_dir: grassroot-nlu
+
+machine:
+  python:
+    version: 3.6.1
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - pip install awscli
+    - pip install awsebcli
+
+
+deployment:
+  production:
+    branch: master
+    commands:
+      # Build image and push to Docker Hub
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      #- bash grassroot-nlu/buildDocker.sh
+      - docker pull grassrootdocker/terafirma:alpha
+
+      # deploy files to beanstalk
+      - bash ./eb/setup-eb.sh
+      - echo 4 | eb init
+      - eb deploy

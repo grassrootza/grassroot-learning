@@ -11,8 +11,7 @@ def test_engines():
 
     for i in range(10):
         test_text1 = 'i would like to set a meeting'
-        x = requests.get('http://0.0.0.0:4000/parse?text=%s' % test_text1).content.decode('ascii')
-        dict_val = json.loads(x)
+        dict_val = json.loads(requests.get('http://0.0.0.0:4000/parse?text=%s' % test_text1).content.decode('ascii'))
         try:
             if dict_val['parsed']['text'] == test_text1:
                 state = 'passed'
@@ -23,8 +22,8 @@ def test_engines():
             print(str(e))
 
 
-        y = requests.get('http://0.0.0.0:4000/distance?text=water').content.decode('ascii')
-        dict_val = json.loads(y)
+        dict_val = json.loads(requests.get('http://0.0.0.0:4000/distance?text=Water ').content.decode('ascii'))
+
         if type(dict_val) == dict:
             hlvlstate = 'passed'
         else:
@@ -55,10 +54,13 @@ def testCentre():
     all_proc = psutil.net_connections()
     for i in all_proc:
         keep.append(i[3])
+
     if ('::', 4000) not in keep:
-        print("System down at %s. Manual restart required" % str(datetime.datetime.now()))
+        print("System down at [%s]. Manual restart required" % str(datetime.datetime.now()))
         time.sleep(30)
+
     else:
+
         print("All's well. System up at %s" % str(datetime.datetime.now()))
         print('Sarting tests...')
         try:

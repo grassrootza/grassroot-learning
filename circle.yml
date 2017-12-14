@@ -1,7 +1,25 @@
 general:
   build_dir: grassroot-nlu
-test:
-  override:
-    - bash activate_me.sh
-    - python tests.py
-  
+
+machine:
+  python:
+    version: 3.6.1
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - pip install awscli
+    - pip install awsebcli
+
+
+deployment:
+  production:
+    branch: master
+    commands:
+      # Build image and push to Docker Hub
+      - bash grassroot-nlu/buildDocker.sh
+
+      # deploy files to beanstalk
+      - bash grassroot-nlu/.eb/setup-eb.sh
+      - eb deploy

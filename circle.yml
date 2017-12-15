@@ -16,8 +16,8 @@ deployment:
     commands:
       # Build image and push to Docker Hub
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      #- bash grassroot-nlu/buildDocker.sh
-      - docker pull grassrootdocker/terafirma:alpha
+      - bash grassroot-nlu/buildDocker.sh
+      #- docker pull grassrootdocker/terafirma:alpha
 
       # deploy files to beanstalk
       - bash ./eb/setup-eb.sh

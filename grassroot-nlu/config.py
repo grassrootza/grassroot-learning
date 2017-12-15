@@ -30,6 +30,10 @@ for file in word_distance_files:
         s3.Bucket('grassroot-nlu').download_file('word_distance/%s' % file, 
                                                  '%s' % file)
 
+if 'feersum_setup.sh' not in current_files:
+    s3.Bucket('grassroot-nlu').download_file('activation/feersum_setup.sh',
+                                              'feersum_setup.sh')
+
 
 files = ['entity_extractor.dat',
          'entity_synonyms.json',

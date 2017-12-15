@@ -1,6 +1,3 @@
-#general:
-#  build_dir: grassroot-nlu
-
 machine:
   python:
     version: 3.6.1
@@ -19,10 +16,10 @@ deployment:
     commands:
       # Build image and push to Docker Hub
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      #- bash grassroot-nlu/buildDocker.sh
-      - docker pull grassrootdocker/terafirma:alpha
+      - bash grassroot-nlu/buildDocker.sh
+      #- docker pull grassrootdocker/terafirma:alpha
 
       # deploy files to beanstalk
       - bash ./eb/setup-eb.sh
-      - echo 4 | eb init
+      - eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
       - eb deploy

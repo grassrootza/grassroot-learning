@@ -18,28 +18,28 @@ fi
 
 # jvm
 
-pip3 install flask
+pip install flask
 
 
-pip3 install pymongo
+pip install pymongo
 
 
-pip3 install schedule
+pip install schedule
 
 
-pip3 install boto3
+pip install boto3
 
 
-pip3 install rasa_nlu
+pip install rasa_nlu
 
 
-pip3 install duckling
+pip install duckling
 
 
-pip3 install git+https://github.com/mit-nlp/MITIE.git
+pip install git+https://github.com/mit-nlp/MITIE.git
 
 
-pip3 install psutil
+pip install psutil
 
 
 [ -f MITIE-models-v0.2.tar.bz2 ] && echo "Requirement already satisfied

@@ -8,8 +8,11 @@ N = 100;  # number of words to return
 def generate():
     with open('vocab.txt', 'r') as f:
         words = [x.rstrip().split(' ')[0] for x in f.readlines()]
+
     with open('vectors.txt', 'r') as f:
+
         vectors = {}
+
         for line in f:
             vals = line.rstrip().split(' ')
             vectors[vals[0]] = [float(x) for x in vals[1:]]
@@ -20,9 +23,11 @@ def generate():
 
     vector_dim = len(vectors[ivocab[0]])
     W = np.zeros((vocab_size, vector_dim))
+
     for word, v in vectors.items():
         if word == '<unk>':
             continue
+
         W[vocab[word], :] = v
 
     # normalize each word vector to unit variance
@@ -35,13 +40,18 @@ W, vocab, ivocab = generate()
 
 
 def distance(input_term, W=W, vocab=vocab, ivocab=ivocab):
+
     for idx, term in enumerate(input_term.split(' ')):
+
         if term in vocab:
             print('Word: %s  Position in vocabulary: %i' % (term, vocab[term]))
+
             if idx == 0:
                 vec_result = np.copy(W[vocab[term], :])
+
             else:
                 vec_result += W[vocab[term], :] 
+
         else:
             print('Word: %s  Out of dictionary!\n' % term)
             return
@@ -61,9 +71,12 @@ def distance(input_term, W=W, vocab=vocab, ivocab=ivocab):
     f = open('grassroot-universe-terms.txt', 'r')
     universe = f.read().split()
     ret_val = {}
+
     for x in a:
+
         if ivocab[x] in universe:
             new_val = {ivocab[x]: dist[x]}
             ret_val = {**ret_val, **new_val}
+            
     return ret_val
 

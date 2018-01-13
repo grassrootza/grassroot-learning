@@ -1,0 +1,9 @@
+# IDE files
+.idea/
+__pycache__/
+
+# Some text file output
+grassroot-nlu/config.pyc            
+grassroot-nlu/nsa/event_listener.txt
+grassroot-nlu/system_status.txt 
+grassroot-nlu/training_output.txt

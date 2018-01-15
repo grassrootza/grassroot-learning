@@ -1,4 +1,4 @@
-from flask import Flask,request, url_for, render_template
+from flask import Flask,request, url_for, render_template, Response
 from config import interpreter, database
 import uuid, time, datetime, pprint
 from duckling import Duckling
@@ -85,7 +85,7 @@ def date():
 
     x = d.parse(d_string)
     x = x[len(x)-1]
-    return x['value']['value'][:16]
+    return Response(x['value']['value'][:16], mimetype='application/json')
     
 
 
@@ -93,7 +93,7 @@ def date():
 def w_distance():
 
     text = request.args.get('text').lower().strip()
-    return json.dumps(distance(text))
+    return Response(json.dumps(distance(text)), mimetype='application/json')
 
 
 

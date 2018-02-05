@@ -41,6 +41,8 @@ pip install git+https://github.com/mit-nlp/MITIE.git
 
 pip install psutil
 
+pip install dateparser
+
 
 [ -f MITIE-models-v0.2.tar.bz2 ] && echo "Requirement already satisfied
  MITIE-models-v0.2.tar.bz2" || wget -P ./ https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2

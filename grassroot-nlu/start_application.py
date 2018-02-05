@@ -11,6 +11,8 @@ import sys
 import psutil
 import logging
 import json
+import re
+import dateparser
 
 
 app = Flask(__name__)
@@ -83,9 +85,16 @@ def date():
 
     d_string = request.args.get('date_string')
 
-    x = d.parse(d_string)
-    x = x[len(x)-1]
-    return Response(x['value']['value'][:16], mimetype='application/json')
+    raw = str(dateparser.parse(d_string, settings={'DATE_ORDER': 'DMY'}))
+    if raw != 'None':
+        clean = raw.replace(' ', 'T')
+        return Response(clean[:16], mimetype='application/json')
+
+    else:
+        x = d.parse(d_string)
+        for i in range(len(x)):
+            if x[i]['dim'] == 'time':
+                return Response(x[i]['value']['value'][:16], mimetype='application/json')
     
 
 

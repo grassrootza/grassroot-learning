@@ -19,6 +19,9 @@ pip3 install rasa_nlu
 pip3 install duckling
 
 
+pip install dateparser
+
+
 pip3 install git+https://github.com/mit-nlp/MITIE.git
 
 

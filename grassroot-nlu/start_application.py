@@ -82,8 +82,16 @@ def parse_rest():
 
 @app.route('/datetime')
 def date():
-
     d_string = request.args.get('date_string')
+
+    set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ']
+    set2 = list(d_string)
+    formal = True
+    for i in set2:
+        if i not in set1:
+            formal = False
+    if formal == True:
+        return Response(d_string, mimetype='application/json')
 
     raw = str(dateparser.parse(d_string, settings={'DATE_ORDER': 'DMY'}))
     if raw != 'None':
@@ -188,8 +196,7 @@ def goldenGates(text_to_parse):
     recall = check_database(database, text_to_parse)
 
     if recall != False:
-        return recall  
-                                  # suitable entry exists. Return said entry. Process complete.
+        return recall   # suitable entry exists. Return said entry. Process complete.
     else:
         new_entry = {
                      'text': text_to_parse,

@@ -3,7 +3,7 @@
 set -x
 set -e
 
-#mkdir /home/ubuntu/.aws
+mkdir /home/ubuntu/.aws
 touch /home/ubuntu/.aws/config
 chmod 600 /home/ubuntu/.aws/config
 echo "[profile eb-cli]" > /home/ubuntu/.aws/config

@@ -30,7 +30,7 @@ pip install schedule
 pip install boto3
 
 
-pip install rasa_nlu
+pip install rasa_nlu==0.10.6
 
 
 pip install duckling

@@ -11,6 +11,8 @@ import sys
 import psutil
 import logging
 import json
+import re
+import dateparser
 
 
 app = Flask(__name__)
@@ -80,12 +82,27 @@ def parse_rest():
 
 @app.route('/datetime')
 def date():
-
     d_string = request.args.get('date_string')
 
-    x = d.parse(d_string)
-    x = x[len(x)-1]
-    return Response(x['value']['value'][:16], mimetype='application/json')
+    set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ']
+    set2 = list(d_string)
+    formal = True
+    for i in set2:
+        if i not in set1:
+            formal = False
+    if formal == True:
+        return Response(d_string, mimetype='application/json')
+
+    raw = str(dateparser.parse(d_string, settings={'DATE_ORDER': 'DMY'}))
+    if raw != 'None':
+        clean = raw.replace(' ', 'T')
+        return Response(clean[:16], mimetype='application/json')
+
+    else:
+        x = d.parse(d_string)
+        for i in range(len(x)):
+            if x[i]['dim'] == 'time':
+                return Response(x[i]['value']['value'][:16], mimetype='application/json')
     
 
 
@@ -179,8 +196,7 @@ def goldenGates(text_to_parse):
     recall = check_database(database, text_to_parse)
 
     if recall != False:
-        return recall  
-                                  # suitable entry exists. Return said entry. Process complete.
+        return recall   # suitable entry exists. Return said entry. Process complete.
     else:
         new_entry = {
                      'text': text_to_parse,

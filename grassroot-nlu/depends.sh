@@ -16,10 +16,10 @@ pip3 install boto3
 pip3 install rasa_nlu==0.10.6
 
 
-pip3 install duckling
+pip3 install duckling==1.7.3
 
 
-pip3 install dateparser
+pip3 install dateparser==0.6.0
 
 
 pip3 install git+https://github.com/mit-nlp/MITIE.git

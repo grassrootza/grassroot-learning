@@ -33,7 +33,7 @@ pip install boto3
 pip install rasa_nlu==0.10.6
 
 
-pip install duckling
+pip install duckling==1.7.3
 
 
 pip install git+https://github.com/mit-nlp/MITIE.git
@@ -41,7 +41,7 @@ pip install git+https://github.com/mit-nlp/MITIE.git
 
 pip install psutil
 
-pip install dateparser
+pip install dateparser==0.6.0
 
 
 [ -f MITIE-models-v0.2.tar.bz2 ] && echo "Requirement already satisfied

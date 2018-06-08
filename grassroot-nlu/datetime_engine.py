@@ -40,7 +40,7 @@ def datetime_engine(d_string):
                     print('parsed time: %s | %s ' % (parse_time_raw, parse_time))
                     if int(parse_time_raw) < int(current_time_raw):
                         while int(parse_time_raw) < int(current_time_raw):
-                            print('parsed value is in the past. sad.')            # program speaks in trump.
+                            print('parsed value is in the past. sad.')           
                             for j in range(len(x[i]['value']['values'])):
                                 next_pos = x[i]['value']['values'][j]['value'][:16]
                                 parse_time_raw = unix_time_millis(datetime.datetime.strptime(next_pos, '%Y-%m-%dT%H:%M'))

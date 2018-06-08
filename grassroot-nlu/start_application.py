@@ -216,11 +216,8 @@ def update_database(new_data):
 def save_as_training_instance(uid):
     find_clean_and_save(database, {'uid': uid})
 
-#with app.test_request_context():
+# with app.test_request_context():
 #    print(url_for('parse', text='make your text queries here'))
-
-d = Duckling()
-d.load()
 
 def time_formalizer(parsed_data):
 

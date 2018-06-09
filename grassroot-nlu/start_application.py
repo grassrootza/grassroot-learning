@@ -1,25 +1,23 @@
-from flask import Flask,request, url_for, render_template, Response
-from config import interpreter, database
-import uuid, time, datetime, pprint
-from duckling import Duckling
-from databases.poly_database import *
-from databases.poly_Mongo import *
-from databases.poly_dynamo import *
-from distance import *
 import os
 import sys
 import psutil
 import logging
 import json
 import re
-import dateparser
-
+import uuid, time, datetime, pprint
+from datetime_engine import *
+from databases.poly_database import *
+from databases.poly_Mongo import *
+from databases.poly_dynamo import *
+from distance import *
+from flask import Flask,request, url_for, render_template, Response
+from config import interpreter, database
 
 app = Flask(__name__)
 
 d = Duckling()
 d.load()
-    
+
 
 @app.route('/')
 def index():
@@ -33,7 +31,7 @@ def parse_view():
     uid = request.form['uid']
     ret_val = process_identifier(text_data)
 
-    if ret_val == 'new_entry':   
+    if ret_val == 'new_entry':
         user_bound = goldenGates(text_data)
         data = user_bound['uid']
         return pep_talk("response.html",var1=json.dumps(user_bound['parsed']), var2=data)
@@ -68,7 +66,7 @@ def parse_rest():
 
     if ret_val == 'new_entry':
         entity_to_return = goldenGates(text_data)
-        print("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))      
+        print("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))
         return app.response_class(json.dumps(entity_to_return), content_type='application/json')
 
     elif ret_val == 'update':
@@ -83,35 +81,13 @@ def parse_rest():
 @app.route('/datetime')
 def date():
     d_string = request.args.get('date_string')
-
-    set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ']
-    set2 = list(d_string)
-    formal = True
-    for i in set2:
-        if i not in set1:
-            formal = False
-    if formal == True:
-        return Response(d_string, mimetype='application/json')
-
-    raw = str(dateparser.parse(d_string, settings={'DATE_ORDER': 'DMY'}))
-    if raw != 'None':
-        clean = raw.replace(' ', 'T')
-        return Response(clean[:16], mimetype='application/json')
-
-    else:
-        x = d.parse(d_string)
-        for i in range(len(x)):
-            if x[i]['dim'] == 'time':
-                return Response(x[i]['value']['value'][:16], mimetype='application/json')
-    
-
+    return Response(datetime_engine(d_string), mimetype='application/json')
 
 @app.route('/distance')
 def w_distance():
 
     text = request.args.get('text').lower().strip()
     return Response(json.dumps(distance(text)), mimetype='application/json')
-
 
 
 def process_identifier(text):
@@ -178,7 +154,7 @@ def transformer(text, uid):
         else:
             new_parsed['past_lives'].append(old_text)
 
-        update_database(new_parsed) 
+        update_database(new_parsed)
         return new_parsed
 
     except Exception as e:
@@ -186,7 +162,7 @@ def transformer(text, uid):
 
 
 def pep_talk(template,var1=None, var2=None):
-    return render_template(template, var1=var1, var2=var2) 
+    return render_template(template, var1=var1, var2=var2)
 
 
 purgables = ["extractor"]
@@ -208,15 +184,15 @@ def goldenGates(text_to_parse):
         insert_one(database, new_entry)
 
         uid = new_entry['_id']
-        x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives']) 
+        x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives'])
         return x
 
 
 def parser(text, uid, date_time, past_life):
     parse = interpreter.parse(text)
-    parsed_data = {'parsed': parse, 'uid': uid, 'date': date_time, 'past_lives': past_life} 
+    parsed_data = {'parsed': parse, 'uid': uid, 'date': date_time, 'past_lives': past_life}
 
-    with open("./nsa/event_listener.txt", "a") as myfile:        
+    with open("./nsa/event_listener.txt", "a") as myfile:
         myfile.write(str(parsed_data)+"\n\n")
 
     res = update_database(parsed_data)
@@ -228,23 +204,20 @@ def parser(text, uid, date_time, past_life):
         for i in range(0,len(parsed_data['parsed']['entities'])):
 
             if "extractor" in parsed_data['parsed']['entities'][i]:
-                parsed_data['parsed']['entities'][i].pop('extractor') 
+                parsed_data['parsed']['entities'][i].pop('extractor')
 
     return parsed_data
 
-    
+
 def update_database(new_data):
     update_db(database, new_data)
 
 
 def save_as_training_instance(uid):
     find_clean_and_save(database, {'uid': uid})
-  
-#with app.test_request_context():
-#    print(url_for('parse', text='make your text queries here'))
 
-d = Duckling()
-d.load()
+# with app.test_request_context():
+#    print(url_for('parse', text='make your text queries here'))
 
 def time_formalizer(parsed_data):
 
@@ -262,11 +235,11 @@ def formalizer_helper(time_string):
     parsed = d.parse(time_string)
 
     for i in range(0,len(parsed)):
-        
+
         if parsed[i]['dim'] == 'time':
             new_value = parsed[i]['value']['value']
             return new_value
-  
+
 
 
 if __name__ == '__main__':

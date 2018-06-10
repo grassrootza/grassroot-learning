@@ -1,6 +1,6 @@
 import os
 import sys
-import psutil
+# import psutil
 import logging
 import json
 import re

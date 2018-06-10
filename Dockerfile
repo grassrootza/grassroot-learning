@@ -4,9 +4,6 @@ FROM python:3.6-alpine
 WORKDIR /app
 
 RUN apk add --no-cache alpine-sdk
-# RUN apk add --no-cache gcc musl-dev
-# RUN apk add --no-cache libc-dev
-# RUN apk add --no-cache linux-headers
 RUN apk add --no-cache openjdk7-jre
 
 ADD ./grassroot-nlu /app

@@ -18,16 +18,16 @@ RUN echo 'y'| apt-get install python3-pip
 
 RUN echo 'y'| apt-get install psmisc
 
-RUN echo debconf shared/accepted-oracle-license-v1-1 select true | \
-  debconf-set-selections
-RUN echo debconf shared/accepted-oracle-license-v1-1 seen true | \
-  debconf-set-selections
+# RUN echo debconf shared/accepted-oracle-license-v1-1 select true | \
+#   debconf-set-selections
+# RUN echo debconf shared/accepted-oracle-license-v1-1 seen true | \
+#   debconf-set-selections
 
-RUN echo 'y'| add-apt-repository ppa:webupd8team/java
-RUN echo 'y'| apt-get update
-RUN echo "yes"| apt-get install oracle-java8-installer
+# RUN echo 'y'| add-apt-repository ppa:webupd8team/java
+# RUN echo 'y'| apt-get update
+# RUN echo "yes"| apt-get install oracle-java8-installer
 
-RUN echo 'y'| apt-get install oracle-java8-set-default
+# RUN echo 'y'| apt-get install oracle-java8-set-default
 
 RUN echo 'y'| apt-get install curl
 

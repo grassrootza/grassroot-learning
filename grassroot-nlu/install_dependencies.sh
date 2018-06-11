@@ -20,28 +20,21 @@ fi
 
 pip install flask
 
-
 pip install pymongo
-
 
 pip install schedule
 
-
 pip install boto3
-
 
 pip install rasa_nlu==0.10.6
 
-
-pip install duckling==1.7.3
-
+pip install duckling
 
 pip install git+https://github.com/mit-nlp/MITIE.git
 
-
 pip install psutil
 
-pip install dateparser==0.6.0
+pip install dateparser
 
 
 [ -f MITIE-models-v0.2.tar.bz2 ] && echo "Requirement already satisfied

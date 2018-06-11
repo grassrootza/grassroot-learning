@@ -39,6 +39,7 @@ def datetime_engine(d_string):
                     parse_time_raw = unix_time_millis(datetime.datetime.strptime(parse_time, '%Y-%m-%dT%H:%M'))
                     print('parsed time: %s | %s ' % (parse_time_raw, parse_time))
                     if int(parse_time_raw) < int(current_time_raw):
+                        cycle = 0
                         while int(parse_time_raw) < int(current_time_raw):
                             print('parsed value is in the past. sad.')           
                             for j in range(len(x[i]['value']['values'])):
@@ -49,7 +50,10 @@ def datetime_engine(d_string):
                                     print('parsed value is in the future. great.')
                                     return next_pos
                                 else:
-                                    print('parsed value is in the past. sad.')
+                                    cycle += 1
+                                    if cycle == 8:
+                                        print('No suitable value found. There you have it folks.')
+                                        return ''
                     else:
                         if int(parse_time_raw) > int(current_time_raw):
                             print('parsed value is in the future. great.')
@@ -66,4 +70,5 @@ datetime_engine('tuesday 5am')
 datetime_engine('tomorrow afternoon')
 datetime_engine('tuesday evening 5')
 datetime_engine('friday 9am')
+datetime_engine('today')
 """

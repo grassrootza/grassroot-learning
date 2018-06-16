@@ -54,7 +54,7 @@ os.system('sh install_mitie.sh')
 
 def configure():
     print('configuring components...')
-    os.environ['PATH_TO_MITIE'] = './model/MITIE-models/english/total_word_feature_extractor.dat'        
+    os.environ['PATH_TO_MITIE'] = './current_model/model/MITIE-models/english/total_word_feature_extractor.dat'        
 
     configuration_1 = {
                      "pipeline": "mitie",
@@ -75,7 +75,7 @@ def configure():
                                    ],
                        "training_data": "training_data.json",
                        "mitie_feature_extractor_fingerprint": 4070312463,
-                       "mitie_file": "./model/MITIE-models/english/total_word_feature_extractor.dat",
+                       "mitie_file": "./current_model/model/MITIE-models/english/total_word_feature_extractor.dat",
                        "entity_extractor_mitie": "entity_extractor.dat",
                        "entity_synonyms": "entity_synonyms.json",
                        "regex_featurizer": "regex_featurizer.json",

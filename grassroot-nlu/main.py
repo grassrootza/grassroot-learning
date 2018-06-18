@@ -35,7 +35,7 @@ def parse_view():
 
     elif ret_val == 'affirm':
         user_bound = "Your request is being processed..."
-        # save_as_training_instance(uid)
+        save_as_training_instance(uid)
         return render_html_template("processing.html",var1=user_bound)
 
     elif ret_val == 'reset':
@@ -81,10 +81,10 @@ def date():
     return Response(datetime_engine(d_string), mimetype='application/json')
 
 
-# @app.route('/distance')
-# def w_distance():
-#     text = request.args.get('text').lower().strip()
-#     return Response(json.dumps(distance(text)), mimetype='application/json')
+@app.route('/distance')
+def w_distance():
+    text = request.args.get('text').lower().strip()
+    return Response(json.dumps(distance(text)), mimetype='application/json')
 
 
 def process_identifier(text):

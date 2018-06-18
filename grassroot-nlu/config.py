@@ -19,14 +19,13 @@ database = DynamoDB
 #database = MongoDB
 
 os.system('aws ecr get-login --region eu-west-1')
-os.system('aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh')
-# os.system('source ./feersum_setup.sh')
+# os.system('aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh')
+# os.system('source ./feersum_setup.sh') 
 
 s3 = boto3.resource('s3')
 client = boto3.client('s3',
                        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], # env vars should be passed with the docker run command
                        aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],) 
-# s3 = boto3.resource('s3', default_region='eu-west-1', api_version='2006-03-01')
 
 current_files = os.listdir('./')
 
@@ -52,9 +51,6 @@ files = ['entity_extractor.dat',
 for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
-
-print('Retrieving components...')
-os.system('sh install_mitie.sh')
 
 def configure():
     print('configuring components...')

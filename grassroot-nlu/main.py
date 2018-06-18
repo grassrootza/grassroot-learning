@@ -123,7 +123,7 @@ def add_detail_to_previous_text_state(new_value, uid):
         else:
             new_parsed['past_lives'].append(old_text)
 
-        # update_database(new_parsed)
+        update_database(new_parsed)
         data = new_parsed['uid']
 
         return render_html_template("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
@@ -148,7 +148,7 @@ def add_detail_to_text(text, uid):
         else:
             new_parsed['past_lives'].append(old_text)
 
-        # update_database(new_parsed)
+        update_database(new_parsed)
         return new_parsed
 
     except Exception as e:
@@ -163,9 +163,7 @@ purgables = ["extractor"]
 
 
 def process_gateway(text_to_parse):
-    #recall = check_database(database, text_to_parse)
-    recall = False # remove after debugging
-
+    recall = check_database(database, text_to_parse)
     if recall != False:
         return recall   # suitable entry exists. Return said entry. Process complete.
     else:
@@ -176,7 +174,7 @@ def process_gateway(text_to_parse):
                      'past_lives': []
                     }
 
-        #insert_one(database, new_entry)
+        insert_one(database, new_entry)
 
         uid = new_entry['_id']
         x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives'])
@@ -190,7 +188,7 @@ def parser(text, uid, date_time, past_life):
     # with open("./nsa/event_listener.txt", "a") as myfile:
     #     myfile.write(str(parsed_data)+"\n\n")
 
-    # res = update_database(parsed_data)
+    res = update_database(parsed_data)
     parsed = time_formalizer(parse)
     parsed_data['parsed'] = parsed
 
@@ -204,12 +202,12 @@ def parser(text, uid, date_time, past_life):
     return parsed_data
 
 
-# def update_database(new_data):
-#     update_db(database, new_data)
+def update_database(new_data):
+    update_db(database, new_data)
 
 
-# def save_as_training_instance(uid):
-#     find_clean_and_save(database, {'uid': uid})
+def save_as_training_instance(uid):
+    find_clean_and_save(database, {'uid': uid})
 
 def time_formalizer(parsed_data):
 

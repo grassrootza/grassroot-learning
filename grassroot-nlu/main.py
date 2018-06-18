@@ -12,7 +12,7 @@ from datetime_engine import *
 # from databases.poly_dynamo import *
 # from distance import *
 from flask import Flask,request, url_for, render_template, Response
-from config import interpreter #, database
+from config import interpreter, database
 
 app = Flask(__name__)
 

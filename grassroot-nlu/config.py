@@ -20,12 +20,13 @@ database = DynamoDB
 
 os.system('aws ecr get-login --region eu-west-1')
 os.system('aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh')
-os.system('source ./feersum_setup.sh')
+# os.system('source ./feersum_setup.sh')
 
+s3 = boto3.resource('s3')
 client = boto3.client('s3',
-                       os.environ['AWS_ACCESS_KEY_ID'], # env vars should be passed with the docker run command
-                       os.environ['AWS_SECRET_ACCESS_KEY'],
-                       os.environ['AWS_DEFAULT_REGION']) 
+                       aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], # env vars should be passed with the docker run command
+                       aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],) 
+# s3 = boto3.resource('s3', default_region='eu-west-1', api_version='2006-03-01')
 
 current_files = os.listdir('./')
 
@@ -60,11 +61,11 @@ def configure():
     os.environ['PATH_TO_MITIE'] = './current_model/model/MITIE-models/english/total_word_feature_extractor.dat'        
 
     configuration_1 = {
-                     "pipeline": "mitie",
-                      "mitie_file": os.environ['PATH_TO_MITIE'],
-                      "path" : "./models",
-                      "data" : "./training_data.json"
-                    }
+                       "pipeline": "mitie",
+                       "mitie_file": os.environ['PATH_TO_MITIE'],
+                       "path" : "./models",
+                       "data" : "./training_data.json"
+                      }
     configuration_2 = {
                        "language": "en",
                        "pipeline": [

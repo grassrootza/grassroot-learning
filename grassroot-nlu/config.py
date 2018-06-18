@@ -18,9 +18,14 @@ threshold = 0.6
 database = DynamoDB
 #database = MongoDB
 
-"""
-client = boto3.client('s3')
-s3 = boto3.resource('s3')
+os.system('aws ecr get-login --region eu-west-1')
+os.system('aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh')
+os.system('source ./feersum_setup.sh')
+
+client = boto3.client('s3',
+                       os.environ['AWS_ACCESS_KEY_ID'], # env vars should be passed with the docker run command
+                       os.environ['AWS_SECRET_ACCESS_KEY'],
+                       os.environ['AWS_DEFAULT_REGION']) 
 
 current_files = os.listdir('./')
 
@@ -33,13 +38,12 @@ for file in word_distance_files:
 
 if 'feersum_setup.sh' not in current_files:
     s3.Bucket('grassroot-nlu').download_file('activation/feersum_setup.sh',
-                                              'feersum_setup.sh')
+                                             'feersum_setup.sh')
 
 
 files = ['entity_extractor.dat',
          'entity_synonyms.json',
          'intent_classifier.dat',
-         'metadata.json',
          'regex_featurizer.json',
          'training_data.json']
 
@@ -47,7 +51,6 @@ files = ['entity_extractor.dat',
 for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
-"""
 
 print('Retrieving components...')
 os.system('sh install_mitie.sh')
@@ -62,7 +65,6 @@ def configure():
                       "path" : "./models",
                       "data" : "./training_data.json"
                     }
-
     configuration_2 = {
                        "language": "en",
                        "pipeline": [

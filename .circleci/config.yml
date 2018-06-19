@@ -26,9 +26,9 @@ jobs:
       - checkout
       - run: 
         name: test awscli installation
-        command: |
-        'pip install awscli'
-        'pip install awsebcli'
+          command: |
+            pip install awscli
+            pip install awsebcli
 
 workflows:
   version: 2

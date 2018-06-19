@@ -8,15 +8,15 @@ jobs:
       - run:
         command: |
           pip install awscli
-          pip install awsebcli
-          # Build image and push to Docker Hub
-          docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-          bash ./buildDocker.sh
-          # docker pull grassrootdocker/terafirma:alpha
-          # deploy files to beanstalk
-          bash ./eb/setup-eb.sh
-          eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
-          eb deploy
+            pip install awsebcli
+            # Build image and push to Docker Hub
+            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            bash ./buildDocker.sh
+            # docker pull grassrootdocker/terafirma:alpha
+            # deploy files to beanstalk
+            bash ./eb/setup-eb.sh
+            eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
+            eb deploy
 
   test:
     docker:

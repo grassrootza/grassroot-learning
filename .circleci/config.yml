@@ -6,7 +6,6 @@ jobs:
     steps:
       - checkout
       - run:
-        name: install awscl
         command: |
           pip install awscli
           pip install awsebcli

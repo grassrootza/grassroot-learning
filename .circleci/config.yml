@@ -7,9 +7,9 @@ jobs:
       - checkout
       - run:
         command: |
-          pip install awscli
-            pip install awsebcli
-            # Build image and push to Docker Hub
+          pip install awscli --upgrade --user
+            pip install awsebcli --upgrade --user
+            # Build image and push to Docker Hub 
             docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
             bash ./buildDocker.sh
             # docker pull grassrootdocker/terafirma:alpha

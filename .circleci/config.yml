@@ -1,48 +1,37 @@
 version: 2
-
-step-library:
-  - &fetch-aws-cli
-      run:
-        name:
-        command: |
-          sudo apt-get update && sudo apt-get install python && sudo apt-get install python-pip && sudo apt-get install python-dev
-          pip install awscli --upgrade --user
-          pip install awsebcli --upgrade --user
-
-
 jobs:
-  dependencies:
-    docker:
-      - images: circleci/python:3.6.1
-
-
   build:
     docker:
       - image: circleci/python:3.6.1
-      services:
-      - docker
+    steps:
+      - checkout
+      - run:
+        name: install awscl
+        command: |
+          pip install awscli
+          pip install awsebcli
+          # Build image and push to Docker Hub
+          docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+          bash ./buildDocker.sh
+          # docker pull grassrootdocker/terafirma:alpha
+          # deploy files to beanstalk
+          bash ./eb/setup-eb.sh
+          eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
+          eb deploy
 
-  deploy-production:
-    command: |
-        # Build image and push to Docker Hub
-        - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-        - bash ./buildDocker.sh
-        #- docker pull grassrootdocker/terafirma:alpha
-
-        # deploy files to beanstalk
-        - bash ./eb/setup-eb.sh
-        - eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
-        - eb deploy
-
+  test:
+    docker:
+      - image: circleci/python:3.6.1
+    steps:
+      - checkout
+      - run: 
+        command: |
+        'pip install awscli'
+        'pip install awsebcli'
 
 workflows:
   version: 2
+  build_and_test:
     jobs:
-    - dependencies
-    - build:
-    - deploy-production:
-        requires:
-          - build
-        filters:
-          branches:
-            only: circle2-working
+      - build
+      - test

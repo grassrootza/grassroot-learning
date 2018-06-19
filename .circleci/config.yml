@@ -25,6 +25,7 @@ jobs:
     steps:
       - checkout
       - run: 
+        name: test awscli installation
         command: |
         'pip install awscli'
         'pip install awsebcli'

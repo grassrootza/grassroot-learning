@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
+        auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
     steps:
       - checkout
       - setup_remote_docker:
@@ -10,8 +13,8 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-            bash ./buildDocker.sh
+            chmod +x buildDocker.sh
+            ./buildDocker.sh
 
   deploy:
     docker:
@@ -41,4 +44,6 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build

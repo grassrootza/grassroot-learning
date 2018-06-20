@@ -10,6 +10,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: docker build -t terafirma .
+      - run: docker tag terafirma grassrootdocker/terafirma:skywalker
+      - run: docker push grassrootdocker/terafirma:skywalker
 
   deploy:
     docker:
@@ -19,6 +21,8 @@ jobs:
       - run: 
           name: deploy
           command: |
+            sudo -H pip install awscli
+            sudo -H pip install awsebcli
             docker pull grassrootdocker/terafirma:alpha
             bash ./eb/setup-eb.sh
             eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem

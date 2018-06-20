@@ -6,7 +6,7 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Do everything at once because why make your life simpler
+        name: build
         command: |
             sudo pip install awscli
             sudo pip install awsebcli
@@ -17,8 +17,7 @@ jobs:
       - image: circlci/python:3.6.1
       steps:
       - checkout
-      - run:
-          name: Okay at least it's separated now but wtf
+      - run:deploy
           command: |
             docker pull grassrootdocker/terafirma:alpha
             bash ./eb/setup-eb.sh

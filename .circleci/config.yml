@@ -34,8 +34,8 @@ jobs:
       - checkout
       - run: 
           command: |
-            pip install awscli
-            pip install awsebcli
+            sudo -H pip install awscli
+            sudo -H pip install awsebcli
 
 workflows:
   version: 2

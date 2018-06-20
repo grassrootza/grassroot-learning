@@ -7,12 +7,9 @@ jobs:
       - checkout
       - run:
           name: Build docker image
-          command: echo 'Hello'
-
-            # sudo pip install awscli
-            # sudo pip install awsebcli
-            # docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-            # bash ./buildDocker.sh
+          command: |
+            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            bash ./buildDocker.sh
 
   deploy:
     docker:

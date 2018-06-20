@@ -11,21 +11,19 @@ jobs:
             sudo pip install awscli
             sudo pip install awsebcli
             docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-            bash ./buildDocker.sh
-            
-    deploy:
-      docker:
-        - image: circlci/python:3.6.1
-        steps:
-        - checkout
-        - run:
-            name: Okay at least it's separated now but wtf
-            command: |
-              docker pull grassrootdocker/terafirma:alpha
-              bash ./eb/setup-eb.sh
-              eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
-              eb deploy
-
+            bash ./buildDocker.sh           
+  deploy:
+    docker:
+      - image: circlci/python:3.6.1
+      steps:
+      - checkout
+      - run:
+          name: Okay at least it's separated now but wtf
+          command: |
+            docker pull grassrootdocker/terafirma:alpha
+            bash ./eb/setup-eb.sh
+            eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
+            eb deploy
   test:
     docker:
       - image: circleci/python:3.6.1

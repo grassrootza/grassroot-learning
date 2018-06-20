@@ -1,41 +1,53 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/mern-starter
+    # The primary container is an instance of the first image listed. The job's commands run in this container.
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/node:4.8.2
+    # The secondary container is an instance of the second listed image which is run in a common network where ports exposed on the primary container are available on localhost.
+      - image: mongo:3.4.4
     steps:
       - checkout
       - run:
-        name: build
-        command: |
-            sudo pip install awscli
-            sudo pip install awsebcli
-            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-            bash ./buildDocker.sh           
-  deploy:
-    docker:
-      - image: circlci/python:3.6.1
-      steps:
-      - checkout
-      - run:deploy
-          command: |
-            docker pull grassrootdocker/terafirma:alpha
-            bash ./eb/setup-eb.sh
-            eb init gr-learning -p "64bit Amazon Linux 2017.03 v2.7.1 running Docker 17.03.1-ce" -r eu-west-1 -k nlu-prep-key.pem
-            eb deploy
+          name: Update npm
+          command: 'sudo npm install -g npm@latest'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install npm wee
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
   test:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/node:4.8.2
+      - image: mongo:3.4.4
     steps:
       - checkout
-      - run: 
-          command: |
-            pip install awscli
-            pip install awsebcli
+      - run:
+          name: Test
+          command: npm test
+      - run:
+          name: Generate code coverage
+          command: './node_modules/.bin/nyc report --reporter=text-lcov'
+      - store_artifacts:
+          path: test-results.xml
+          prefix: tests
+      - store_artifacts:
+          path: coverage
+          prefix: coverage
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

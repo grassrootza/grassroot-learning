@@ -25,7 +25,6 @@ jobs:
           command: |
             sudo -H pip install awscli
             sudo -H pip install awsebcli
-            docker pull grassrootdocker/terafirma:alpha
             aws elasticbeanstalk update-environment --environment-name learning-staging --region eu-west-1
             
   test:
@@ -42,8 +41,8 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      # - build
+      # - test:
+      #     requires:
+      #       - build
       - deploy

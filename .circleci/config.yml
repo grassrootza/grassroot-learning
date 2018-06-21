@@ -10,9 +10,9 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: |
-        docker build -t terafirma .
-        docker tag terafirma grassrootdocker/terafirma:skywalker
-        docker push grassrootdocker/terafirma:skywalker
+          docker build -t terafirma .
+          docker tag terafirma grassrootdocker/terafirma:skywalker
+          docker push grassrootdocker/terafirma:skywalker
 
   deploy:
     docker:

@@ -76,6 +76,8 @@ jobs:
           command: |
             . venv/bin/activate
             python grassroot-nlu/main.py test
+            curl 127.0.0.1:5000/
+            curl 127.0.0.1:5000/datetime?date_string=tomorrow
       - store_artifacts:
           path: test-reports/
           destination: tr1

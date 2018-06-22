@@ -75,7 +75,7 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-            python grassroot-nlu/datetime_engine.py test
+            python grassroot-nlu/main.py test
       - store_artifacts:
           path: test-reports/
           destination: tr1

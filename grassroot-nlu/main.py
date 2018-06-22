@@ -11,8 +11,12 @@ from databases.poly_database import *
 from databases.poly_Mongo import *
 from databases.poly_dynamo import *
 # from distance import *
-from flask import Flask,request, url_for, render_template, Response
-from config import interpreter, database
+rasa_present = True
+try:
+    from flask import Flask,request, url_for, render_template, Response
+    from config import interpreter, database
+except Exception as e:
+    rasa_present = False
 
 app = Flask(__name__)
 

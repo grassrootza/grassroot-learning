@@ -14,6 +14,7 @@ def test_light_build():
     print('driver: %s' % driver)
     print('\n\ndriver.title: %s' % driver.title)
     #assert "Grassroot-nlu" in driver.title
-    os.system('curl localhost:5000/shutdown')
+    time.sleep(5)
+    os.system('curl 127.0.0.1:5000/shutdown')
 
 test_light_build()

@@ -7,9 +7,10 @@ import json
 import re
 import uuid, time, datetime, pprint
 from datetime_engine import *
-from flask import Flask,request, url_for, render_template, Response
+from flask import Flask, request, url_for, render_template, Response
 # from distance import *
 rasa_present = True
+"""
 try:
     from databases.poly_database import *
     from databases.poly_Mongo import *
@@ -18,7 +19,7 @@ try:
 except Exception as e:
     rasa_present = False
     pass
-
+"""
 app = Flask(__name__)
 
 @app.route('/')
@@ -90,6 +91,15 @@ def date():
 def w_distance():
     text = request.args.get('text').lower().strip()
     return Response(json.dumps(distance(text)), mimetype='application/json')
+
+# for tests
+@app.route('/shutdown')
+def shutdown():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server :(')
+    func()
+    return 'Server shutting down'
 
 
 def process_identifier(text):

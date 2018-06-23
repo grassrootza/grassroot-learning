@@ -9,13 +9,15 @@ def start_light_app():
 def test_light_build():
     driver = webdriver.Chrome(service_args=['--verbose'])
     threading.Thread(target=start_light_app).start()
-    time.sleep(15)
-    driver.get('http://localhost:5000/')
-    driver.get('http://localhost:5000/datetime?date_string=tomorrow')
+    x = driver.get('http://localhost:5000/')
+    y = driver.get('http://localhost:5000/datetime?date_string=tomorrow')
+    z = driver.get('http://localhost:5000/nullpath')
+    try:
+        print('x: %s, \n\ny: %s, \n\nz: %s' % (x,y,z))
+    except:
+    	pass
     print('driver: %s' % driver)
     print('\n\ndriver.title: %s' % driver.title)
-    #assert "Grassroot-nlu" in driver.title
-    time.sleep(5)
     driver.get('http://127.0.0.1:5000/shutdown')
 
 test_light_build()

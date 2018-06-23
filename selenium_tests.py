@@ -9,6 +9,7 @@ def start_light_app():
 def test_light_build():
     driver = webdriver.Chrome(service_args=['--verbose'])
     threading.Thread(target=start_light_app).start()
+    time.sleep(30)
     driver.get('http://localhost:5000/')
     driver.get('http://localhost:5000/datetime?date_string=tomorrow')
     driver.get('http://localhost:5000/nullpath')

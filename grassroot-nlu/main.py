@@ -83,9 +83,11 @@ def parse_rest():
 
 @app.route('/datetime')
 def date():
-    d_string = request.args.get('date_string')
-    return Response(datetime_engine(d_string), mimetype='application/json')
-
+    try:
+        d_string = request.args.get('date_string')
+        return Response(datetime_engine(d_string), mimetype='application/json')
+    except Exception as e:
+        raise e
 
 @app.route('/distance')
 def w_distance():

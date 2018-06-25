@@ -1,6 +1,6 @@
 import datetime
 import dateparser
-from duckling import Duckling
+# from duckling import Duckling
 
 d = Duckling()
 d.load()

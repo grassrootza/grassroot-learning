@@ -11,9 +11,14 @@ def test_light_build():
     threading.Thread(target=start_light_app).start()
     time.sleep(40)
     driver.get('http://localhost:5000/')
+    x = os.system('curl http://localhost:5000/')
+    print('x: %s' % x)
     if '404' in driver.title:
     	raise ValueError("path not available.")
+
     driver.get('http://localhost:5000/datetime?date_string=tomorrow')
+    y = os.system('curl http://localhost:5000/datetime?date_string=tomorrow')
+    print('y: %s' % y)
     if '404' in driver.title:
     	raise ValueError("path not available.")
     driver.get('http://127.0.0.1:5000/shutdown')

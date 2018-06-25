@@ -87,7 +87,7 @@ def date():
         d_string = request.args.get('date_string')
         return Response(datetime_engine(d_string), mimetype='application/json')
     except Exception as e:
-        reurn '404'
+        return '404'
 
 @app.route('/distance')
 def w_distance():

@@ -2,3 +2,4 @@ duckling
 dateparser
 flask
 selenium
+requests

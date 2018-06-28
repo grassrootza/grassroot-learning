@@ -104,7 +104,7 @@ for line in split_data:
         pass
 """
 # custom test instances, add as required
-
+"""
 datetime_engine('tuesday 5am')
 datetime_engine('tomorrow afternoon')
 datetime_engine('tuesday evening 5')
@@ -116,3 +116,4 @@ datetime_engine('26/01/2019')
 datetime_engine('27.08.2018')
 datetime_engine('tuesday  August 2018')
 datetime_engine('26 6 2018')
+"""

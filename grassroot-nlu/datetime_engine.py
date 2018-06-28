@@ -15,14 +15,14 @@ def datetime_engine(d_string):
     print(beam)
     print('request: %s' % d_string)
     set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ', '.', '_']         
-    set2 = list(d_string)                                                # F #
-    formal = True                                                       # R #
-    for i in set2:                                                       # T #
-        if i not in set1:                                                 # N #
-            formal = False                                               # X #
+    set2 = list(d_string)
+    formal = True
+    for i in set2:
+        if i not in set1:
+            formal = False
     if formal == True:
-        new_time = d_string.strip().replace(' ', '-').replace('/', '-').replace('.','-').replace('_','-')+'T00:00'
-        print('returning: %s' % new_time)                                                   # # #
+        new_time = verify_format(d_string.strip().replace(' ', '-').replace('/', '-').replace('.','-').replace('_','-'))+'T00:00'
+        print('returning: %s' % new_time)
         return new_time
 
     time = datetime.datetime.now()
@@ -31,7 +31,7 @@ def datetime_engine(d_string):
     raw = str(dateparser.parse(d_string, settings={'DATE_ORDER': 'DMY'}))
     if raw == 'NoneChucks':   # raw will never be NoneChucks, effectively disabling this engine. Switch this to 'if raw != None:' when needed.
         clean = raw.replace(' ', 'T')
-        return clean[:16]+'\nprocessed by engine 2'
+        return clean[:16]
 
     else:
         x = d.parse(d_string)
@@ -71,6 +71,20 @@ def datetime_engine(d_string):
                     print('No suitable value found. There you have it folks.')
                     return ''
 
+
+def verify_format(ds):
+    x = ds.split('-')
+    fmtd = []
+    for i in x:
+        if len(i) == 1:
+            prefix = '0'
+            fmtd.append(prefix+i)
+        else:
+            fmtd.append(i)
+    return '-'.join(fmtd)
+
+
+
 beam = '----------------------------------------------------'
 
 # test from raw csv
@@ -90,7 +104,7 @@ for line in split_data:
         pass
 """
 # custom test instances, add as required
-"""
+
 datetime_engine('tuesday 5am')
 datetime_engine('tomorrow afternoon')
 datetime_engine('tuesday evening 5')
@@ -101,4 +115,4 @@ datetime_engine('29 06 2018')
 datetime_engine('26/01/2019')
 datetime_engine('27.08.2018')
 datetime_engine('tuesday  August 2018')
-"""
+datetime_engine('26 6 2018')

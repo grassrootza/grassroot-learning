@@ -1,5 +1,6 @@
 import datetime
 import dateparser
+import time
 from duckling import Duckling
 
 d = Duckling()
@@ -13,14 +14,16 @@ def unix_time_millis(dt):
 def datetime_engine(d_string):
     print(beam)
     print('request: %s' % d_string)
-    set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ']         # # #
+    set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ', '.', '_']         
     set2 = list(d_string)                                                # F #
     formal = True                                                       # R #
     for i in set2:                                                       # T #
         if i not in set1:                                                 # N #
             formal = False                                               # X #
-    if formal == True:                                                   # # #
-        return d_string
+    if formal == True:
+        new_time = d_string.strip().replace(' ', '-').replace('/', '-').replace('.','-').replace('_','-')+'T00:00'
+        print('returning: %s' % new_time)                                                   # # #
+        return new_time
 
     time = datetime.datetime.now()
     current_time_raw = unix_time_millis(time)
@@ -40,6 +43,7 @@ def datetime_engine(d_string):
                     print('parsed time: %s | %s ' % (parse_time_raw, parse_time))
                     if int(parse_time_raw) < int(current_time_raw):
                         cycle = 0
+                        cycle2 = 0
                         while int(parse_time_raw) < int(current_time_raw):
                             print('parsed value is in the past. sad.')           
                             for j in range(len(x[i]['value']['values'])):
@@ -54,6 +58,11 @@ def datetime_engine(d_string):
                                     if cycle == 8:
                                         print('No suitable value found. There you have it folks.')
                                         return ''
+                            if cycle2 == 8:
+                                print('No suitable value found. There you have it folks.')
+                                return ''
+                            else:
+                                cycle2 += 1
                     else:
                         if int(parse_time_raw) > int(current_time_raw):
                             print('parsed value is in the future. great.')
@@ -64,11 +73,32 @@ def datetime_engine(d_string):
 
 beam = '----------------------------------------------------'
 
-# test instances, add as required
+# test from raw csv
+"""
+test_file = open('time_inputs.csv', 'r')
+raw_data = test_file.read()
+split_data = raw_data.split('\n')
+print(split_data)
+
+for line in split_data:
+    # print('line: %s' % line)
+    try:
+        start = line.find("input:")+7
+        datetime_engine(line[start:].replace('"',''))
+        # time.sleep(3)
+    except:
+        pass
+"""
+# custom test instances, add as required
 """
 datetime_engine('tuesday 5am')
 datetime_engine('tomorrow afternoon')
 datetime_engine('tuesday evening 5')
 datetime_engine('friday 9am')
 datetime_engine('today')
+datetime_engine('today at 9pm')
+datetime_engine('29 06 2018')
+datetime_engine('26/01/2019')
+datetime_engine('27.08.2018')
+datetime_engine('tuesday  August 2018')
 """

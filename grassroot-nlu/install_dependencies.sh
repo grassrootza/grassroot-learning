@@ -20,6 +20,8 @@ fi
 
 pip install flask
 
+pip install googletrans
+
 pip install pymongo
 
 pip install schedule

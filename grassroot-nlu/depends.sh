@@ -3,6 +3,8 @@
 
 pip3 install flask
 
+pip3 install googletrans
+
 
 # pip3 install pymongo
 

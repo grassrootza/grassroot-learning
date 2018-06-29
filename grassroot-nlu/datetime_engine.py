@@ -1,8 +1,10 @@
 import datetime
 import dateparser
 import time
+from googletrans import Translator
 from duckling import Duckling
 
+translator = Translator()
 d = Duckling()
 d.load()
 
@@ -14,16 +16,21 @@ def unix_time_millis(dt):
 def datetime_engine(d_string):
     print(beam)
     print('request: %s' % d_string)
-    set1 = ['0','1','2','3','4','5','6','7','8','9','-','/',' ', '.', '_']         
+    set1 = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '/', ' ', '.', '_']
     set2 = list(d_string)
     formal = True
     for i in set2:
         if i not in set1:
             formal = False
     if formal == True:
-        new_time = verify_format(d_string.strip().replace(' ', '-').replace('/', '-').replace('.','-').replace('_','-'))+'T00:00'
-        print('returning: %s' % new_time)
-        return new_time
+        new_time = verify_format(transform(d_string).strip().replace(' ', '-').replace('/', '-').replace('.','-').replace('_','-'))+'T00:00'
+        try:
+            datetime.datetime.strptime(new_time, "%d-%m-%YT00:00")
+            print('returning: %s' % new_time)
+            return new_time
+        except ValueError as e:
+            print('could not parse request.\nreturning: %s' % d_string)
+            return d_string
 
     time = datetime.datetime.now()
     current_time_raw = unix_time_millis(time)
@@ -34,6 +41,7 @@ def datetime_engine(d_string):
         return clean[:16]
 
     else:
+        d_string = translate(d_string)
         x = d.parse(d_string)
         for i in range(len(x)):
             if x[i]['dim'] == 'time':
@@ -84,6 +92,38 @@ def verify_format(ds):
     return '-'.join(fmtd)
 
 
+def transform(dst):
+    ds = dst.strip().replace('/', '').replace('.', '').replace('_','').replace('-','').replace(' ','')
+    if len(ds) == 6 or len(ds) == 8:
+        if ' ' not in ds:
+            dd = ds[:2]
+            mm = ds[2:4]
+            yy = ds[4:]
+            if len(yy) == 2:
+                prefix = '20'
+                this_year = datetime.datetime.now().year
+                if prefix+yy == this_year:
+                    yy = this_year
+                else:
+                    yy = prefix+yy
+            raw = [dd,mm,yy]
+            return '-'.join(raw)
+        else:
+            return dst
+    else:
+        return dst
+
+def translate(ds):
+    try:
+        translated = translator.translate(ds)
+        trans_json = translated.__dict__
+        trans_text = trans_json['text']
+        print('translater recieved: %s \ntranslated to: %s' % (ds, trans_text))
+        return trans_text
+    except Exception as e:
+        print(str(e))
+        return ds
+
 
 beam = '----------------------------------------------------'
 
@@ -104,7 +144,7 @@ for line in split_data:
         pass
 """
 # custom test instances, add as required
-"""
+
 datetime_engine('tuesday 5am')
 datetime_engine('tomorrow afternoon')
 datetime_engine('tuesday evening 5')
@@ -116,4 +156,18 @@ datetime_engine('26/01/2019')
 datetime_engine('27.08.2018')
 datetime_engine('tuesday  August 2018')
 datetime_engine('26 6 2018')
-"""
+datetime_engine('200618')
+datetime_engine('20062018')
+datetime_engine('2606 430') # unsupported
+datetime_engine('2606 4300') # unsupported
+datetime_engine('2606') # unsupported
+datetime_engine('20/06/18')
+datetime_engine('20/06/2018')
+datetime_engine('20.06.08')
+datetime_engine('20.06.2018')
+datetime_engine('20_06_08')
+datetime_engine('20_06_2018')
+datetime_engine('20-6-2018')
+datetime_engine('20-06-18')
+datetime_engine('ngomso at 5pm')
+datetime_engine('kusasa ngo 11pm')

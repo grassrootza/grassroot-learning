@@ -1,3 +1,4 @@
+print('Loading configurations...')
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.converters import load_data
 from rasa_nlu.model import Interpreter, Metadata, Trainer
@@ -17,9 +18,14 @@ threshold = 0.6
 database = DynamoDB
 #database = MongoDB
 
+os.system('aws ecr get-login --region eu-west-1')
+# os.system('aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh')
+# os.system('source ./feersum_setup.sh') 
 
-client = boto3.client('s3')
 s3 = boto3.resource('s3')
+client = boto3.client('s3',
+                       aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], # env vars should be passed with the docker run command
+                       aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],) 
 
 current_files = os.listdir('./')
 
@@ -32,13 +38,12 @@ for file in word_distance_files:
 
 if 'feersum_setup.sh' not in current_files:
     s3.Bucket('grassroot-nlu').download_file('activation/feersum_setup.sh',
-                                              'feersum_setup.sh')
+                                             'feersum_setup.sh')
 
 
 files = ['entity_extractor.dat',
          'entity_synonyms.json',
          'intent_classifier.dat',
-         'metadata.json',
          'regex_featurizer.json',
          'training_data.json']
 
@@ -47,34 +52,49 @@ for file in files:
     x = s3.Bucket('grassroot-nlu').download_file('models/current_model/%s' % file, 
                                                  './current_model/%s' % file)
 
-
-metadata = Metadata.load('./current_model')
-
-
 def configure():
+    print('configuring components...')
+    os.environ['PATH_TO_MITIE'] = './current_model/model/MITIE-models/english/total_word_feature_extractor.dat'        
 
-    try:
-
-        os.environ['PATH_TO_MITIE']
-
-    except KeyError as e:
-        os.environ['PATH_TO_MITIE'] = './model/MITIE-models/english/total_word_feature_extractor.dat'        
-
-
-    configuration = {
-                     "pipeline": "mitie",
-                      "mitie_file": os.environ['PATH_TO_MITIE'],
-                      "path" : "./models",
-                      "data" : "./training_data.json"
-                    }
+    configuration_1 = {
+                       "pipeline": "mitie",
+                       "mitie_file": os.environ['PATH_TO_MITIE'],
+                       "path" : "./models",
+                       "data" : "./training_data.json"
+                      }
+    configuration_2 = {
+                       "language": "en",
+                       "pipeline": [
+                                    "nlp_mitie",
+                                    "tokenizer_mitie",
+                                    "ner_mitie",
+                                    "ner_synonyms",
+                                    "intent_entity_featurizer_regex",
+                                    "intent_classifier_mitie"
+                                   ],
+                       "training_data": "training_data.json",
+                       "mitie_feature_extractor_fingerprint": 4070312463,
+                       "mitie_file": "./current_model/model/MITIE-models/english/total_word_feature_extractor.dat",
+                       "entity_extractor_mitie": "entity_extractor.dat",
+                       "entity_synonyms": "entity_synonyms.json",
+                       "regex_featurizer": "regex_featurizer.json",
+                       "intent_classifier_mitie": "intent_classifier.dat",
+                       "trained_at": "20171004-160114",
+                       "rasa_nlu_version": "0.9.2"
+                       }
 
     c_file = open('config_mitie.json', 'w')
-    c_file.write(json.dumps(configuration))
+    c_file.write(json.dumps(configuration_1))
+    
+    os.system('touch ./current_model/metadata.json')
+    m_file = open('./current_model/metadata.json', 'w')
+    m_file.write(json.dumps(configuration_2))
 
 
 configure()
+metadata = Metadata.load('./current_model')
 interpreter = Interpreter.load(metadata, RasaNLUConfig('config_mitie.json'))
-
+print('components configured')
 
 def generate_training_data():
 
@@ -218,4 +238,4 @@ def default(obj):
 
     raise TypeError("Object of type '%s' is not JSON serializable" % type(obj))
 
-
+print('I am configured.')

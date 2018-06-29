@@ -1,0 +1,6 @@
+duckling
+dateparser
+flask
+selenium
+requests
+googletrans

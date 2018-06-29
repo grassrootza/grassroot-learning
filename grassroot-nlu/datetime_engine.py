@@ -127,47 +127,50 @@ def translate(ds):
 
 beam = '----------------------------------------------------'
 
-# test from raw csv
-"""
-test_file = open('time_inputs.csv', 'r')
-raw_data = test_file.read()
-split_data = raw_data.split('\n')
-print(split_data)
 
-for line in split_data:
-    # print('line: %s' % line)
-    try:
-        start = line.find("input:")+7
-        datetime_engine(line[start:].replace('"',''))
-        # time.sleep(3)
-    except:
-        pass
-"""
-# custom test instances, add as required
+def test_engine(*csv):
+    if not csv:
+        datetime_engine('tuesday 5am')
+        datetime_engine('tomorrow afternoon')
+        datetime_engine('tuesday evening 5')
+        datetime_engine('friday 9am')
+        datetime_engine('today')
+        datetime_engine('today at 9pm')
+        datetime_engine('29 06 2018')
+        datetime_engine('26/01/2019')
+        datetime_engine('27.08.2018')
+        datetime_engine('tuesday  August 2018')
+        datetime_engine('26 6 2018')
+        datetime_engine('200618')
+        datetime_engine('20062018')
+        datetime_engine('2606 430') # unsupported
+        datetime_engine('2606 4300') # unsupported
+        datetime_engine('2606') # unsupported
+        datetime_engine('20/06/18')
+        datetime_engine('20/06/2018')
+        datetime_engine('20.06.08')
+        datetime_engine('20.06.2018')
+        datetime_engine('20_06_08')
+        datetime_engine('20_06_2018')
+        datetime_engine('20-6-2018')
+        datetime_engine('20-06-18')
+        datetime_engine('ngomso at 5pm')
+        datetime_engine('kusasa ngo 11pm')
+    else:
+        test_file = open('time_inputs.csv', 'r')
+        raw_data = test_file.read()
+        split_data = raw_data.split('\n')
+        print(split_data)
 
-datetime_engine('tuesday 5am')
-datetime_engine('tomorrow afternoon')
-datetime_engine('tuesday evening 5')
-datetime_engine('friday 9am')
-datetime_engine('today')
-datetime_engine('today at 9pm')
-datetime_engine('29 06 2018')
-datetime_engine('26/01/2019')
-datetime_engine('27.08.2018')
-datetime_engine('tuesday  August 2018')
-datetime_engine('26 6 2018')
-datetime_engine('200618')
-datetime_engine('20062018')
-datetime_engine('2606 430') # unsupported
-datetime_engine('2606 4300') # unsupported
-datetime_engine('2606') # unsupported
-datetime_engine('20/06/18')
-datetime_engine('20/06/2018')
-datetime_engine('20.06.08')
-datetime_engine('20.06.2018')
-datetime_engine('20_06_08')
-datetime_engine('20_06_2018')
-datetime_engine('20-6-2018')
-datetime_engine('20-06-18')
-datetime_engine('ngomso at 5pm')
-datetime_engine('kusasa ngo 11pm')
+        for line in split_data:
+            # print('line: %s' % line)
+            try:
+                start = line.find("input:")+7
+                datetime_engine(line[start:].replace('"',''))
+                # time.sleep(3)
+            except:
+                pass
+
+
+# test_engine()
+# test_engine(*['csv_mode'])

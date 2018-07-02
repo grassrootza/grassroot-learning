@@ -81,7 +81,9 @@ def index():
 @app.route('/datetime')
 def date():
     d_string = request.args.get('date_string')
-    return Response(datetime_engine(d_string), mimetype='application/json')
+    datetime_response = datetime_engine(d_string)
+    print('main recieved from dt: %s' % datetime_response)
+    return Response(datetime_response, mimetype='application/json')
 
 # for tests
 @app.route('/shutdown')

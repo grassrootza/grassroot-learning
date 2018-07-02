@@ -28,16 +28,19 @@ def datetime_engine(d_string):
             datetime.datetime.strptime(new_time, "%d-%m-%YT00:00")
             valid_year = validate_year(new_time)
             if valid_year:
-                print('returning: %s' % new_time)
+                print('returning a: %s' % new_time)
                 return new_time
             else:
-            	print('returning: %s' % d_string)
+            	print('returning b: %s' % d_string)
             	return d_string
         except ValueError as e:
-            d_string = omega(d_string)
-            if d_string != None:
-                print('returning omega value: %s' % d_string)
-                return d_string
+            d_s = omega(d_string)
+            if d_s != None:
+                if validate_year(d_s):
+                    print('returning omega value: %s' % d_s)
+                    return d_s
+                else:
+                    return d_string
 
     else:
         time = datetime.datetime.now()
@@ -129,11 +132,11 @@ def translate(ds):
 def omega(ds):                    
     if '/' in ds or '-' in ds:                                                            
         yy = '-'+str(datetime.datetime.now().year)         
-        new_date = ds.strip().replace('/','-')+yy
+        new_date = verify_format(ds.strip().replace('/','-')+yy)
         try:                     
             datetime.datetime.strptime(new_date, "%d-%m-%Y")
             affirmed_date = check_tense_and_fix(new_date)
-            datetime_engine(affirmed_date)                                   
+            return datetime_engine(affirmed_date)                                   
         except ValueError as e:
             return ds                    
     else:
@@ -152,10 +155,13 @@ def check_tense_and_fix(new_date):
 
 def validate_year(ds):
     this_year = datetime.datetime.now().year
-    if int(ds[6:10]) > this_year+1 or int(ds[6:10]) < this_year:
+    try:
+        if int(ds[6:10]) > this_year+1 or int(ds[6:10]) < this_year:
+            return False
+        else:
+            return True
+    except:
         return False
-    else:
-        return True
 
 
 beam = '----------------------------------------------------'
@@ -194,6 +200,8 @@ def test_engine(*csv):
         datetime_engine('27-03')
         datetime_engine('27-09')
         datetime_engine('27-9')
+        datetime_engine('27-1')
+        datetime_engine('13/3')
     else:
         test_file = open('time_inputs.csv', 'r')
         raw_data = test_file.read()

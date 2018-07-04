@@ -3,3 +3,4 @@ dateparser
 flask
 selenium
 requests
+googletrans

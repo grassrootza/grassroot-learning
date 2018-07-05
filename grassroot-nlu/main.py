@@ -82,25 +82,9 @@ def parse_rest():
 @app.route('/datetime')
 def date():
     d_string = request.args.get('date_string')
-<<<<<<< HEAD
-    return Response(datetime_engine(d_string), mimetype='application/json')
-
-# for tests
-@app.route('/shutdown')
-def shutdown():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server :(')
-    func()
-    return 'Server shutting down'
-
-# @app.route('/distance')
-# def w_distance():
-=======
     datetime_response = datetime_engine(d_string)
     print('main recieved from dt: %s' % datetime_response)
     return Response(datetime_response, mimetype='application/json')
->>>>>>> circle2-working
 
 # for tests
 @app.route('/shutdown')

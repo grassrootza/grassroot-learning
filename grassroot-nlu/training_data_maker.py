@@ -3,16 +3,6 @@ import json
 import os
 import time
 
-# R: Research on whether normalising text before rasaring it helps or not
-# NOTE: Perhaps it might helpt to convert meeting training data along with
-# affirm, negate, and null entities to this new format. change main.py accordingly
-# NOTE: Remember that all input will go to an intent extractor before being sent to
-# an entity extractor.
-# TODO: Separate training data json destinations according. Add directing param
-# TODO: Change structure to allow entity value to be passed with value key value
-# NOTE: make sure the training data json files contains a stub
-# containing the entity synonyms and other hire keys
-
 intents = {"rasa_nlu_data": {"common_examples": []}}
 meeting = {"rasa_nlu_data": {"common_examples": []}}
 group = {"rasa_nlu_data": {"common_examples": []}}

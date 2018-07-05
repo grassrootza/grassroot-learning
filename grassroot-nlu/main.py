@@ -2,22 +2,26 @@ print('Ignition.')
 import os
 import sys
 # import psutil
-import logging
-import json
-import re
 import uuid, time, datetime, pprint
 from datetime_engine import *
 from flask import Flask, request, url_for, render_template, Response
 # from distance import *
-nlu_active = True
+nlu = False
 try:
+    nlu = sys.argv[1]
+except:
+	pass
+
+if not nlu:
+    print('no arguments past')
+    from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
+            meeting_interpreter, updates_interpreter, database
     from databases.poly_database import *
     from databases.poly_Mongo import *
     from databases.poly_dynamo import *
-    from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, meeting_interpreter, updates_interpreter, database
-except Exception as e:
-    nlu_active = False
-    pass
+else:
+    if nlu == '--no-nlu':
+        print('Recieved: %s\nLoading in test environment.' % nlu)
 
 app = Flask(__name__)
 
@@ -96,11 +100,12 @@ def shutdown():
     return 'Server shutting down'
 
 
-
+"""
 @app.route('/distance')
 def w_distance():
     text = request.args.get('text').lower().strip()
     return Response(json.dumps(distance(text)), mimetype='application/json')
+"""
 
 def process_identifier(text):
     x = intent_interpreter.parse(text)
@@ -109,7 +114,7 @@ def process_identifier(text):
     if value == 'affirm':
         return value
 
-    elif value == 'update': # change to elif value == 'update' after new implementation
+    elif value == 'update':  # change to elif value == 'update' after new implementation
         return 'update'
 
     elif value == 'negate':
@@ -143,7 +148,7 @@ def add_detail_to_previous_text_state(new_value, uid):
 
         return render_html_template("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
 
-    except:
+    except Exception as e:
         print(str(e))
         return "Patience and perseverence."
 

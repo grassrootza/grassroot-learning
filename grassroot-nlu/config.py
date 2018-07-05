@@ -56,7 +56,8 @@ def configure():
 
     try:
         load_interpreters()
-    except:
+    except Exception as e:
+        print(str(e))
         train_models()
         configure()
 

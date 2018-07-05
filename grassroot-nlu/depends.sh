@@ -4,10 +4,6 @@
 pip3 install flask
 
 pip3 install googletrans
-<<<<<<< HEAD
-
-=======
->>>>>>> circle2-working
 
 pip3 install pymongo
 

@@ -16,8 +16,6 @@ fi
 
 # conda install libgcc
 
-# jvm
-
 pip install flask
 
 pip install googletrans
@@ -38,13 +36,12 @@ pip install psutil
 
 pip install dateparser
 
-
 [ -f MITIE-models-v0.2.tar.bz2 ] && echo "Requirement already satisfied
  MITIE-models-v0.2.tar.bz2" || wget -P ./ https://github.com/mit-nlp/MITIE/releases/download/v0.4/MITIE-models-v0.2.tar.bz2
  
+tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./current_model/model/
 
-tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./model/
-
+sudo rm -r MITIE-models-v0.2.tar.bz2
 
 if hash aws; then
     echo "aws is installed.

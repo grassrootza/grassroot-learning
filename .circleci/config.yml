@@ -86,8 +86,17 @@ workflows:
   version: 2
   build_and_test:
     jobs:
+<<<<<<< HEAD
       - build
       - selenium_test:
           requires:
             - build
       - deploy
+=======
+      # - build
+      # - test:
+      #     requires:
+      #       - build
+      # - deploy
+      - selenium_test
+>>>>>>> circle2-working

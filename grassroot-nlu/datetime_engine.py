@@ -1,3 +1,4 @@
+print('loading datetime engine...')
 import datetime
 import dateparser
 import time
@@ -26,6 +27,7 @@ def datetime_engine(d_string):
         new_time = verify_format(transform(d_string).strip().replace(' ', '-').replace('/', '-').replace('.','-').replace('_','-'))+'T00:00'
         try:
             datetime.datetime.strptime(new_time, "%d-%m-%YT00:00")
+<<<<<<< HEAD
             print('returning: %s' % new_time)
             return new_time
         except ValueError as e:
@@ -41,6 +43,28 @@ def datetime_engine(d_string):
         return clean[:16]
 
     else:
+=======
+            valid_year = validate_year(new_time)
+            if valid_year:
+                print('returning a: %s' % new_time)
+                return new_time
+            else:
+            	print('returning b: %s' % d_string)
+            	return d_string
+        except ValueError as e:
+            d_s = omega(d_string)
+            if d_s != None:
+                if validate_year(d_s):
+                    print('returning omega value: %s' % d_s)
+                    return d_s
+                else:
+                    return d_string
+
+    else:
+        time = datetime.datetime.now()
+        current_time_raw = unix_time_millis(time)
+        print('current time: %s | %s' % (current_time_raw, str(time)[:16].replace(' ', 'T')))    	
+>>>>>>> circle2-working
         d_string = translate(d_string)
         x = d.parse(d_string)
         for i in range(len(x)):
@@ -124,6 +148,43 @@ def translate(ds):
         print(str(e))
         return ds
 
+<<<<<<< HEAD
+=======
+def omega(ds):                    
+    if '/' in ds or '-' in ds:                                                            
+        yy = '-'+str(datetime.datetime.now().year)         
+        new_date = verify_format(ds.strip().replace('/','-')+yy)
+        try:                     
+            datetime.datetime.strptime(new_date, "%d-%m-%Y")
+            affirmed_date = check_tense_and_fix(new_date)
+            return datetime_engine(affirmed_date)                                   
+        except ValueError as e:
+            return ds                    
+    else:
+        return ds 
+
+def check_tense_and_fix(new_date):
+    derived_time = unix_time_millis(datetime.datetime.strptime(new_date, '%d-%m-%Y'))
+    current_time = unix_time_millis(datetime.datetime.now())
+    if derived_time < current_time:
+        year = int(new_date[6:10])
+        new_year = year+1
+        abridged_date = new_date[:6]+str(new_year)+new_date[10:]
+        return abridged_date
+    else:
+        return new_date
+
+def validate_year(ds):
+    this_year = datetime.datetime.now().year
+    try:
+        if int(ds[6:10]) > this_year+1 or int(ds[6:10]) < this_year:
+            return False
+        else:
+            return True
+    except:
+        return False
+
+>>>>>>> circle2-working
 
 beam = '----------------------------------------------------'
 
@@ -143,6 +204,10 @@ def test_engine(*csv):
         datetime_engine('26 6 2018')
         datetime_engine('200618')
         datetime_engine('20062018')
+<<<<<<< HEAD
+=======
+        datetime_engine('2606 0430') # unsupported
+>>>>>>> circle2-working
         datetime_engine('2606 430') # unsupported
         datetime_engine('2606 4300') # unsupported
         datetime_engine('2606') # unsupported
@@ -156,6 +221,15 @@ def test_engine(*csv):
         datetime_engine('20-06-18')
         datetime_engine('ngomso at 5pm')
         datetime_engine('kusasa ngo 11pm')
+<<<<<<< HEAD
+=======
+        datetime_engine('11-05')
+        datetime_engine('27-03')
+        datetime_engine('27-09')
+        datetime_engine('27-9')
+        datetime_engine('27-1')
+        datetime_engine('13/3')
+>>>>>>> circle2-working
     else:
         test_file = open('time_inputs.csv', 'r')
         raw_data = test_file.read()
@@ -173,4 +247,9 @@ def test_engine(*csv):
 
 
 # test_engine()
+<<<<<<< HEAD
 # test_engine(*['csv_mode'])
+=======
+# test_engine(*['csv_mode'])
+print('datetime engine loaded.')
+>>>>>>> circle2-working

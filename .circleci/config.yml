@@ -11,9 +11,9 @@ jobs:
       - setup_remote_docker
       - run: |
           docker build -t terafirma .
-          docker tag terafirma grassrootdocker/terafirma:skywalker
+          docker tag terafirma grassrootdocker/terafirma:latest
           docker login -u $DOCKER_USER -p $DOCKER_PASS
-          docker push grassrootdocker/terafirma:skywalker
+          docker push grassrootdocker/terafirma:latest
 
   deploy:
     docker:

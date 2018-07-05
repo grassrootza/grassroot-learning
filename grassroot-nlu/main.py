@@ -276,4 +276,4 @@ def formalizer_helper(time_string):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

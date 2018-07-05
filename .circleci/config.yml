@@ -91,6 +91,8 @@ workflows:
           requires:
             - build
       - deploy:
+          requires:
+            - selenium_test
           filters:
             branches:
               only: preprod

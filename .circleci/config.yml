@@ -25,7 +25,9 @@ jobs:
           command: |
             sudo -H pip install awscli
             sudo -H pip install awsebcli
-            aws elasticbeanstalk update-environment --environment-name learning-staging --region eu-west-1
+            echo "Deploying version $CIRCLE_BRANCH-$CIRCLE-SHA1"
+            sed -i "s/<TAG>/$CIRCLE_BRANCH-$CIRCLE_SHA1/" ./Dockerrun.aws.json
+            eb deploy learning-staging
             
   test:
     docker:

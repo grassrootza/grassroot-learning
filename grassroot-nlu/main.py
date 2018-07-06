@@ -12,16 +12,16 @@ try:
 except:
 	pass
 
-if not nlu:
-    print('no arguments past')
-    from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
-            meeting_interpreter, updates_interpreter, database
-    from databases.poly_database import *
-    from databases.poly_Mongo import *
-    from databases.poly_dynamo import *
-else:
-    if nlu == '--no-nlu':
-        print('Recieved: %s\nLoading in test environment.' % nlu)
+# if not nlu:
+#     print('no arguments past')
+#     from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
+#             meeting_interpreter, updates_interpreter, database
+#     from databases.poly_database import *
+#     from databases.poly_Mongo import *
+#     from databases.poly_dynamo import *
+# else:
+#     if nlu == '--no-nlu':
+#         print('Recieved: %s\nLoading in test environment.' % nlu)
 
 app = Flask(__name__)
 

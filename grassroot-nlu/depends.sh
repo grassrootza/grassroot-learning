@@ -38,5 +38,3 @@ pip3 install psutil
 tar xvjf MITIE-models-v0.2.tar.bz2 --directory ./current_model/model/
 
 sudo rm -r MITIE-models-v0.2.tar.bz2
-
-python3 training_data_maker.py

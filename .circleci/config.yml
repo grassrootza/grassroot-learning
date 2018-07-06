@@ -89,12 +89,12 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - selenium_test:
-          requires:
-            - build
+      # - selenium_test:
+      #     requires:
+      #       - build
       - deploy:
           requires:
-            - selenium_test
+            - build
           filters:
             branches:
               only: preprod

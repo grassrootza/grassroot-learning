@@ -8,7 +8,7 @@ apk add libpng
 
 # pip3 install numpy==1.14.3
 
-pip3 install --no-deps pandas==0.23.0
+# pip3 install --no-deps pandas==0.23.0
 
 # pip3 install rasa_nlu==0.10.6
 

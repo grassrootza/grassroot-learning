@@ -58,7 +58,8 @@ def configure():
         load_interpreters()
     except Exception as e:
         print(str(e))
-        train_models()
+        print("Dont worry, I'll take care of this\ndeploying counter-measures...")
+        try_download_models()
         configure()
 
 def load_interpreters():
@@ -82,11 +83,37 @@ def load_interpreters():
     todo_interpreter = Interpreter.load(todo_metadata, RasaNLUConfig('todo_config_mitie.json'))
     updates_interpreter = Interpreter.load(updates_metadata, RasaNLUConfig('updates_config_mitie.json'))
     group_interpreter = Interpreter.load(group_metadata, RasaNLUConfig('group_config_mitie.json'))
-
     print('components configured')
 
 def train_models():
-    os.system('python training_data_maker.py')
+    os.system('python3 training_data_maker.py')
+    try:
+        upload_new_models()
+    except Exception as e:
+        pass
+
+def upload_new_models():
+    os.system('zip -r models/trained_models.zip models/*')
+    client.upload_file('models/trained_models.zip', 'grassroot-nlu','models/')
+    print('model upload successful')
+    os.system('rm -r models/*')
+
+
+def try_download_models():
+    try:
+        s3.Bucket('grassroot-nlu').download_file('models/', 'models/trained_models.zip')
+        print('download success')
+        print('unpackaging files...')
+        os.system('unzip models/trained_models.zip')
+        print('Done.')
+        print('Cleaning up..')
+        os.remove('models/trained_models.zip')
+        print('model download and cleanup complete.')
+        os.system('python3 generate_mities.py')
+    except Exception as e:
+        print(str(e))
+        train_models()
+
         
 configure()
 print('I am configured.')

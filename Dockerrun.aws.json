@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "grassrootdocker/terafirma:latest",
+    "Name": "grassrootdocker/terafirma:<TAG>",
     "Update": "true"
   },
   "Ports": [

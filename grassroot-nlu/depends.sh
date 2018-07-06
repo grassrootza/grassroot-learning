@@ -6,8 +6,6 @@ apk add freetype-dev
 
 apk add libpng
 
-sh install_mitie.sh
-
 pip3 install numpy==1.14.3
 
 pip3 install --no-deps pandas==0.23.0

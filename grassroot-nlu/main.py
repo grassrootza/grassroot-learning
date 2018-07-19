@@ -1,23 +1,19 @@
+print('Ignition.')
 import os
 import sys
-# import psutil
-import logging
-import json
-import re
-import uuid, time, datetime, pprint
-from datetime_engine import *
-# from databases.poly_database import *
-# from databases.poly_Mongo import *
-# from databases.poly_dynamo import *
-# from distance import *
-from flask import Flask,request, url_for, render_template, Response
-# from config import interpreter, database
+import requests
+import uuid
+import time
+import datetime
+from flask import Flask, request, url_for, render_template, Response
+
+from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
+            meeting_interpreter, updates_interpreter, database
+from databases.poly_database import *
+from databases.poly_Mongo import *
+from databases.poly_dynamo import *
 
 app = Flask(__name__)
-
-d = Duckling()
-d.load()
-
 
 @app.route('/')
 def index():
@@ -25,63 +21,58 @@ def index():
 
 
 # emulator/tester
-# @app.route('/', methods=["POST"])
-# def parse_view():
-#     text_data = request.form['text']
-#     uid = request.form['uid']
-#     ret_val = process_identifier(text_data)
+@app.route('/', methods=["POST"])
+def parse_view():
+    text_data = request.form['text']
+    uid = request.form['uid']
+    ret_val = process_identifier(text_data)
 
-#     if ret_val == 'new_entry':
-#         user_bound = goldenGates(text_data)
-#         data = user_bound['uid']
-#         return pep_talk("response.html",var1=json.dumps(user_bound['parsed']), var2=data)
+    if ret_val == 'new_entry':
+        user_bound = process_gateway(text_data)
+        data = user_bound['uid']
+        return render_html_template("response.html",var1=json.dumps(user_bound['parsed']), var2=data)
 
-#     elif ret_val == 'affirm':
-#         user_bound = "Your request is being processed..."
-#         save_as_training_instance(uid)
-#         return pep_talk("processing.html",var1=user_bound)
+    elif ret_val == 'affirm':
+        user_bound = "Your request is being processed..."
+        save_as_training_instance(uid)
+        return render_html_template("processing.html",var1=user_bound)
 
-#     elif ret_val == 'reset':
-#         return render_template("textbox.html")
+    elif ret_val == 'reset':
+        return render_template("textbox.html")
 
-#     elif ret_val == 'update':
-#         new_parsed = transformer(text_data, uid)
-#         return pep_talk("response.html", var1=json.dumps(new_parsed['parsed']), var2=new_parsed['uid'])
+    elif ret_val == 'update':
+        new_parsed = add_detail_to_text(text_data, uid)
+        return render_html_template("response.html", var1=json.dumps(new_parsed['parsed']), var2=new_parsed['uid'])
 
-#     else:
-#         user_bound = osiris(ret_val, uid)
-#         return str(user_bound)
-
-
-# # REST method
-# @app.route('/parse')
-# def parse_rest():
-#     text_data = request.args.get('text')
-#     uid = request.args.get('uid')
-
-#     print("received a parse request, text = " + text_data)
-
-#     ret_val = process_identifier(text_data)
-#     print("return type = " + ret_val)
-
-#     if ret_val == 'new_entry':
-#         entity_to_return = goldenGates(text_data)
-#         print("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))
-#         return app.response_class(json.dumps(entity_to_return), content_type='application/json')
-
-#     elif ret_val == 'update':
-#         entity_to_return = transformer(text_data, uid)
-#         print("returning entity: " + "\n" + json.dumps(entity_to_return, indent=1))
-#         return app.response_class(entity_to_return, content_type='application/json')
-
-#     else:
-#         return "Error, didn't know what to do"
+    else:
+        user_bound = add_detail_to_previous_text_state(ret_val, uid)
+        return str(user_bound)
 
 
-@app.route('/datetime')
-def date():
-    d_string = request.args.get('date_string')
-    return Response(datetime_engine(d_string), mimetype='application/json')
+# REST method
+@app.route('/parse')
+def parse_rest():
+    text_data = request.args.get('text')
+    uid = request.args.get('uid')
+
+    print("received a parse request, text = " + text_data)
+
+    ret_val = process_identifier(text_data)
+    print("return type = " + ret_val)
+
+    if ret_val == 'new_entry':
+        entity_to_return = process_gateway(text_data)
+        print("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))
+        return app.response_class(json.dumps(entity_to_return), content_type='application/json')
+
+    elif ret_val == 'update':
+        entity_to_return = add_detail_to_text(text_data, uid)
+        print("returning entity: " + "\n" + json.dumps(entity_to_return, indent=1))
+        return app.response_class(entity_to_return, content_type='application/json')
+
+    else:
+        return "Error, didn't know what to do"
+
 
 # for tests
 @app.route('/shutdown')
@@ -92,147 +83,146 @@ def shutdown():
     func()
     return 'Server shutting down'
 
-# @app.route('/distance')
-# def w_distance():
 
-#     text = request.args.get('text').lower().strip()
-#     return Response(json.dumps(distance(text)), mimetype='application/json')
+def process_identifier(text):
+    x = intent_interpreter.parse(text)
+    value = x['intent']['name']
 
+    if value == 'affirm':
+        return value
 
-# def process_identifier(text):
-#     x = interpreter.parse(text)
-#     value = x['intent']['name']
+    elif value == 'update':
+        return 'update'
 
-#     if value == 'affirm':
-#         return value
+    elif value == 'negate':
 
-#     elif value == 'None':
-#         return 'update'
+        if x['entities']  != []:
+            return x['entities'][0]['value']
 
-#     elif value == 'negation':
+        else:
+            return 'reset'
 
-#         if x['entities']  != []:
-#             return x['entities'][0]['value']
-
-#         else:
-#             return 'reset'
-
-#     else:
-#         return 'new_entry'
+    else:
+        return 'new_entry'
 
 
-# def osiris(new_value, uid):
+def add_detail_to_previous_text_state(new_value, uid):
+    try:
+        old_text = load_old_text(database, {'uid':uid})
+        new_text = old_text + " " + new_value
+        new_parsed = process_gateway(new_text)
 
-#     try:
+        if new_parsed['past_lives'] != []:
 
-#         old_text = load_old_text(database, {'uid':uid})
-#         new_text = old_text + " " + new_value
-#         new_parsed = goldenGates(new_text)
+            if new_parsed['past_lives'][0] != old_text:
+                new_parsed['past_lives'].append(old_text)
 
-#         if new_parsed['past_lives'] != []:
+        else:
+            new_parsed['past_lives'].append(old_text)
 
-#             if new_parsed['past_lives'][0] != old_text:
-#                 new_parsed['past_lives'].append(old_text)
+        update_database(new_parsed)
+        data = new_parsed['uid']
 
-#         else:
-#             new_parsed['past_lives'].append(old_text)
+        return render_html_template("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
 
-#         update_database(new_parsed)
-#         data = new_parsed['uid']
-
-#         return pep_talk("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
-
-#     except:
-#         return "Patience and perseverence."
-
-
-# def transformer(text, uid):
-
-#     try:
-
-#         entry = find_previous_entry(database, {'uid':uid})
-#         old_text = entry['text']
-#         new_text = old_text+ " " + text
-#         new_parsed = goldenGates(new_text)
-
-#         if new_parsed['past_lives'] != []:
-
-#             if new_parsed['past_lives'][0] != old_text:
-#                 new_parsed['past_lives'].append(old_text)
-
-#         else:
-#             new_parsed['past_lives'].append(old_text)
-
-#         update_database(new_parsed)
-#         return new_parsed
-
-#     except Exception as e:
-#         return str(e)
+    except Exception as e:
+        print(str(e))
+        return "Patience and perseverence."
 
 
-# def pep_talk(template,var1=None, var2=None):
-#     return render_template(template, var1=var1, var2=var2)
+def add_detail_to_text(text, uid):
+    try:
+        entry = find_previous_entry(database, {'uid':uid})
+        old_text = entry['text']
+        new_text = old_text+ " " + text
+        new_parsed = process_gateway(new_text)
+
+        if new_parsed['past_lives'] != []:
+
+            if new_parsed['past_lives'][0] != old_text:
+                new_parsed['past_lives'].append(old_text)
+
+        else:
+            new_parsed['past_lives'].append(old_text)
+
+        update_database(new_parsed)
+        return new_parsed
+
+    except Exception as e:
+        return str(e)
 
 
-# purgables = ["extractor"]
+def render_html_template(template,var1=None, var2=None):
+    return render_template(template, var1=var1, var2=var2)
 
 
-# def goldenGates(text_to_parse):
-#     recall = check_database(database, text_to_parse)
-
-#     if recall != False:
-#         return recall   # suitable entry exists. Return said entry. Process complete.
-#     else:
-#         new_entry = {
-#                      'text': text_to_parse,
-#                      '_id' : str(uuid.uuid4()),
-#                      'date': str(datetime.datetime.now()),
-#                      'past_lives': []
-#                     }
-
-#         insert_one(database, new_entry)
-
-#         uid = new_entry['_id']
-#         x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives'])
-#         return x
+purgables = ["extractor"]
 
 
-# def parser(text, uid, date_time, past_life):
-#     parse = interpreter.parse(text)
-#     parsed_data = {'parsed': parse, 'uid': uid, 'date': date_time, 'past_lives': past_life}
+def process_gateway(text_to_parse):
+    recall = check_database(database, text_to_parse)
+    if recall != False:
+        return recall   # suitable entry exists. Return said entry. Process complete.
+    else:
+        new_entry = {
+                     'text': text_to_parse,
+                     '_id' : str(uuid.uuid4()),
+                     'date': str(datetime.datetime.now()),
+                     'past_lives': []
+                    }
 
-#     with open("./nsa/event_listener.txt", "a") as myfile:
-#         myfile.write(str(parsed_data)+"\n\n")
+        insert_one(database, new_entry)
 
-#     res = update_database(parsed_data)
-#     parsed = time_formalizer(parse)
-#     parsed_data['parsed'] = parsed
-
-#     if parsed_data['parsed']['entities'] != []:
-
-#         for i in range(0,len(parsed_data['parsed']['entities'])):
-
-#             if "extractor" in parsed_data['parsed']['entities'][i]:
-#                 parsed_data['parsed']['entities'][i].pop('extractor')
-
-#     return parsed_data
+        uid = new_entry['_id']
+        x = parser(new_entry['text'], uid, new_entry['date'], new_entry['past_lives'])
+        return x
 
 
-# def update_database(new_data):
-#     update_db(database, new_data)
+def parser(text, uid, date_time, past_life):
+    intent_raw = intent_interpreter.parse(text)
+    intent = intent_raw['intent']['name']
+    if intent == 'call_meeting':
+        parse = meeting_interpreter.parse(text)
+    elif intent == 'call_vote':
+        parse = vote_interpreter.parse(text)
+    elif 'todo' in intent:
+        parse = todo_interpreter.parse(text)
+    elif intent == 'create_group':
+        parse = group_interpreter.parse(text)
+    else:
+        parse = intent_raw 
+
+    parsed_data = {'parsed': parse, 'uid': uid, 'date': date_time, 'past_lives': past_life}
+
+    # with open("./nsa/event_listener.txt", "a") as myfile:
+    #     myfile.write(str(parsed_data)+"\n\n")
+
+    res = update_database(parsed_data)
+    parsed = time_formalizer(parse)
+    parsed_data['parsed'] = parsed
+
+    if parsed_data['parsed']['entities'] != []:
+
+        for i in range(0,len(parsed_data['parsed']['entities'])):
+
+            if "extractor" in parsed_data['parsed']['entities'][i]:
+                parsed_data['parsed']['entities'][i].pop('extractor')
+
+    return parsed_data
 
 
-# def save_as_training_instance(uid):
-#     find_clean_and_save(database, {'uid': uid})
+def update_database(new_data):
+    update_db(database, new_data)
 
-# with app.test_request_context():
-#    print(url_for('parse', text='make your text queries here'))
+
+def save_as_training_instance(uid):
+    find_clean_and_save(database, {'uid': uid})
 
 def time_formalizer(parsed_data):
 
     for i in range(0, len(parsed_data['entities'])):
 
-        if parsed_data['entities'][i]['entity'] == 'date_time':
+        if parsed_data['entities'][i]['entity'] == 'datetime':
             value = parsed_data['entities'][i]['value']
             formal = formalizer_helper(value)
             parsed_data['entities'][i]['value'] = formal
@@ -241,15 +231,8 @@ def time_formalizer(parsed_data):
 
 
 def formalizer_helper(time_string):
-    parsed = d.parse(time_string)
-
-    for i in range(0,len(parsed)):
-
-        if parsed[i]['dim'] == 'time':
-            new_value = parsed[i]['value']['value']
-            return new_value
-
+    return requests.get('http://learning.grassroot.cloud/datetime?date_string=%s' % time_string).content.decode('ascii')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', debug=True)

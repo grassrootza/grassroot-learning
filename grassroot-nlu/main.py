@@ -1,27 +1,17 @@
 print('Ignition.')
 import os
 import sys
-# import psutil
-import uuid, time, datetime, pprint
-from datetime_engine import *
+import requests
+import uuid
+import time
+import datetime
 from flask import Flask, request, url_for, render_template, Response
-# from distance import *
-nlu = False
-try:
-    nlu = sys.argv[1]
-except:
-	pass
 
-# if not nlu:
-#     print('no arguments past')
-#     from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
-#             meeting_interpreter, updates_interpreter, database
-#     from databases.poly_database import *
-#     from databases.poly_Mongo import *
-#     from databases.poly_dynamo import *
-# else:
-#     if nlu == '--no-nlu':
-#         print('Recieved: %s\nLoading in test environment.' % nlu)
+from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
+            meeting_interpreter, updates_interpreter, database
+from databases.poly_database import *
+from databases.poly_Mongo import *
+from databases.poly_dynamo import *
 
 app = Flask(__name__)
 
@@ -83,12 +73,6 @@ def parse_rest():
     else:
         return "Error, didn't know what to do"
 
-@app.route('/datetime')
-def date():
-    d_string = request.args.get('date_string')
-    datetime_response = datetime_engine(d_string)
-    print('main recieved from dt: %s' % datetime_response)
-    return Response(datetime_response, mimetype='application/json')
 
 # for tests
 @app.route('/shutdown')
@@ -100,13 +84,6 @@ def shutdown():
     return 'Server shutting down'
 
 
-"""
-@app.route('/distance')
-def w_distance():
-    text = request.args.get('text').lower().strip()
-    return Response(json.dumps(distance(text)), mimetype='application/json')
-"""
-
 def process_identifier(text):
     x = intent_interpreter.parse(text)
     value = x['intent']['name']
@@ -114,7 +91,7 @@ def process_identifier(text):
     if value == 'affirm':
         return value
 
-    elif value == 'update':  # change to elif value == 'update' after new implementation
+    elif value == 'update':
         return 'update'
 
     elif value == 'negate':
@@ -254,15 +231,8 @@ def time_formalizer(parsed_data):
 
 
 def formalizer_helper(time_string):
-    parsed = d.parse(time_string)
-
-    for i in range(0,len(parsed)):
-
-        if parsed[i]['dim'] == 'time':
-            new_value = parsed[i]['value']['value']
-            return new_value
-
+    return requests.get('http://learning.grassroot.cloud/datetime?date_string=%s' % time_string).content.decode('ascii')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', debug=True)

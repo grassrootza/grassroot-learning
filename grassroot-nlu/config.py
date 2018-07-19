@@ -6,6 +6,7 @@ from databases.poly_database import *
 from databases.poly_Mongo import *
 from databases.poly_dynamo import *
 import schedule
+import threading
 import time
 import json
 from examples import *
@@ -59,7 +60,10 @@ def configure():
     except Exception as e:
         print(str(e))
         print("Dont worry, I'll take care of this\ndeploying counter-measures...")
-        try_download_models()
+        threading.Thread(target=try_download_models).start()
+        print('putting baby to sleep...')
+        time.sleep(30)
+        print('baby is up and screaming.')
         configure()
 
 def load_interpreters():
@@ -104,7 +108,7 @@ def try_download_models():
         s3.Bucket('grassroot-nlu').download_file('models/', 'models/trained_models.zip')
         print('download success')
         print('unpackaging files...')
-        os.system('unzip models/trained_models.zip')
+        os.system('unzip -o models/trained_models.zip')
         print('Done.')
         print('Cleaning up..')
         os.remove('models/trained_models.zip')

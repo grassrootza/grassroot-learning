@@ -1,18 +1,17 @@
 print('Ignition.')
 import os
 import sys
-# import psutil
-import logging
-import json
-import re
-import uuid, time, datetime, pprint
-from datetime_engine import *
+import requests
+import uuid
+import time
+import datetime
+from flask import Flask, request, url_for, render_template, Response
+
+from config import intent_interpreter, vote_interpreter, group_interpreter, todo_interpreter, \
+            meeting_interpreter, updates_interpreter, database
 from databases.poly_database import *
 from databases.poly_Mongo import *
 from databases.poly_dynamo import *
-from distance import *
-from flask import Flask,request, url_for, render_template, Response
-from config import interpreter, database
 
 app = Flask(__name__)
 
@@ -75,29 +74,27 @@ def parse_rest():
         return "Error, didn't know what to do"
 
 
-@app.route('/datetime')
-def date():
-    d_string = request.args.get('date_string')
-    return Response(datetime_engine(d_string), mimetype='application/json')
-
-
-@app.route('/distance')
-def w_distance():
-    text = request.args.get('text').lower().strip()
-    return Response(json.dumps(distance(text)), mimetype='application/json')
+# for tests
+@app.route('/shutdown')
+def shutdown():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server :(')
+    func()
+    return 'Server shutting down'
 
 
 def process_identifier(text):
-    x = interpreter.parse(text)
+    x = intent_interpreter.parse(text)
     value = x['intent']['name']
 
     if value == 'affirm':
         return value
 
-    elif value == 'None':
+    elif value == 'update':
         return 'update'
 
-    elif value == 'negation':
+    elif value == 'negate':
 
         if x['entities']  != []:
             return x['entities'][0]['value']
@@ -128,7 +125,7 @@ def add_detail_to_previous_text_state(new_value, uid):
 
         return render_html_template("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
 
-    except:
+    except Exception as e:
         print(str(e))
         return "Patience and perseverence."
 
@@ -177,12 +174,24 @@ def process_gateway(text_to_parse):
         insert_one(database, new_entry)
 
         uid = new_entry['_id']
-        x = parser(new_entry['text'],uid,new_entry['date'],new_entry['past_lives'])
+        x = parser(new_entry['text'], uid, new_entry['date'], new_entry['past_lives'])
         return x
 
 
 def parser(text, uid, date_time, past_life):
-    parse = interpreter.parse(text)
+    intent_raw = intent_interpreter.parse(text)
+    intent = intent_raw['intent']['name']
+    if intent == 'call_meeting':
+        parse = meeting_interpreter.parse(text)
+    elif intent == 'call_vote':
+        parse = vote_interpreter.parse(text)
+    elif 'todo' in intent:
+        parse = todo_interpreter.parse(text)
+    elif intent == 'create_group':
+        parse = group_interpreter.parse(text)
+    else:
+        parse = intent_raw 
+
     parsed_data = {'parsed': parse, 'uid': uid, 'date': date_time, 'past_lives': past_life}
 
     # with open("./nsa/event_listener.txt", "a") as myfile:
@@ -213,7 +222,7 @@ def time_formalizer(parsed_data):
 
     for i in range(0, len(parsed_data['entities'])):
 
-        if parsed_data['entities'][i]['entity'] == 'date_time':
+        if parsed_data['entities'][i]['entity'] == 'datetime':
             value = parsed_data['entities'][i]['value']
             formal = formalizer_helper(value)
             parsed_data['entities'][i]['value'] = formal
@@ -222,15 +231,8 @@ def time_formalizer(parsed_data):
 
 
 def formalizer_helper(time_string):
-    parsed = d.parse(time_string)
-
-    for i in range(0,len(parsed)):
-
-        if parsed[i]['dim'] == 'time':
-            new_value = parsed[i]['value']['value']
-            return new_value
-
+    return requests.get('http://learning.grassroot.cloud/datetime?date_string=%s' % time_string).content.decode('ascii')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

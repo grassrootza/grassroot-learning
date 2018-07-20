@@ -10,8 +10,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: |
-          docker build -t terafirma .
-          docker tag terafirma grassrootdocker/grassroot-nlu:$CIRCLE_BRANCH-$CIRCLE_SHA1
+          docker build -t grassroot-nlu .
+          docker tag grassroot-nlu grassrootdocker/grassroot-nlu:$CIRCLE_BRANCH-$CIRCLE_SHA1
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker push grassrootdocker/grassroot-nlu:$CIRCLE_BRANCH-$CIRCLE_SHA1
 

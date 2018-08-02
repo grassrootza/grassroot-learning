@@ -1,4 +1,5 @@
-print('Loading configurations...')
+from logger import rootLogger
+rootLogger.debug('Loading configurations...')
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.converters import load_data
 from rasa_nlu.model import Interpreter, Metadata, Trainer
@@ -13,7 +14,7 @@ from decimal import Decimal
 import os
 import shutil
 import boto3
-print('imports complete.')
+rootLogger.debug('imports complete.')
 
 threshold = 0.6
 database = DynamoDB
@@ -51,7 +52,7 @@ group_interpreter = 0
 
 
 def configure():
-    print('configuring components...')
+    rootLogger.debug('configuring components...')
     os.environ['PATH_TO_MITIE'] = './current_model/model/MITIE-models/english/total_word_feature_extractor.dat'        
 
     try:
@@ -66,7 +67,7 @@ def configure():
         configure()
 
 def load_interpreters():
-    print('configuring interpreters...')
+    rootLogger.debug('configuring interpreters...')
     global intent_interpreter
     global vote_interpreter
     global meeting_interpreter
@@ -86,7 +87,7 @@ def load_interpreters():
     todo_interpreter = Interpreter.load(todo_metadata, RasaNLUConfig('todo_config_mitie.json'))
     updates_interpreter = Interpreter.load(updates_metadata, RasaNLUConfig('updates_config_mitie.json'))
     group_interpreter = Interpreter.load(group_metadata, RasaNLUConfig('group_config_mitie.json'))
-    print('components configured')
+    rootLogger.debug('components configured')
 
 def train_models():
     os.system('python3 training_data_maker.py')
@@ -119,4 +120,4 @@ def try_download_models():
 
         
 configure()
-print('I am configured.')
+rootLogger.debug('I am configured.')

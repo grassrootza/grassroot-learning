@@ -1,7 +1,22 @@
-print('Ignition.')
+import os
+try:
+    os.system('rm logs/*')
+except:
+    pass
+    
+import threading
+from logger import *
+
+def displayLogs():
+    os.system("tail -f logs/nlu.log")
+
+threading.Thread(target=displayLogs).start()
+
+rootLogger.info('Ignition.')
 import os
 import sys
 import requests
+import logging
 import uuid
 import time
 import datetime
@@ -55,23 +70,25 @@ def parse_rest():
     text_data = request.args.get('text')
     uid = request.args.get('uid')
 
-    print("received a parse request, text = " + text_data)
+    rootLogger.debug("received a parse request, text = " + text_data)
 
     ret_val = process_identifier(text_data)
-    print("return type = " + ret_val)
+    rootLogger.debug("return type = " + ret_val)
 
     if ret_val == 'new_entry':
         entity_to_return = process_gateway(text_data)
-        print("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))
+        rootLogger.debug("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))
         return app.response_class(json.dumps(entity_to_return), content_type='application/json')
 
     elif ret_val == 'update':
         entity_to_return = add_detail_to_text(text_data, uid)
-        print("returning entity: " + "\n" + json.dumps(entity_to_return, indent=1))
+        rootLogger.debug("returning entity: " + "\n" + json.dumps(entity_to_return, indent=1))
         return app.response_class(entity_to_return, content_type='application/json')
 
     else:
-        return "Error, didn't know what to do"
+        entity_to_return = process_gateway(text_data)
+        rootLogger.debug("returning entity 2: " + "\n" + json.dumps(entity_to_return, indent=1))
+        return app.response_class(json.dumps(entity_to_return), content_type='application/json')
 
 
 # for tests
@@ -126,7 +143,7 @@ def add_detail_to_previous_text_state(new_value, uid):
         return render_html_template("response.html", var1=json.dumps(new_parsed['parsed']), var2=data)
 
     except Exception as e:
-        print(str(e))
+        rootLogger.debug(str(e))
         return "Patience and perseverence."
 
 

@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>config &#8212; Grassroot-nlu 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for config</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logger</span> <span class="k">import</span> <span class="n">rootLogger</span>
+<span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Loading configurations...&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rasa_nlu.config</span> <span class="k">import</span> <span class="n">RasaNLUConfig</span>
+<span class="kn">from</span> <span class="nn">rasa_nlu.converters</span> <span class="k">import</span> <span class="n">load_data</span>
+<span class="kn">from</span> <span class="nn">rasa_nlu.model</span> <span class="k">import</span> <span class="n">Interpreter</span><span class="p">,</span> <span class="n">Metadata</span><span class="p">,</span> <span class="n">Trainer</span>
+<span class="kn">from</span> <span class="nn">databases.poly_database</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">databases.poly_Mongo</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">databases.poly_dynamo</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">schedule</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="n">Decimal</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;imports complete.&#39;</span><span class="p">)</span>
+
+<span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.6</span>
+<span class="n">database</span> <span class="o">=</span> <span class="n">DynamoDB</span>
+<span class="c1">#database = MongoDB</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;aws ecr get-login --region eu-west-1&#39;</span><span class="p">)</span>
+<span class="c1"># os.system(&#39;aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh&#39;)</span>
+<span class="c1"># os.system(&#39;source ./feersum_setup.sh&#39;) </span>
+
+<span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span>
+                       <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;AWS_ACCESS_KEY_ID&#39;</span><span class="p">],</span> <span class="c1"># env vars should be passed with the docker run command</span>
+                       <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;AWS_SECRET_ACCESS_KEY&#39;</span><span class="p">],)</span> 
+
+<span class="c1"># current_files = os.listdir(&#39;./&#39;)</span>
+
+<span class="c1"># word_distance_files = [&quot;vocab.txt&quot;, &quot;vectors.txt&quot;]</span>
+
+<span class="c1"># for file in word_distance_files:</span>
+<span class="c1">#     if file not in current_files:</span>
+<span class="c1">#         s3.Bucket(&#39;grassroot-nlu&#39;).download_file(&#39;word_distance/%s&#39; % file, </span>
+<span class="c1">#                                                 &#39;%s&#39; % file)</span>
+
+<span class="c1"># if &#39;feersum_setup.sh&#39; not in current_files:</span>
+<span class="c1">#     s3.Bucket(&#39;grassroot-nlu&#39;).download_file(&#39;activation/feersum_setup.sh&#39;,</span>
+<span class="c1">#                                              &#39;feersum_setup.sh&#39;)</span>
+
+<span class="n">intent_interpreter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">vote_interpreter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">meeting_interpreter</span><span class="o">=</span> <span class="mi">0</span>
+<span class="n">todo_interpreter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">updates_interpreter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">group_interpreter</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<div class="viewcode-block" id="configure"><a class="viewcode-back" href="../index.html#config.configure">[docs]</a><span class="k">def</span> <span class="nf">configure</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Main configuration automator. Responsible for call other configuration functions.</span>
+<span class="sd">    Tries configuring nlu engine in current state, downloads models from s3 if absent,</span>
+<span class="sd">    trains new models locally on host if s3 models cannot be obtained.&quot;&quot;&quot;</span>
+    <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;configuring components...&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">load_interpreters</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dont worry, I&#39;ll take care of this</span><span class="se">\n</span><span class="s2">deploying counter-measures...&quot;</span><span class="p">)</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">try_download_models</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;putting baby to sleep...&#39;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;baby is up and screaming.&#39;</span><span class="p">)</span>
+        <span class="n">configure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="load_interpreters"><a class="viewcode-back" href="../index.html#config.load_interpreters">[docs]</a><span class="k">def</span> <span class="nf">load_interpreters</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Loads interpreters and their respective metadatas&quot;&quot;&quot;</span>
+    <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;configuring interpreters...&#39;</span><span class="p">)</span>
+    <span class="k">global</span> <span class="n">intent_interpreter</span>
+    <span class="k">global</span> <span class="n">vote_interpreter</span>
+    <span class="k">global</span> <span class="n">meeting_interpreter</span>
+    <span class="k">global</span> <span class="n">todo_interpreter</span>
+    <span class="k">global</span> <span class="n">updates_interpreter</span>
+    <span class="k">global</span> <span class="n">group_interpreter</span>
+    <span class="n">intent_metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./models/intent/default/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;./models/intent/default/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">meeting_metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./models/meeting/default/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;./models/meeting/default/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">vote_metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./models/vote/default/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;./models/vote/default/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">todo_metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./models/todo/default/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;./models/todo/default/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">updates_metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./models/updates/default/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;./models/updates/default/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">group_metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./models/group/default/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;./models/group/default/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">intent_interpreter</span> <span class="o">=</span> <span class="n">Interpreter</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">intent_metadata</span><span class="p">,</span> <span class="n">RasaNLUConfig</span><span class="p">(</span><span class="s1">&#39;intent_config_mitie.json&#39;</span><span class="p">))</span>
+    <span class="n">vote_interpreter</span> <span class="o">=</span> <span class="n">Interpreter</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">vote_metadata</span><span class="p">,</span> <span class="n">RasaNLUConfig</span><span class="p">(</span><span class="s1">&#39;vote_config_mitie.json&#39;</span><span class="p">))</span>
+    <span class="n">meeting_interpreter</span> <span class="o">=</span> <span class="n">Interpreter</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">meeting_metadata</span><span class="p">,</span> <span class="n">RasaNLUConfig</span><span class="p">(</span><span class="s1">&#39;meeting_config_mitie.json&#39;</span><span class="p">))</span>
+    <span class="n">todo_interpreter</span> <span class="o">=</span> <span class="n">Interpreter</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">todo_metadata</span><span class="p">,</span> <span class="n">RasaNLUConfig</span><span class="p">(</span><span class="s1">&#39;todo_config_mitie.json&#39;</span><span class="p">))</span>
+    <span class="n">updates_interpreter</span> <span class="o">=</span> <span class="n">Interpreter</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">updates_metadata</span><span class="p">,</span> <span class="n">RasaNLUConfig</span><span class="p">(</span><span class="s1">&#39;updates_config_mitie.json&#39;</span><span class="p">))</span>
+    <span class="n">group_interpreter</span> <span class="o">=</span> <span class="n">Interpreter</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">group_metadata</span><span class="p">,</span> <span class="n">RasaNLUConfig</span><span class="p">(</span><span class="s1">&#39;group_config_mitie.json&#39;</span><span class="p">))</span>
+    <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;components configured&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="train_models"><a class="viewcode-back" href="../index.html#config.train_models">[docs]</a><span class="k">def</span> <span class="nf">train_models</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Activates training_data_maker.py and uploads generated model to s3 if </span>
+<span class="sd">    internet connection exists.&quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;python3 training_data_maker.py&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">upload_new_models</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="upload_new_models"><a class="viewcode-back" href="../index.html#config.upload_new_models">[docs]</a><span class="k">def</span> <span class="nf">upload_new_models</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Called by train_models() when a new model comes fresh out of training&quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;zip -r models/trained_models.zip models/*&#39;</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="s1">&#39;models/trained_models.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;grassroot-nlu&#39;</span><span class="p">,</span><span class="s1">&#39;models/&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;model upload successful&#39;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rm -r models/*&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="try_download_models"><a class="viewcode-back" href="../index.html#config.try_download_models">[docs]</a><span class="k">def</span> <span class="nf">try_download_models</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Attempts to download models from s3 and calls train_models if unsuccessful.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">s3</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="s1">&#39;grassroot-nlu&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="s1">&#39;models/&#39;</span><span class="p">,</span> <span class="s1">&#39;models/trained_models.zip&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;download success&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;unpackaging files...&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;unzip -o models/trained_models.zip&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Done.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cleaning up..&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;models/trained_models.zip&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;model download and cleanup complete.&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;python3 generate_mities.py&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">train_models</span><span class="p">()</span></div>
+
+        
+<span class="n">configure</span><span class="p">()</span>
+<span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;I am configured.&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Grassroot.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -192,6 +192,11 @@ convertTextToTD("new group Abahlali Community Group", "create_group", 1)
 ## update
 convertTextToTD("tomorrow", "update", 1)
 convertTextToTD("tomorrow 9am", "update", 1)
+convertTextToTD("9am", "update", 1)
+convertTextToTD("at 9am", "update", 1)
+convertTextToTD("FNB Stadium", "update", 1)
+convertTextToTD("at FNB Stadium", "update", 1)
+convertTextToTD("Milpark", "update", 1)
 convertTextToTD("Abahlali Community Group", "update", 1)
 convertTextToTD("Abahlali", "update", 1)
 ## affirm
@@ -199,10 +204,22 @@ convertTextToTD("yes", "affirm", 1)
 convertTextToTD("absolutely", "affirm", 1)
 convertTextToTD("indeed", "affirm", 1)
 convertTextToTD("yes thats what I want", "affirm", 1)
+convertTextToTD("yep", "affirm", 1)
+convertTextToTD("yes indeed", "affirm", 1)
+convertTextToTD("yes please", "affirm", 1)
+convertTextToTD("you are correct", "affirm", 1)
+convertTextToTD("correct", "affirm", 1)
+convertTextToTD("yeah", "affirm", 1)
 ## negate
 convertTextToTD("no", "negate", 1)
 convertTextToTD("no thats not what I want", "negate", 1)
 convertTextToTD("wtf", "negate", 1)
+convertTextToTD("nah", "negate", 1)
+convertTextToTD("nope", "negate", 1)
+convertTextToTD("noooooooooo", "negate", 1)
+convertTextToTD("hell no", "negate", 1)
+convertTextToTD("negative", "negate", 1)
+convertTextToTD("nay", "negate", 1)
 
 # Meeting
 # add more instances
@@ -350,6 +367,11 @@ convertTextToTD("new group Abahlali Community Group", "create_group", 5, *[{'gro
 # Update
 convertTextToTD("tomorrow", "update", 6, *[{'datetime': 'tomorrow'}])
 convertTextToTD("tomorrow 9am", "update", 6, *[{'datetime': 'tomorrow 9am'}])
+convertTextToTD("9am", "update", 6, *[{'datetime': '9am'}])
+convertTextToTD("at 9am", "update", 6, *[{'datetime': '9am'}])
+convertTextToTD("FNB Stadium", "update", 6, *[{'location': 'FNB Stadium'}])
+convertTextToTD("at FNB Stadium", "update", 6, *[{'location': 'FNB Stadium'}])
+convertTextToTD("Milpark", "update", 6, *[{'location': 'Milpark'}])
 convertTextToTD("Abahlali Community Group", "update", 6, *[{'group': 'Abahlali Community Group'}])
 convertTextToTD("Abahlali", "update", 6, *[{'group': 'Abahlali'}])
 

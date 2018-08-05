@@ -28,20 +28,19 @@ s3 = boto3.resource('s3')
 client = boto3.client('s3',
                        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], # env vars should be passed with the docker run command
                        aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],) 
-"""
-current_files = os.listdir('./')
 
-word_distance_files = ["vocab.txt", "vectors.txt"]
+# current_files = os.listdir('./')
 
-for file in word_distance_files:
-    if file not in current_files:
-        s3.Bucket('grassroot-nlu').download_file('word_distance/%s' % file, 
-                                                 '%s' % file)
+# word_distance_files = ["vocab.txt", "vectors.txt"]
 
-if 'feersum_setup.sh' not in current_files:
-    s3.Bucket('grassroot-nlu').download_file('activation/feersum_setup.sh',
-                                             'feersum_setup.sh')
-"""
+# for file in word_distance_files:
+#     if file not in current_files:
+#         s3.Bucket('grassroot-nlu').download_file('word_distance/%s' % file, 
+#                                                 '%s' % file)
+
+# if 'feersum_setup.sh' not in current_files:
+#     s3.Bucket('grassroot-nlu').download_file('activation/feersum_setup.sh',
+#                                              'feersum_setup.sh')
 
 intent_interpreter = 0
 vote_interpreter = 0
@@ -52,9 +51,10 @@ group_interpreter = 0
 
 
 def configure():
+    """Main configuration automator. Responsible for call other configuration functions.
+    Tries configuring nlu engine in current state, downloads models from s3 if absent,
+    trains new models locally on host if s3 models cannot be obtained."""
     rootLogger.debug('configuring components...')
-    os.environ['PATH_TO_MITIE'] = './current_model/model/MITIE-models/english/total_word_feature_extractor.dat'        
-
     try:
         load_interpreters()
     except Exception as e:
@@ -66,7 +66,9 @@ def configure():
         print('baby is up and screaming.')
         configure()
 
+
 def load_interpreters():
+    """Loads interpreters and their respective metadatas"""
     rootLogger.debug('configuring interpreters...')
     global intent_interpreter
     global vote_interpreter
@@ -90,6 +92,8 @@ def load_interpreters():
     rootLogger.debug('components configured')
 
 def train_models():
+    """Activates training_data_maker.py and uploads generated model to s3 if 
+    internet connection exists."""
     os.system('python3 training_data_maker.py')
     try:
         upload_new_models()
@@ -97,6 +101,7 @@ def train_models():
         pass
 
 def upload_new_models():
+    """Called by train_models() when a new model comes fresh out of training"""
     os.system('zip -r models/trained_models.zip models/*')
     client.upload_file('models/trained_models.zip', 'grassroot-nlu','models/')
     print('model upload successful')
@@ -104,6 +109,7 @@ def upload_new_models():
 
 
 def try_download_models():
+    """Attempts to download models from s3 and calls train_models if unsuccessful."""
     try:
         s3.Bucket('grassroot-nlu').download_file('models/', 'models/trained_models.zip')
         print('download success')

@@ -185,6 +185,8 @@ convertTextToTD("Did everytone get home safe yesterday?", "create_validation_tod
 convertTextToTD("Has everyone voted on service delivery?", "create_validation_todo", 1)
 convertTextToTD("Can everyone please send their physical address", "create_info_todo", 1)
 convertTextToTD("Can everytone please send their id numbers", "create_info_todo", 1)
+
+convertTextToTD("Find me volunteers", "create_volunteer_todo", 1)
 ## group
 convertTextToTD("create a new group called Abahlali Community Group", "create_group", 1)
 convertTextToTD("create group Abahlali Community Group", "create_group", 1)
@@ -193,12 +195,16 @@ convertTextToTD("new group Abahlali Community Group", "create_group", 1)
 convertTextToTD("tomorrow", "update", 1)
 convertTextToTD("tomorrow 9am", "update", 1)
 convertTextToTD("9am", "update", 1)
-convertTextToTD("at 9am", "update", 1)
 convertTextToTD("FNB Stadium", "update", 1)
 convertTextToTD("at FNB Stadium", "update", 1)
 convertTextToTD("Milpark", "update", 1)
 convertTextToTD("Abahlali Community Group", "update", 1)
 convertTextToTD("Abahlali", "update", 1)
+
+convertTextToTD("protest", "update", 1)
+convertTextToTD("protest tomorrow", "update", 1)
+convertTextToTD("protest tomorrow at 9 am", "update", 1)
+convertTextToTD("at 9am", "update", "update", 1)
 ## affirm
 convertTextToTD("yes", "affirm", 1)
 convertTextToTD("absolutely", "affirm", 1)

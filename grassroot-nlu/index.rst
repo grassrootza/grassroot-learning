@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Grassroot-nlu's documentation!
+Welcome to Grassroot-NLU's documentation!
 =========================================
 
 .. toctree::
@@ -115,6 +115,34 @@ to :file:`/parse`.
 
 The demo client will demonstate how to implement dynamic text construction as well as how 
 to pass general queries to the engine.
+
+Output
+------
+
+The basic output for a request like :file:`call a meeting tomorrow` is ::
+
+    {
+     "parsed": {
+      "intent": {
+       "name": "call_meeting",
+       "confidence": 0.0
+      },
+      "entities": [
+       {
+        "entity": "datetime",
+        "value": "YYYY-MM-DDTHH:MM",
+        "start": 15,
+        "end": 23
+       }
+      ],
+      "text": "call a meeting tomorrow"
+     },
+     "uid": "8e8df664-32ab-xxxx-a896-0f650rtn92x0",
+     "date": "2018-08-07 15:45:24.127244",
+     "past_lives": []
+    }
+    
+All output conforms to this basic structure with variable intents and entities.
 
 
 Core Functions

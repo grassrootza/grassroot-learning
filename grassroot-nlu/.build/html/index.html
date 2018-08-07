@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to Grassroot-nlu’s documentation! &#8212; Grassroot-nlu 0.0.1 documentation</title>
+    <title>Welcome to Grassroot-NLU’s documentation! &#8212; Grassroot-nlu 0.0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -42,7 +42,7 @@
           <div class="body" role="main">
             
   <div class="section" id="welcome-to-grassroot-nlu-s-documentation">
-<h1>Welcome to Grassroot-nlu&#8217;s documentation!<a class="headerlink" href="#welcome-to-grassroot-nlu-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to Grassroot-NLU&#8217;s documentation!<a class="headerlink" href="#welcome-to-grassroot-nlu-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <ul class="simple">
@@ -50,8 +50,8 @@
 <li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
 <li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
 </ul>
-<p>Grassroot-nlu is an nlu engine trained for parsing through common user input and
-extracting intent and entities from said text.</p>
+<p>Grassroot-nlu is an nlu engine trained for parsing through common Grassroot user
+input and extracting intent and entities from said text.</p>
 <div class="section" id="getting-started-with-grassroot-nlu">
 <h2>Getting Started with Grassroot-NLU<a class="headerlink" href="#getting-started-with-grassroot-nlu" title="Permalink to this headline">¶</a></h2>
 <p>There are multiple ways one could get the server up. A popular option is
@@ -136,12 +136,40 @@ then run the file with</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ python3 demo_client.py
 </pre></div>
 </div>
-<p>This will prompt you to enter a base url. If you running Grassroot-NLU from in a
-docker conatiner and have used the above port mapping then enter <code class="file docutils literal"><span class="pre">http://localhost:5000</span></code></p>
+<p>This will prompt you to enter a base url. If you running Grassroot-NLU from a
+docker conatiner and have used the above port mapping then enter <code class="file docutils literal"><span class="pre">http://localhost:5000</span></code>
+This will also work where the engine is started from running <code class="file docutils literal"><span class="pre">python3</span> <span class="pre">main.py</span></code></p>
 <p>If you have hosted it online somewhere then enter the base domain and path to the engine prior
 to <code class="file docutils literal"><span class="pre">/parse</span></code>.</p>
 <p>The demo client will demonstate how to implement dynamic text construction as well as how
 to pass general queries to the engine.</p>
+</div>
+<div class="section" id="output">
+<h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
+<p>The basic output for a request like <code class="file docutils literal"><span class="pre">call</span> <span class="pre">a</span> <span class="pre">meeting</span> <span class="pre">tomorrow</span></code> is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+ <span class="s2">&quot;parsed&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;intent&quot;</span><span class="p">:</span> <span class="p">{</span>
+   <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;call_meeting&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;entities&quot;</span><span class="p">:</span> <span class="p">[</span>
+   <span class="p">{</span>
+    <span class="s2">&quot;entity&quot;</span><span class="p">:</span> <span class="s2">&quot;datetime&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="mi">23</span>
+   <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;call a meeting tomorrow&quot;</span>
+ <span class="p">},</span>
+ <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="s2">&quot;8e8df664-32ab-xxxx-a896-0f650rtn92x0&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2018-08-07 15:45:24.127244&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;past_lives&quot;</span><span class="p">:</span> <span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>All output conforms to this basic structure with variable intents and entities.</p>
 </div>
 <div class="section" id="module-main">
 <span id="core-functions"></span><h2>Core Functions<a class="headerlink" href="#module-main" title="Permalink to this headline">¶</a></h2>
@@ -272,9 +300,10 @@ internet connection exists.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to Grassroot-nlu&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">Welcome to Grassroot-NLU&#8217;s documentation!</a><ul>
 <li><a class="reference internal" href="#getting-started-with-grassroot-nlu">Getting Started with Grassroot-NLU</a></li>
 <li><a class="reference internal" href="#demo-client">Demo Client</a></li>
+<li><a class="reference internal" href="#output">Output</a></li>
 <li><a class="reference internal" href="#module-main">Core Functions</a></li>
 </ul>
 </li>

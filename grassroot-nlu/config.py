@@ -1,5 +1,5 @@
 from logger import rootLogger
-rootLogger.debug('Loading configurations...')
+rootLogger.info('Loading configurations...')
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.converters import load_data
 from rasa_nlu.model import Interpreter, Metadata, Trainer
@@ -14,13 +14,13 @@ from decimal import Decimal
 import os
 import shutil
 import boto3
-rootLogger.debug('imports complete.')
+rootLogger.info('imports complete.')
 
 threshold = 0.6
 database = DynamoDB
-#database = MongoDB
+# database = MongoDB
 
-os.system('aws ecr get-login --region eu-west-1')
+# os.system('aws ecr get-login --region eu-west-1')
 # os.system('aws s3api get-object --bucket grassroot-nlu --key activation/feersum_setup.sh feersum_setup.sh')
 # os.system('source ./feersum_setup.sh') 
 
@@ -54,7 +54,7 @@ def configure():
     """Main configuration automator. Responsible for call other configuration functions.
     Tries configuring nlu engine in current state, downloads models from s3 if absent,
     trains new models locally on host if s3 models cannot be obtained."""
-    rootLogger.debug('configuring components...')
+    rootLogger.info('configuring components...')
     try:
         load_interpreters()
     except Exception as e:

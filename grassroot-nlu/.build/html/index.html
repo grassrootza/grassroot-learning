@@ -65,8 +65,10 @@ part of the command.</p>
 <p>Building a docker image will download necessary dependencies and behave
 predictably. Before running the image, make sure to have the necessary aws access
 key id and aws secret key which should be passed as environment variables
-when running the image, like so</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo docker run -e AWS_ACCESS_KEY_ID=&#39;ACCESSKEYVALUE&#39; -e AWS_SECRET_ACCESS_KEY=&#39;SECRETKEYVALUE&#39; -p 5000:80 grassroot-nlu
+when running the image, like so (see Environment Variable section below for details
+on env var values)</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo docker run -e AWS_ACCESS_KEY_ID=&#39;ACCESSKEYVALUE&#39; -e AWS_SECRET_ACCESS_KEY=&#39;SECRETKEYVALUE&#39;
+-e NLU_MAIL_ADDR=&#39;engineemailaddress&#39; -e NLU_MAIL_PWD=&#39;enterpasswordhere&#39; -e DEV=&#39;developeremailadrress&#39; -p 5000:80 grassroot-nlu
 </pre></div>
 </div>
 <p>This runs a docker container exposing port 80, mapped to port 5000.</p>
@@ -85,6 +87,21 @@ with</p>
 <p class="last">This alternative installation only works on Linux systems, preferably Ubuntu
 16.04 with Python 3</p>
 </div>
+</div>
+<div class="section" id="environent-variables">
+<h2>Environent Variables<a class="headerlink" href="#environent-variables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>AWS_ACCESS_KEY_ID     - your aws access key id</li>
+<li>AWS_SECRET_ACCESS_KEY - your aws secret access key</li>
+<li><dl class="first docutils">
+<dt>NLU_MAIL_ADDR**        - this value stores the email address the engine will send emails from. It is</dt>
+<dd>recomended that you create a new gmail account dedicated to this. After creating it, or if you have chosen a pre-existing account, allow access to less secure apps and enter the email address here.</dd>
+</dl>
+</li>
+<li>NLU_MAIL_PWD          - enter the password to the email you created above here.</li>
+<li>DEV                   - enter the email address you would like to recieve crash reports from.</li>
+</ul>
+<p>** For convenience and rapid response to bugs the engine includes an email service that will send crash reports and other useful information the the email address entered as the value of the DEV environment variable.</p>
 </div>
 <div class="section" id="demo-client">
 <h2>Demo Client<a class="headerlink" href="#demo-client" title="Permalink to this headline">¶</a></h2>
@@ -174,25 +191,11 @@ to pass general queries to the engine.</p>
 <div class="section" id="module-main">
 <span id="core-functions"></span><h2>Core Functions<a class="headerlink" href="#module-main" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="main.add_detail_to_previous_text_state">
-<code class="descclassname">main.</code><code class="descname">add_detail_to_previous_text_state</code><span class="sig-paren">(</span><em>new_value</em>, <em>uid</em><span class="sig-paren">)</span><a class="headerlink" href="#main.add_detail_to_previous_text_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when a process is identified with the &#8216;update&#8217; intent.
-searches database for text with uid and appends new_value to it. It
-then sends it for parsing and returns output</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="main.add_detail_to_text">
-<code class="descclassname">main.</code><code class="descname">add_detail_to_text</code><span class="sig-paren">(</span><em>text</em>, <em>uid</em><span class="sig-paren">)</span><a class="headerlink" href="#main.add_detail_to_text" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">main.</code><code class="descname">add_detail_to_text</code><span class="sig-paren">(</span><em>text</em>, <em>uid</em>, <em>*prev_text_state</em><span class="sig-paren">)</span><a class="headerlink" href="#main.add_detail_to_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a process is identified with the &#8216;update&#8217; intent.
 searches database for text with uid and appends new_value to it. It
 then sends it for parsing and returns output</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="main.displayLogs">
-<code class="descclassname">main.</code><code class="descname">displayLogs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.displayLogs" title="Permalink to this definition">¶</a></dt>
-<dd><p>tails the log file</p>
 </dd></dl>
 
 <dl class="function">
@@ -205,6 +208,12 @@ then sends it for parsing and returns output</p>
 <dt id="main.index">
 <code class="descclassname">main.</code><code class="descname">index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Renders the home page.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="main.logdog">
+<code class="descclassname">main.</code><code class="descname">logdog</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.logdog" title="Permalink to this definition">¶</a></dt>
+<dd><p>tails the log file</p>
 </dd></dl>
 
 <dl class="function">
@@ -302,6 +311,7 @@ internet connection exists.</p>
   <ul>
 <li><a class="reference internal" href="#">Welcome to Grassroot-NLU&#8217;s documentation!</a><ul>
 <li><a class="reference internal" href="#getting-started-with-grassroot-nlu">Getting Started with Grassroot-NLU</a></li>
+<li><a class="reference internal" href="#environent-variables">Environent Variables</a></li>
 <li><a class="reference internal" href="#demo-client">Demo Client</a></li>
 <li><a class="reference internal" href="#output">Output</a></li>
 <li><a class="reference internal" href="#module-main">Core Functions</a></li>

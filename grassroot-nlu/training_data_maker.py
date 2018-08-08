@@ -204,7 +204,7 @@ convertTextToTD("Abahlali", "update", 1)
 convertTextToTD("protest", "update", 1)
 convertTextToTD("protest tomorrow", "update", 1)
 convertTextToTD("protest tomorrow at 9 am", "update", 1)
-convertTextToTD("at 9am", "update", "update", 1)
+convertTextToTD("at 9am", "update", 1)
 ## affirm
 convertTextToTD("yes", "affirm", 1)
 convertTextToTD("absolutely", "affirm", 1)

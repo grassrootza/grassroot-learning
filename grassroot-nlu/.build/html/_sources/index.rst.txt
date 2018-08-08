@@ -33,11 +33,13 @@ part of the command.
 Building a docker image will download necessary dependencies and behave 
 predictably. Before running the image, make sure to have the necessary aws access
 key id and aws secret key which should be passed as environment variables 
-when running the image, like so ::
+when running the image, like so (see Environment Variable section below for details 
+on env var values) ::
 
-   $ sudo docker run -e AWS_ACCESS_KEY_ID='ACCESSKEYVALUE' -e AWS_SECRET_ACCESS_KEY='SECRETKEYVALUE' -p 5000:80 grassroot-nlu
+   $ sudo docker run -e AWS_ACCESS_KEY_ID='ACCESSKEYVALUE' -e AWS_SECRET_ACCESS_KEY='SECRETKEYVALUE' 
+   -e NLU_MAIL_ADDR='engineemailaddress' -e NLU_MAIL_PWD='enterpasswordhere' -e DEV='developeremailadrress' -p 5000:80 grassroot-nlu
 
-This runs a docker container exposing port 80, mapped to port 5000.
+This runs a docker container exposing port 80, mapped to port 5000. 
 
 Alternatively, if you prefer a docker free environment, then simply open a terminal
 in the directory containing :file:`main.py` and run ::
@@ -54,6 +56,17 @@ with ::
    This alternative installation only works on Linux systems, preferably Ubuntu
    16.04 with Python 3
 
+Environent Variables
+--------------------
+
+- AWS_ACCESS_KEY_ID     - your aws access key id
+- AWS_SECRET_ACCESS_KEY - your aws secret access key
+- NLU_MAIL_ADDR**        - this value stores the email address the engine will send emails from. It is
+                          recomended that you create a new gmail account dedicated to this. After creating it, or if you have chosen a pre-existing account, allow access to less secure apps and enter the email address here. 
+- NLU_MAIL_PWD          - enter the password to the email you created above here.
+- DEV                   - enter the email address you would like to recieve crash reports from.
+
+** For convenience and rapid response to bugs the engine includes an email service that will send crash reports and other useful information the the email address entered as the value of the DEV environment variable.
 
 Demo Client
 -----------

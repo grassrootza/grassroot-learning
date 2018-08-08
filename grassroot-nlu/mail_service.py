@@ -5,11 +5,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-os.environ['NLU_MAIL_ADDR'] = 'grassrootnlu@gmail.com'
-os.environ['DEV'] = 'frtnxwolfone@outlook.com'
-os.environ['NLU_MAIL_PWD'] = 'grassrootnlu1.0.0'
-
-
 def mail(message, subject, *emergency):
     try:
         file = open('logs/overflowBlock', 'r')

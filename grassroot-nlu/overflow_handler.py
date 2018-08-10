@@ -4,7 +4,7 @@ from logger import rootLogger
 
 def overflow_handler():
     try:
-    	rootLogger.info('Cleaning overflow counter...')
+    	rootLogger.info('Cleaning overflow counter.')
     	os.system('rm logs/overflowBlock')
     	file = open('logs/overflowBlock', 'w')
     	file.write('0')

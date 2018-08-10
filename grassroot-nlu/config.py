@@ -58,12 +58,12 @@ def configure():
     try:
         load_interpreters()
     except Exception as e:
-        print(str(e))
-        print("Dont worry, I'll take care of this\ndeploying counter-measures...")
+        rootLogger.info(str(e))
+        rootLogger.info("Dont worry, I'll take care of this\ndeploying counter-measures...")
         threading.Thread(target=try_download_models).start()
-        print('putting baby to sleep...')
+        rootLogger.info('putting baby to sleep...')
         time.sleep(30)
-        print('baby is up and screaming.')
+        rootLogger.info('baby is up and screaming.')
         configure()
 
 
@@ -98,13 +98,14 @@ def train_models():
     try:
         upload_new_models()
     except Exception as e:
+        rootLogger.error(str(e))
         pass
 
 def upload_new_models():
     """Called by train_models() when a new model comes fresh out of training"""
     os.system('zip -r models/trained_models.zip models/*')
     client.upload_file('models/trained_models.zip', 'grassroot-nlu','models/')
-    print('model upload successful')
+    rootLogger.info('model upload successful')
     os.system('rm -r models/*')
 
 
@@ -112,18 +113,18 @@ def try_download_models():
     """Attempts to download models from s3 and calls train_models if unsuccessful."""
     try:
         s3.Bucket('grassroot-nlu').download_file('models/', 'models/trained_models.zip')
-        print('download success')
-        print('unpackaging files...')
+        rootLogger.info('download success')
+        rootLogger.info('unpackaging files...')
         os.system('unzip -o models/trained_models.zip')
-        print('Done.')
-        print('Cleaning up..')
+        rootLogger.info('Done.')
+        rootLogger.info('Cleaning up..')
         os.remove('models/trained_models.zip')
-        print('model download and cleanup complete.')
+        rootLogger.info('model download and cleanup complete.')
         os.system('python3 generate_mities.py')
     except Exception as e:
-        print(str(e))
+        rootLogger.error(str(e))
         train_models()
 
         
 configure()
-rootLogger.debug('I am configured.')
+rootLogger.info('I am configured.')

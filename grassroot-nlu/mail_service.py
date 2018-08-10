@@ -20,7 +20,6 @@ def mail(message, subject, *emergency):
             if 'sysf' in current_files:
                 rootLogger.info('Developer has been notified on system failure. Suppressing further notification.')
             else:
-                last_request_time = time.time()
                 from_addr = os.environ['NLU_MAIL_ADDR']
                 to_addr = os.environ['DEV']
                 rootLogger.info('sending "%s..." to developer.' % message[:5])

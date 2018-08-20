@@ -46,9 +46,9 @@ def mail(message, subject, *emergency):
 
 
 def system_failure():
-    current_files = os.listdir('./')
+    states = os.listdir('./')
     text = 'We have a giant boogy on the loose. Its time to go bug hunting.'
-    if 'sysf' not in current_files:
+    if 'sysf' not in states:
         mail(text, 'System Failure', *['oh the horror'])
         os.system('touch sysf')
     else:

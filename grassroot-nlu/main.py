@@ -111,7 +111,7 @@ def process_identifier(text):
         if x['entities']  != []:
             return x['entities'][0]['value']
         else:
-            return 'reset'
+            return app.response_class(json.dumps(x), content_type='application/json')
     else:
         return 'new_entry'
 

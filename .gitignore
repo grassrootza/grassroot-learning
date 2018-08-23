@@ -2,6 +2,15 @@
 .idea/
 __pycache__/
 
+# Virtual ENV
+env/
+
+# Models built by Rasa
+models/
+
+# Rasa logs
+**/rasa_core.log
+
 # Some text file output
 grassroot-nlu/config.pyc            
 grassroot-nlu/nsa/event_listener.txt

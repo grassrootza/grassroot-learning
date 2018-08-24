@@ -1,0 +1,92 @@
+entities:
+  - issue
+  - procedure
+  - problem
+  - action_taken
+
+intents:
+  - greet
+  - mood_affirm
+  - mood_confused
+  - request_water
+  - request_more_options
+  - select
+  - goodbye
+
+slots:
+  issue:
+    type: categorical
+    values:
+      - housing
+      - water
+  procedure:
+    type: categorical
+    values:
+      - know_rights
+      - obtain_contact
+      - take_action
+  problem:
+    type: text
+  action_taken:
+    type: text
+
+templates:
+  utter_greet:
+    - "Hello!"
+  utter_orientation:
+    - "These are things you can do"
+  utter_confirmation:
+    - "Alright, we'll do that"
+  provide_issues_menu:
+    - text: "What issue is the problem?"
+      buttons:
+      - title: "Housing"
+        payload: "/select{\"issue\":\"housing\"}"
+      - title: "Water"
+        payload: "/select{\"procedure\":\"water\"}"
+  provide_procedures_menu:
+    - text: "Okay, what can we help you with?"
+      buttons:
+      - title: "Knowing your rights"
+        payload: "/select{\"procedure\":\"rights\"}"
+      - title: "Who you can talk to"
+        payload: "/select{\"procedure\":\"contact\"}"
+      - title: "How to take action"
+        payload: "/select{\"procedure\":\"take_action\"}"
+  provide_actions_menu:
+    - "What action have you done?"
+  provide_housing_problems_main:
+    - "What's your housing problem?"
+  provide_housing_problems_more:
+    - "Here are more problems:"
+  provide_water_problems_main:
+    - "What are your water problems?"
+  provide_water_problems_more:
+    - "Here are some more water problem"
+  utter_please_confirm:
+    - "Okay please confirm"
+  utter_completed:
+    - "And it is done"
+  utter_restart:
+    - "Restarting ..."
+  utter_grassroot_site:
+    - "Please visit grassroot.org.za"
+  utter_goodbye:
+    - "Goodbye!"
+  
+actions:
+  - utter_greet
+  - provide_issues_menu
+  - utter_orientation
+  - utter_confirmation
+  - provide_procedures_menu
+  - provide_actions_menu
+  - provide_housing_problems_main
+  - provide_housing_problems_more
+  - provide_water_problems_main
+  - provide_water_problems_more
+  - utter_please_confirm
+  - utter_completed
+  - utter_restart
+  - utter_grassroot_site
+  - utter_goodbye

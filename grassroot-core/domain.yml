@@ -1,3 +1,6 @@
+config:
+  store_entities_as_slots: true
+
 intents:
   - greet
   - goodbye
@@ -7,17 +10,36 @@ intents:
   - know
   - find
   - connect
+  - meet
+  - request_izwe_lami_service
+
+entities:
+  - province
+  - izwe_lami_service
+
+slots:
+  province:
+    type: text
+  izwe_lami_service:
+    type: categorical
+    values:
+      - shelter
+      - ttz_clinic
+      - hc_facility
+    
 
 actions:
 - utter_greet
 - provide_opening_menu
 - provide_action_menu
 - provide_knowledge_menu
+- provide_izwe_lami_service_menu
 - utter_goodbye
+- utter_restart
 
 templates:
   utter_greet:
-  - text: "Dumelang. Welcome! What do you want to do?"
+  - text: "Dumelang. Welcome! What do you want to do? Has this changed? Clearly not"
 
   provide_opening_menu:
   - text: "Grassroot Zonke can help you:"
@@ -52,6 +74,14 @@ templates:
       payload: "contact"
     - title: "How to take action"
       payload: "direct_action"
+
+  provide_izwe_lami_service_menu:
+  - text: "What service do you need?"
+    buttons: 
+    - title: "Health care facility"
+      payload: "/request_izwe_lami_service{\"izwe_lami_service\":\"hc_facility\"}"
+    - title: "Shelter"
+      payload: "/request_izwe_lami_service{\"izwe_lami_service\":\"shelter\"}"
  
   utter_not_built:
   - text: "I'm sorry, we haven't built that yet"
@@ -66,4 +96,7 @@ templates:
 
   utter_goodbye:
   - text: "Bye"
+
+  utter_restart:
+  - text: "Alright, restarting chat ..."
     

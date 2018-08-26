@@ -65,7 +65,7 @@
     - slot{"procedure": "obtain_contact"}
     - utter_confirmation
     - provide_water_problems_main
-* request_more
+* request_more_options
     - provide_water_problems_more
 * select{"problem": "health_concerns"}
     - slot{"problem": "health_concerns"}

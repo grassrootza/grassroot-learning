@@ -17,3 +17,6 @@ grassroot-nlu/nsa/event_listener.txt
 grassroot-nlu/system_status.txt 
 grassroot-nlu/training_output.txt
 grassroot-nlu/logs/nlu.log
+
+# Some config files
+*_credentials.yml

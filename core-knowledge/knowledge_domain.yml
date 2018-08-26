@@ -11,6 +11,7 @@ intents:
   - request_water
   - request_more_options
   - select
+  - go_back
   - goodbye
 
 slots:
@@ -50,7 +51,7 @@ templates:
       - title: "Knowing your rights"
         payload: "/select{\"procedure\":\"rights\"}"
       - title: "Who you can talk to"
-        payload: "/select{\"procedure\":\"contact\"}"
+        payload: "/select{\"procedure\":\"obtain_contact\"}"
       - title: "How to take action"
         payload: "/select{\"procedure\":\"take_action\"}"
   provide_actions_menu:

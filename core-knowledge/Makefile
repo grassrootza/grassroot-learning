@@ -24,5 +24,8 @@ train-online:
 run-cmdline:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/knowledge_nlu --debug
 
+run-slack:
+	python -m rasa_core.run -d models/dialogue -u models/current/knowledge_nlu --port 5002 --connector slack --credentials slack_credentials.yml --debug
+
 visualize:
 	python3 -m rasa_core.visualize -s data/core/ -d domain.yml -o story_graph.png

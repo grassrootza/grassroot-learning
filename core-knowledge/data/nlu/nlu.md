@@ -179,3 +179,29 @@
 - next
 - next options
 - other options
+
+## intent:select
+- [housing](issue)
+- [water](issue)
+- Problem with [housing](issue)
+- Don't have [housing](issue)
+- No [water](issue)
+- My [rights](procedure)
+- [rights](procedure)
+- [contact](procedure:obtain_contact)
+- I need to [talk](procedure:obtain_contact) to someone
+- [contact](procedure:obtain_contact) please
+- A [contact](procedure:obtain_contact) pls
+
+## intent:mood_confused
+- I don't understand
+- no this is wrong
+- what, i thought it was different
+- no that's not what i need
+- can i have something else please
+- this is confusing
+
+## intent:go_back
+- please go back
+- no i meant something different
+- go back please

@@ -10,7 +10,7 @@ from rasa_core.policies.memoization import MemoizationPolicy
 logger = logging.getLogger(__name__)
 
 
-def run_concertbot_online(input_channel, interpreter,
+def run_training_online(input_channel, interpreter,
                           domain_file="knowledge_domain.yml",
                           training_data_file='data/core'):
     agent = Agent(domain_file,
@@ -29,4 +29,4 @@ def run_concertbot_online(input_channel, interpreter,
 
 if __name__ == '__main__':
     utils.configure_colored_logging(loglevel="INFO")
-    run_concertbot_online(ConsoleInputChannel(), RasaNLUInterpreter("models/current/knowledge_nlu"))
+    run_training_online(ConsoleInputChannel(), RasaNLUInterpreter("models/current/knowledge_nlu"))

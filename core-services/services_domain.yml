@@ -1,0 +1,39 @@
+entities:
+  - province
+  - service_type
+
+intents:
+  - request_shelters
+  - request_thuthuzela
+  - select
+
+slots:
+  service_type:
+    type: categorical
+    values:
+      - shelter
+      - thuthuzela
+  province:
+    type: categorical
+    values:
+      - gauteng
+      - western_cape
+      - eastern_cape
+      - northern_cape
+      - kzn
+      - limpopo
+      - mpumalanga
+      - free_state
+      - north_west
+
+templates:
+  utter_confirm_shelters:
+    - "Okay, we will send shelters. Where do you live? Just enter a province or send us a location pin"
+  utter_confirm_thuthuzela:
+    - "Okay, we will send the TCCs. Where do you live? Just enter a province or send us a location pin"
+
+
+actions:
+  - utter_confirm_shelters
+  - utter_confirm_thuthuzela
+  - services_actions.ActionRetrieveAndSendServices

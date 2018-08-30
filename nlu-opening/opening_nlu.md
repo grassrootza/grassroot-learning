@@ -32,9 +32,9 @@
 - pain
 - service pls
 - where
-- where is the clinic
-- where is shelter
-- where shelter
+- where is the [clinic](service)
+- where is [shelter](service)
+- where [shelter](shelter)
 - rape
 - assault
 - abuse

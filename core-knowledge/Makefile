@@ -16,7 +16,7 @@ train-nlu:
 	python3 -m rasa_nlu.train -c knowledge_nlu_config.yml --data data/nlu/nlu.md -o models --fixed_model_name knowledge_nlu --project current --verbose
 
 train-core:
-	python3 train.py
+	python3 train_knowledge.py
 
 train-online:
 	python3 train_online.py

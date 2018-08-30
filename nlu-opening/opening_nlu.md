@@ -1,0 +1,42 @@
+## intent:greet
+- hi
+- hello
+- hey
+- yebo
+- sawubona
+- saw'bona
+- sbona
+- dumelang
+- good day
+- whats up
+- pls
+- how are you
+- hie
+- uhm
+- um
+- ?
+- yo
+- helo
+- hi how are you
+- stuff next
+- howzit
+- morning
+- good morning
+- evening
+- good evening
+- hey there
+
+## intent:find_services
+- izwe lami
+- pls I'm in pain
+- pain
+- service pls
+- where
+- where is the clinic
+- where is shelter
+- where shelter
+- rape
+- assault
+- abuse
+- violence
+- hit

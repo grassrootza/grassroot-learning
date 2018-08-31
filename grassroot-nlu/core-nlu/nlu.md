@@ -1,0 +1,808 @@
+## intent:call_meeting
+- set a meeting this friday with Abahlali Community Group about housing permits
+- Voice meeting variations
+- Meeting , Jozihub, 2pm/o’clock, today, Feedback session
+- Meet at Jozihub about Feedback session week at 2pm today
+- Meeting, today at 2pm/o’clock about the Feedback session at Jozihub
+- Meet at JoziHub today for Feedback session at 2pm/o’clock
+- Meet about the Feedback session at JoziHub today at 2 in the afternoon
+- Feedback session, today, 2pm/o’clock, JoziHub, meeting
+- Meeting, Enkomponi, 5pm/o’clock, tomorrow, protest action
+- Meeting at Enkomponi, about protest action at 5pm/o’clock, tomorrow
+- Meeting, tomorrow at 5pm/o’clock about protest action at Enkomponi
+- Meet at Enkomponi tomorrow for protest action at 5 pm/o’’clock
+- Meet about protest action at Enkomponi tomorrow at 5 in the evening
+- Protest action, tomorrow, 5pm/o’clock, Enkomponi, meeting
+- Meeting, KYP, 9am/o’clock, Saturday, Discussion Group
+- Meeting at KYP, about Discussion Group at 9am/o’clock, this Saturday
+- Meeting, next Saturday at 9am/o’clock about the Discussion Group at KYP
+- Meet at KYP, Saturday after next for Discussion Group at 9 in the morning
+- Feedback session, last Saturday of this month, 9am/o’clock, KYP, meeting
+- I want a meeting at Enkomponi
+- I would (I’d) like to request a meeting
+- Urgent meeting about Electricity
+- Record a meeting
+- TCC has a meeting at Sports Complex
+- We would like to meet at Paki for housing permits
+- Let’s meet at KYP
+- Schedule a meeting for 2pm on Monday
+- Organize a meeting at The Containers
+- Create a meeting at Walter Sisulu Square
+- Let’s have a meeting at Freedom Park Primary
+- Do a meeting request for tonight
+- I want a meeting on the  13th of July
+- Strat a meeting about housing today at 6pm
+- Start meeting request for Kliptown community
+- Arrange a meeting for Khotso House for 2pm
+- Set up a meeting at 5pm for Sanitation
+- Set a meeting up for today at Milpark
+- Execute a meeting request for this evening at 7
+- Send meeting request to Mnandini Community Group
+- I would like to order a meeting for today at 5pm
+- Greater Kliptown Leadership would like to meet this Saturday at 10am
+- Generate meeting request for SOPA this Tuesday
+- Carry out a meeting request on behalf of Abahlali Forum
+
+## intent:call_vote
+- call a vote within the Abahlali Comminity Group
+- call a vote for housing permits in Abahlali community group
+- I would like for people to vote between water electricity and roads
+- call a vote on water and electricity and roads
+- call a vote between water and electricity and roads
+- call vote, water, electricity, roads
+- call a vote between water and electricity and roads in Abahlali Community Group
+- Lets vote on water and electricity and roads
+- Lets vote between water, electricity and roads in Abahlali Community Group
+- I would like to vote between roads, electricity, and water in Abahlali Community Group
+- Create a vote fora new Abahlali Community Group leader between Jon Hopkins and Nils Frahm
+- Cast a vote between the mortals Jon Hopkins and Nils Frahm
+- call a vote
+- call a vote for a new venue. Members can choose between Soweto and Braamfontein
+- call a vote for a new local councillor
+
+## intent:create_group
+- create a new group called Abahlali Community Group
+- create group Abahlali Community Group
+- new group Abahlali Community Group
+
+## intent:update
+- tomorrow
+- tomorrow 9am
+- 9am
+- FNB Stadium
+- at FNB Stadium
+- Milpark
+- Abahlali Community Group
+- Abahlali
+- protest
+- protest tomorrow
+- protest tomorrow at 9 am
+- at 9am
+
+## intent:create_info_todo
+- tell all members in Abahlali community group to send their id numbers
+- Can everyone please send their physical address
+- Can everytone please send their id numbers
+
+## intent:create_validation_todo
+- Did everytone get home safe yesterday?
+- Has everyone voted on service delivery?
+
+## intent:create_volunteer_todo
+- find me people who would like to volunteer for a protest this friday
+- create a volunteer task
+- Who wants to volunteer for a protest this friday
+
+## intent:create_action_todo
+- Lets protest for better service delivery this friday
+
+## intent:affirm
+- yes
+- absolutely
+- indeed
+- yes thats what I want
+- yep
+- yes indeed
+- yes please
+- you are correct
+- correct
+- yeah
+- 😀
+- 😂
+- 😃
+- 😄
+- 😆
+- 😇
+- 😉
+- 😊
+- 🙂
+- ☺
+- 😋
+- 😌
+- 😍
+- 😘
+- 😗
+- 😙
+- 😚
+- 😜
+- 😝
+- 🤑
+- 😎
+- 🤗
+- 😤
+- 😈
+- 😺
+- 😸
+- 😹
+- 😻
+- 😽
+- 🙌
+- 🙌🏻
+- 🙌🏼
+- 🙌🏽
+- 🙌🏾
+- 🙌🏿
+- 👏
+- 👏🏼
+- 👏🏼
+- 👏🏽
+- 👏🏾
+- 👏🏿
+- 👍
+- 👍🏻
+- 👍🏼
+- 👍🏽
+- 👍🏾
+- 👍🏿
+- ✊
+- ✊🏻
+- ✊🏼
+- ✊🏽
+- ✊🏾
+- ✊🏿
+- ✌
+- ✌🏻
+- ✌🏼
+- ✌🏽
+- ✌🏾
+- ✌🏿
+- 👌
+- 👌🏻
+- 👌🏼
+- 👌🏽
+- 👌🏾
+- 👌🏿
+- 🙆
+- 🙆🏻
+- 🙆🏼
+- 🙆🏽
+- 🙆🏾
+- 🙆🏿
+- 🙋
+- 🙋🏻
+- 🙋🏼
+- 🙋🏽
+- 🙋🏾
+- 🙋🏿
+- 💏
+- 👩‍❤️‍💋‍👩
+- 👨‍❤️‍💋‍👨
+- 👑
+- 😀
+- 😂
+- 😃
+- 😄
+- 😆
+- 😇
+- 😉
+- 😊
+- 🙂
+- ☺
+- 😋
+- 😌
+- 😍
+- 😘
+- 😗
+- 😙
+- 😚
+- 😜
+- 😝
+- 🤑
+- 😎
+- 🤗
+- 😤
+- 😈
+- 😺
+- 😸
+- 😹
+- 😻
+- 😽
+- 🙌
+- 🙌🏻
+- 🙌🏼
+- 🙌🏽
+- 🙌🏾
+- 🙌🏿
+- 👏
+- 👏🏼
+- 👏🏼
+- 👏🏽
+- 👏🏾
+- 👏🏿
+- 👍
+- 👍🏻
+- 👍🏼
+- 👍🏽
+- 👍🏾
+- 👍🏿
+- ✊
+- ✊🏻
+- ✊🏼
+- ✊🏽
+- ✊🏾
+- ✊🏿
+- ✌
+- ✌🏻
+- ✌🏼
+- ✌🏽
+- ✌🏾
+- ✌🏿
+- 👌
+- 👌🏻
+- 👌🏼
+- 👌🏽
+- 👌🏾
+- 👌🏿
+- 🙆
+- 🙆🏻
+- 🙆🏼
+- 🙆🏽
+- 🙆🏾
+- 🙆🏿
+- 🙋
+- 🙋🏻
+- 🙋🏼
+- 🙋🏽
+- 🙋🏾
+- 🙋🏿
+- 💏
+- 👩‍❤️‍💋‍👩
+- 👨‍❤️‍💋‍👨
+- 👑
+- 😀
+- 😂
+- 😃
+- 😄
+- 😆
+- 😇
+- 😉
+- 😊
+- 🙂
+- ☺
+- 😋
+- 😌
+- 😍
+- 😘
+- 😗
+- 😙
+- 😚
+- 😜
+- 😝
+- 🤑
+- 😎
+- 🤗
+- 😤
+- 😈
+- 😺
+- 😸
+- 😹
+- 😻
+- 😽
+- 🙌
+- 🙌🏻
+- 🙌🏼
+- 🙌🏽
+- 🙌🏾
+- 🙌🏿
+- 👏
+- 👏🏼
+- 👏🏼
+- 👏🏽
+- 👏🏾
+- 👏🏿
+- 👍
+- 👍🏻
+- 👍🏼
+- 👍🏽
+- 👍🏾
+- 👍🏿
+- ✊
+
+
+## intent:negate
+- no
+- no thats not what I want
+- wtf
+- nah
+- nope
+- noooooooooo
+- hell no
+- negative
+- nay
+- stop
+- 😬
+- 😁
+- 😏
+- 😒
+- 😞
+- 😠
+- 🙁
+- ☹
+- 😫
+- 😩
+- 😱
+- 😨
+- 😰
+- 😦
+- 😧
+- 😢
+- 😓
+- 😭
+- 😴
+- 💤
+- 💩
+- 💀
+- 🙀
+- 😿
+- 👎
+- 👎🏻
+- 👎🏼
+- 👎🏽
+- 👎🏾
+- 👎🏿
+- 🖕
+- 🖕🏻
+- 🖕🏼
+- 🖕🏽
+- 🖕🏾
+- 🖕🏿
+- 🙍
+- 🙍🏻
+- 🙍🏼
+- 🙍🏽
+- 🙍🏾
+- 🙍🏿
+- 😬
+- 😁
+- 😏
+- 😒
+- 😞
+- 😠
+- 🙁
+- ☹
+- 😫
+- 😩
+- 😱
+- 😨
+- 😰
+- 😦
+- 😧
+- 😢
+- 😓
+- 😭
+- 😴
+- 💤
+- 💩
+- 💀
+- 🙀
+- 😿
+- 👎
+- 👎🏻
+- 👎🏼
+- 👎🏽
+- 👎🏾
+- 👎🏿
+- 🖕
+- 🖕🏻
+- 🖕🏼
+- 🖕🏽
+- 🖕🏾
+- 🖕🏿
+- 🙍
+- 🙍🏻
+- 🙍🏼
+- 🙍🏽
+- 🙍🏾
+- 🙍🏿
+- 😬
+- 😁
+- 😏
+- 😒
+- 😞
+- 😠
+- 🙁
+- ☹
+- 😫
+- 😩
+- 😱
+- 😨
+- 😰
+- 😦
+- 😧
+- 😢
+- 😓
+- 😭
+- 😴
+- 💤
+- 💩
+- 💀
+- 🙀
+- 😿
+- 👎
+- 👎🏻
+- 👎🏼
+- 👎🏽
+- 👎🏾
+- 👎🏿
+- 🖕
+- 🖕🏻
+- 🖕🏼
+- 🖕🏽
+- 🖕🏾
+- 🖕🏿
+- 🙍
+- 🙍🏻
+- 🙍🏼
+- 🙍🏽
+- 🙍🏾
+- 🙍🏿
+- 😬
+- 😁
+- 😏
+- 😒
+- 😞
+- 😠
+- 🙁
+- ☹
+- 😫
+- 😩
+- 😱
+- 😨
+- 😰
+- 😦
+- 😧
+- 😢
+- 😓
+- 😭
+- 😴
+- 💤
+- 💩
+- 💀
+- 🙀
+- 😿
+- 👎
+- 👎🏻
+- 👎🏼
+- 👎🏽
+- 👎🏾
+- 👎🏿
+- 🖕
+- 🖕🏻
+- 🖕🏼
+- 🖕🏽
+- 🖕🏾
+- 🖕🏿
+- 🙍
+- 🙍🏻
+- 🙍🏼
+- 🙍🏽
+- 🙍🏾
+- 🙍🏿
+- 😬
+- 😁
+- 😏
+- 😒
+- 😞
+- 😠
+- 🙁
+- ☹
+- 😫
+- 😩
+- 😱
+- 😨
+- 😰
+- 😦
+- 😧
+- 😢
+- 😓
+- 😭
+- 😴
+- 💤
+- 💩
+- 💀
+- 🙀
+- 😿
+- 👎
+- 👎🏻
+- 👎🏼
+- 👎🏽
+- 👎🏾
+- 👎🏿
+- 🖕
+- 🖕🏻
+- 🖕🏼
+- 🖕🏽
+- 🖕🏾
+- 🖕🏿
+- 🙍
+- 🙍🏻
+- 🙍🏼
+- 🙍🏽
+- 🙍🏾
+- 🙍🏿
+- 😬
+- 😁
+- 😏
+- 😒
+
+## intent:confusion
+- i dont understand
+- what do you mean
+- 🤔
+- 😟
+- 😡
+- 😔
+- 😕
+- 😖
+- 😥
+- 😵
+- 😲
+- 🤕
+- 😾
+- 🙎🏻
+- 🙎🏼
+- 🙎🏽
+- 🙎🏾
+- 🙎🏿
+- 🤔
+- 😟
+- 😡
+- 😔
+- 😕
+- 😖
+- 😥
+- 😵
+- 😲
+- 🤕
+- 😾
+- 🙎🏻
+- 🙎🏼
+- 🙎🏽
+- 🙎🏾
+- 🙎🏿
+- 🤔
+- 😟
+- 😡
+- 😔
+- 😕
+- 😖
+- 😥
+- 😵
+- 😲
+- 🤕
+- 😾
+- 🙎🏻
+- 🙎🏼
+- 🙎🏽
+- 🙎🏾
+- 🙎🏿
+
+
+## ignore:ignore
+- 😅
+- 🙃
+- 😛
+- 🤓
+- 😶
+- 😐
+- 😑
+- 🙄
+- 😳
+- 😣
+- 😮
+- 😯
+- 😪
+- 🤐
+- 😷
+- 🤒
+- 👿
+- 👹
+- 👺
+- 👻
+- 👽
+- 🤖
+- 😼
+- 👋
+- 👋🏻
+- 👋🏼
+- 👋🏽
+- 👋🏾
+- 👋🏿
+- 👊
+- 👊🏻
+- 👊🏼
+- 👊🏽
+- 👊🏾
+- 👊🏿
+- ✋
+- ✋🏻
+- ✋🏼
+- ✋🏽
+- ✋🏾
+- ✋🏿
+- 👐
+- 👐🏻
+- 👐🏼
+- 👐🏽
+- 👐🏾
+- 👐🏿
+- 💪
+- 💪🏻
+- 💪🏼
+- 💪🏽
+- 💪🏾
+- 💪🏿
+- 🙏
+- 🙏🏻
+- 🙏🏼
+- 🙏🏽
+- 🙏🏾
+- 🙏🏿
+- ☝
+- ☝🏻
+- ☝🏼
+- ☝🏽
+- ☝🏾
+- ☝🏿
+- 👆
+- 👆🏻
+- 👆🏼
+- 👆🏽
+- 👆🏾
+- 👆🏿
+- 👇
+- 👇🏻
+- 👇🏼
+- 👇🏽
+- 👇🏾
+- 👇🏿
+- 👈
+- 👈🏻
+- 👈🏼
+- 👈🏽
+- 👈🏾
+- 👈🏿
+- 👉
+- 👉🏻
+- 👉🏼
+- 👉🏽
+- 👉🏾
+- 👉🏿
+- 🖐
+- 🖐🏻
+- 🖐🏼
+- 🖐🏽
+- 🖐🏾
+- 🖐🏿
+- 🤘
+- 🤘🏻
+- 🤘🏼
+- 🤘🏽
+- 🤘🏾
+- 🤘🏿
+- 🖖
+- 🖖🏻
+- 🖖🏼
+- 🖖🏽
+- 🖖🏾
+- 🖖🏿
+- ✍
+- ✍🏻
+- ✍🏼
+- ✍🏽
+- ✍🏾
+- ✍🏿
+- 💅
+- 💅🏻
+- 💅🏼
+- 💅🏽
+- 💅🏾
+- 💅🏿
+- 👄
+- 👅
+- 👂
+- 👂🏻
+- 👂🏼
+- 👂🏽
+- 👂🏾
+- 👂🏿
+- 👃
+- 👃🏻
+- 👃🏼
+- 👃🏽
+- 👃🏾
+- 👃🏿
+- 👁
+- 👀
+- 👤
+- 👥
+- 🗣
+- 👶
+- 👶🏻
+- 👶🏼
+- 👶🏽
+- 👶🏾
+- 👶🏿
+- 👦
+- 👦🏻
+- 👦🏼
+- 👦🏽
+- 👦🏾
+- 👦🏿
+- 👧
+- 👧🏻
+- 👧🏼
+- 👧🏽
+- 👧🏾
+- 👧🏿
+- 👨
+- 👨🏻
+- 👨🏼
+- 👨🏽
+- 👨🏾
+- 👨🏿
+- 👩
+- 👩🏻
+- 👩🏼
+- 👩🏽
+- 👩🏾
+- 👩🏿
+- 👱
+- 👱🏻
+- 👱🏼
+- 👱🏽
+- 👱🏾
+- 👱🏿
+- 👴
+- 👴🏻
+- 👴🏼
+- 👴🏽
+- 👴🏾
+- 👴🏿
+- 👵
+- 👵🏻
+- 👵🏼
+- 👵🏽
+- 👵🏾
+- 👵🏿
+- 👲
+- 👲🏼
+- 👲🏼
+- 👲🏽
+- 👲🏾
+- 👲🏿
+- 👳
+- 👳🏻
+- 👳🏼
+- 👳🏽
+- 👳🏾
+- 👳🏿
+- 👮
+- 👮🏻
+- 👮🏼
+- 👮🏽
+- 👮🏾
+- 👮🏿
+- 👷
+- 👷🏻
+- 👷🏼

@@ -1,4 +1,3 @@
-# training data maker
 import json
 import os
 import time
@@ -788,6 +787,7 @@ convertTextToTD("Meet at KYP, Saturday after next for Discussion Group at 9 in t
 convertTextToTD("Feedback session, last Saturday of this month, 9am/o’clock, KYP, meeting", "call_meeting", 2, *[{'location': 'KYP',
                                                                                                'datetime': 'last Saturday of this month, 9am/o’clock',
                                                                                                'subject': 'Feedback session'}])
+
 convertTextToTD("I want a meeting at Enkomponi", "call_meeting", 2, *[{'location': 'Enkomponi'}])
 convertTextToTD("I would (I’d) like to request a meeting", "call_meeting", 2)
 convertTextToTD("Urgent meeting about Electricity ", "call_meeting", 2, *[{'subject': 'Electricity'}])

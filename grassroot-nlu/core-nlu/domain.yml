@@ -1,0 +1,49 @@
+intents:
+  - affirm
+  - negate
+  - confusion
+  - ignore
+  - call_meeting
+  - call vote
+  - create_action_todo
+  - create_info_todo
+  - create_volunteer_todo
+  - create_validation_todo
+  - update
+  - create_group
+
+actions:
+- affirm intent
+- affirm_entities
+- affirm_action_complete
+- negate_action
+# create_group
+# call_meeting
+# call_vote
+# create_todo
+
+entities:
+ - datetime
+ - location
+ - subject
+ - vote_option
+ - information_required
+ - group
+
+templates:
+  affirm_intent:
+    - "You chose {location} as the location?"
+  affirm_entities:
+    -  "Vote option '{vote option}' captured."
+  affirm_action_complete:
+    - "All is done."
+  negate_action:
+    - "Sorry. Couldn't complete this action."
+  # create_group:
+  #   - api call
+  # call_meeting
+  #   - api call
+  # call_vote
+  #   - api call
+  # create_todo
+  #   - api call

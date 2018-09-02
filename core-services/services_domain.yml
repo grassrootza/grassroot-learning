@@ -36,4 +36,4 @@ templates:
 actions:
   - utter_confirm_shelters
   - utter_confirm_thuthuzela
-  - services_actions.ActionRetrieveAndSendServices
+  - core-services.services_actions.ActionRetrieveAndSendServices

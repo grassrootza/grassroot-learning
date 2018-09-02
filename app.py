@@ -28,14 +28,14 @@ domain_agents = {
     "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter='core-knowledge/models/current/knowledge_nlu')
 }
 
-CONFIDENCE_THRESHOLD = 0.8
+CONFIDENCE_THRESHOLD = 0.7
 
 @application.route('/status')
 def say_hello():
     return "Hello World! I am alive"
 
 
-@application.route('/parse', methods=['GET'])
+@application.route('/opening/parse', methods=['GET'])
 def parse_unknown_domain():
     """Parser when nothing is known about the message, i.e., at the start of a conversation (or at restart)
 
@@ -50,8 +50,9 @@ def parse_unknown_domain():
     primary_result = nlu_result['intent']
     if (primary_result['confidence'] > CONFIDENCE_THRESHOLD):
         # since we are now pretty sure of the result, check if we can skip straight into domain
-        if (primary_result['intent'] in intent_domain_map):
-            domain = intent_domain_map[primary_result['intent']]
+        logging.info('Primary result: %s', primary_result)
+        if (primary_result['name'] in intent_domain_map):
+            domain = intent_domain_map[primary_result['name']]
             logging.info('Short cutting straight to domain: %s', domain)
             resp = parse_knowledge_domain(domain)
         else:
@@ -74,11 +75,11 @@ def parse_knowledge_domain(domain):
     user_message = request.args.get('message')
     if 'user_id' in request.args:
         user_id = request.args.get('user_id')
-        agent_response = domain_agents[domain].handle_message(user_message, sender_id=user_id)
+        responses_to_user = domain_agents[domain].handle_message(user_message, sender_id=user_id)
     else:
-        agent_response = domain_agents[domain].handle_message(user_message)
+        responses_to_user = domain_agents[domain].handle_message(user_message)
     
-    agent_response['domain'] = domain
+    agent_response = { 'domain': domain, 'responses': responses_to_user }
     logging.info('Domain agent response: %s', agent_response)
     
     resp = jsonify(agent_response)

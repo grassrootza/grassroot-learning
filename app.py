@@ -30,6 +30,36 @@ domain_agents = {
 
 CONFIDENCE_THRESHOLD = 0.7
 
+"""
+Common response format: {
+    'domain': what this belongs to (non-empty),
+    'intent': best guess of the intent
+    'responses': what should be sent back,
+    'intent_list': the list of guessed intents, in order,
+    'entities': any entities passed back
+}
+"""
+
+def reshape_nlu_result(domain, nlu_result):
+    return {
+        'domain': domain,
+        'intent': nlu_result['intent'],
+        'intent_list': nlu_result.get('intent_ranking', []),
+        'entities': nlu_result.get('entities', []),
+        'responses': []
+    }
+
+
+def error_catching_nlu_parse(user_message, interpreter):
+    logging.info('Parsing user message: %s', user_message)
+    try:
+        return interpreter.parse(user_message)
+    except ValueError as ErrorMesage:
+        logging.error('Error parsing! Value error')
+        logging.error('Error message: %s', ErrorMesage)
+        return interpreter.parse('')
+
+
 @application.route('/status')
 def say_hello():
     return "Hello World! I am alive"
@@ -46,19 +76,21 @@ def parse_unknown_domain():
         The best-guess intent, ranked intents, and any guessed entities, except for high-confidence results, in which case, domain parse result
     """
     user_message = request.args.get('message')
-    nlu_result = opening_nlu.parse(user_message)
+    nlu_result = error_catching_nlu_parse(user_message, opening_nlu)
+    
     primary_result = nlu_result['intent']
+    logging.info('NLU result on opening: %s', nlu_result)
+    result_as_response = reshape_nlu_result('opening', nlu_result); 
     if (primary_result['confidence'] > CONFIDENCE_THRESHOLD):
         # since we are now pretty sure of the result, check if we can skip straight into domain
-        logging.info('Primary result: %s', primary_result)
         if (primary_result['name'] in intent_domain_map):
             domain = intent_domain_map[primary_result['name']]
             logging.info('Short cutting straight to domain: %s', domain)
             resp = parse_knowledge_domain(domain)
         else:
-            resp = jsonify(primary_result)
+            resp = jsonify(result_as_response)
     else:
-        resp = jsonify(nlu_result['intent_ranking'])
+        resp = jsonify(result_as_response)
     resp.status_code = 200
     return resp
 
@@ -86,6 +118,8 @@ def parse_knowledge_domain(domain):
     resp.status_code = 200
     return resp
 
+
 if __name__ == "__main__":
+    logging.info("Starting up Grassroot Rasa components")
     application.debug = True
-    application.run()
+    application.run(host='0.0.0.0')

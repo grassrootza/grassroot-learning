@@ -1,16 +1,29 @@
 ## intent:find_services
+- service pls
+- where
+- need services
+- pls help
+- find
+- search
+- looking for
+- ngicela
+
+## intent:find_services_gbv
 - izwe lami
 - pls I'm in pain
 - pain
-- service pls
-- where
 - rape
 - assault
 - abuse
 - violence
 - hit
+- raped
+- need hlp now pls now
+- need hlp now pls
+- help me pls
+- help help help
 
-## intent:request_shelters
+## intent:request_shelter
 - shelter
 - where is shelter
 - where shelter
@@ -29,5 +42,17 @@
 - shelta
 - ngicela shelter
 
-## intent:request_clinic
+## intent:request_24hr_hcf
 - where is the clinic
+- hospital
+- clinic pls
+- open clinic pls
+- pls clinic
+- need clinic
+- clinic help pls
+- want a clinic
+- need hospital
+- please i need a hospital
+- health care
+- 24hr clinic
+- 24hr hospital

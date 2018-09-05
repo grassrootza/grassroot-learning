@@ -1,10 +1,16 @@
 entities:
   - province
+  - geo_location
   - service_type
+  - longitude
+  - latitude
 
 intents:
-  - request_shelters
+  - find_services
+  - find_services_gbv
+  - request_shelter
   - request_thuthuzela
+  - request_24hr_hcf
   - select
 
 slots:
@@ -13,6 +19,7 @@ slots:
     values:
       - shelter
       - thuthuzela
+      - 24hr_hcf
   province:
     type: categorical
     values:
@@ -25,15 +32,35 @@ slots:
       - mpumalanga
       - free_state
       - north_west
+  geo_location:
+    type: text
+  longitude:
+    type: float
+  latitude:
+    type: float
 
 templates:
-  utter_confirm_shelters:
+  utter_confirm_gbv_services:
+    - text: "Okay, we will help you find services. What do you need?"
+      buttons:
+        - title: "A 24 hour hospital or clinic"
+          payload: "24hr_hcf"
+        - title: "A shelter"
+          payload: "shelter"
+        - title: "A Thuthuzela rape care centre"
+          payload: "thuthuzela"
+        - title: "Other services"
+          payload: "other"
+  utter_confirm_24hr_hcf:
+    - "Okay, we will send nearby health care facilities. Please send us a pin of where you are now"
+  utter_confirm_shelter:
     - "Okay, we will send shelters. Where do you live? Just enter a province or send us a location pin"
   utter_confirm_thuthuzela:
     - "Okay, we will send the TCCs. Where do you live? Just enter a province or send us a location pin"
 
-
 actions:
-  - utter_confirm_shelters
+  - utter_confirm_gbv_services
+  - utter_confirm_24hr_hcf
+  - utter_confirm_shelter
   - utter_confirm_thuthuzela
   - core-services.services_actions.ActionRetrieveAndSendServices

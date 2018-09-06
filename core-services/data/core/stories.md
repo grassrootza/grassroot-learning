@@ -58,6 +58,39 @@
     - utter_confirm_24hr_hcf
 > request_province_or_pin
 
+## Generated Story -3893191575660869171
+* select{"service_type": "shelter"}
+    - slot{"service_type": "shelter"}
+    - utter_confirm_shelter
+* select{"province": "gauteng"}
+    - slot{"province": "gauteng"}
+    - action_retrieve_and_send_services
+
+## Generated Story -1895316140752856410
+* select{"service_type": "thuthuzela"}
+    - slot{"service_type": "thuthuzela"}
+    - utter_confirm_thuthuzela
+* select{"province": "western_cape"}
+    - slot{"province": "western_cape"}
+    - action_retrieve_and_send_services
+
+## Generated Story -6046854158320525225
+* select{"service_type": "thuthuzela"}
+    - slot{"service_type": "thuthuzela"}
+    - utter_confirm_thuthuzela
+* select{"province": "limpopo"}
+    - slot{"province": "limpopo"}
+    - action_retrieve_and_send_services
+
+## Generated Story 1698526148454156378
+* select{"service_type": "24hr_hcf"}
+    - slot{"service_type": "24hr_hcf"}
+    - utter_confirm_24hr_hcf
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+    - slot{"latitude": -26.1947954}
+    - slot{"longitude": 28.036162200000035}
+    - action_retrieve_and_send_services
+
 ## request province, or pin, and provide a province
 > request_province_or_pin
 * select{"province":"gauteng"} OR select{"province":"western_cape"} OR select{"province":"eastern_cape"} OR select{"province":"northern_cape"} OR select{"province":"limpopo"} OR select{"province":"mpumalanga"} OR select{"province":"kzn"} OR select{"province":"north_west"} OR select{"province":"free_state"}
@@ -72,3 +105,4 @@
 > request_province_or_pin
 * select{"latitude":-26.1947954,"longitude":28.036162200000035}
     - action_retrieve_and_send_services
+

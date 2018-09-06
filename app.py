@@ -16,7 +16,7 @@ logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(leve
 application = Flask(__name__)
 
 # Now load up the various interpreters and agents
-opening_nlu = Interpreter.load('./nlu-opening/models/current/nlu')
+opening_nlu = Interpreter.load('./nlu-opening/models/current/opening_nlu')
 
 intent_domain_map = {
     'find_services': 'service',
@@ -47,6 +47,34 @@ def reshape_nlu_result(domain, nlu_result):
         'intent_list': nlu_result.get('intent_ranking', []),
         'entities': nlu_result.get('entities', []),
         'responses': []
+    }
+
+def reshape_core_result(domain, core_result):
+    logging.info('reshaping core_result: {}'.format(core_result))
+    
+    response_texts = []
+    response_menu = []
+
+    if 'text' in core_result:
+        response_texts.append(core_result['text'])
+    
+    if 'data' in core_result:
+        # extracted_text = list(map(lambda button: button['title'], core_result['data']))
+        extracted_text = []
+        for idx, button in enumerate(core_result['data']):
+            extracted_text.append('{}. {}'.format(idx + 1, button['title']))
+        response_texts.extend(extracted_text)
+        response_menu = core_result['data']
+    else:
+        response_menu = []
+        
+    
+    logging.info('Extracted response texts: {}'.format(response_texts))
+
+    return {
+        'domain': domain,
+        'responses': response_texts,
+        'menu': response_menu
     }
 
 
@@ -111,10 +139,13 @@ def parse_knowledge_domain(domain):
     else:
         responses_to_user = domain_agents[domain].handle_message(user_message)
     
-    agent_response = { 'domain': domain, 'responses': responses_to_user }
-    logging.info('Domain agent response: %s', agent_response)
+    # agent_response = { 'domain': domain, 'responses': responses_to_user }
+    # logging.info('Domain agent response: %s', agent_response)
+
+    reshaped_response = reshape_core_result(domain, responses_to_user[0])
+    logging.info('Newly reshaped response: {}'.format(reshaped_response))
     
-    resp = jsonify(agent_response)
+    resp = jsonify(reshaped_response)
     resp.status_code = 200
     return resp
 

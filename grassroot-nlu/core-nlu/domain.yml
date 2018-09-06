@@ -4,23 +4,13 @@ intents:
   - confusion
   - ignore
   - call_meeting
-  - call vote
+  - call_vote
   - create_action_todo
   - create_info_todo
   - create_volunteer_todo
   - create_validation_todo
   - update
   - create_group
-
-actions:
-- affirm intent
-- affirm_entities
-- affirm_action_complete
-- negate_action
-# create_group
-# call_meeting
-# call_vote
-# create_todo
 
 entities:
  - datetime
@@ -30,15 +20,31 @@ entities:
  - information_required
  - group
 
+slots:
+  datetime:
+    type: text
+  location:
+    type: text
+  subject:
+    type: text
+  vote_option:
+    type: text
+  information_required:
+    type: text
+  group:
+    type: text
+
 templates:
-  affirm_intent:
-    - "You chose {location} as the location?"
-  affirm_entities:
-    -  "Vote option '{vote option}' captured."
-  affirm_action_complete:
+  utter_affirm_intent:
+    - "I have recieved your message. You would like to ?"
+  utter_affirm_entities:
+    -  "I have recieved your entities."
+  utter_affirm_action:
     - "All is done."
-  negate_action:
+  utter_negate_action:
     - "Sorry. Couldn't complete this action."
+  utter_greet:
+    - "Greetings."
   # create_group:
   #   - api call
   # call_meeting
@@ -47,3 +53,28 @@ templates:
   #   - api call
   # create_todo
   #   - api call
+
+actions:
+  - utter_affirm_intent
+  - utter_affirm_entities
+  - utter_affirm_action
+  - utter_negate_action
+  - utter_greet
+  - provide_issues_menu
+  - utter_orientation
+  - utter_confirmation
+  - provide_procedures_menu
+  - provide_actions_menu
+  - provide_housing_problems_main
+  - provide_housing_problems_more
+  - provide_water_problems_main
+  - provide_water_problems_more
+  - utter_please_confirm
+  - utter_completed
+  - utter_restart
+  - utter_grassroot_site
+  - utter_goodbye
+# create_group
+# call_meeting
+# call_vote
+# create_todo

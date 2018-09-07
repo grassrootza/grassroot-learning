@@ -20,8 +20,8 @@ def run_training_online(input_channel, interpreter,
     training_data = agent.load_data(training_data_file)
     agent.train_online(training_data,
                        input_channel=input_channel,
-                       batch_size=50,
-                       epochs=200,
+                       batch_size=10,
+                       epochs=50,
                        max_training_samples=300)
 
     return agent

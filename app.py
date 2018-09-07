@@ -1,3 +1,4 @@
+import os
 import re
 import json
 
@@ -90,7 +91,7 @@ def error_catching_nlu_parse(user_message, interpreter):
 
 @application.route('/status')
 def say_hello():
-    return "Hello World! I am alive"
+    return "Hello World! I am alive \n And the configured URLs are: \n clinic service: {} \n province service: {}".format(os.getenv('CLINIC_LAMBDA_URL', 'http://localhost:3001/longlat'), os.getenv('PROVINCE_SERVICE_URL', 'http://localhost:3001/longlat'))
 
 
 @application.route('/opening/parse', methods=['GET'])

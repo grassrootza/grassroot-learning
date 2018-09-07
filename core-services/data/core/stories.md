@@ -95,14 +95,37 @@
 > request_province_or_pin
 * select{"province":"gauteng"} OR select{"province":"western_cape"} OR select{"province":"eastern_cape"} OR select{"province":"northern_cape"} OR select{"province":"limpopo"} OR select{"province":"mpumalanga"} OR select{"province":"kzn"} OR select{"province":"north_west"} OR select{"province":"free_state"}
     - action_retrieve_and_send_services
+    - utter_anything_else
+* negate OR goodbye
+    - utter_goodbye
+    - action_restart
+
+## request province, or pin, and provide a province
+> request_province_or_pin
+* select{"province":"gauteng"} OR select{"province":"western_cape"} OR select{"province":"eastern_cape"} OR select{"province":"northern_cape"} OR select{"province":"limpopo"} OR select{"province":"mpumalanga"} OR select{"province":"kzn"} OR select{"province":"north_west"} OR select{"province":"free_state"}
+    - action_retrieve_and_send_services
+    - utter_anything_else
+* affirm
+    - action_service_type_reset
+    - utter_services_menu_reset
+* select{"service_type": "24hr_hcf"} OR select{"service_type":"shelter"} OR select{"service_type": "thuthuzela"}
+> request_province_or_pin
 
 ## request province, or pin, and provide a pin, as a dict
 > request_province_or_pin
 * select{"geo_location":"{latitude:\"-26.1947954\",longitude:\"28.036162200000035\"}"}
     - action_retrieve_and_send_services
+    - utter_anything_else
+* negate OR goodbye
+    - utter_goodbye
+    - action_restart
 
 ## request province, or pin, and provide a pin, as two floats
 > request_province_or_pin
 * select{"latitude":-26.1947954,"longitude":28.036162200000035}
     - action_retrieve_and_send_services
+    - utter_anything_else
+* negate OR goodbye
+    - utter_goodbye
+    - action_restart
 

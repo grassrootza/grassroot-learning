@@ -16,16 +16,8 @@ train-nlu:
 	python3 -m rasa_nlu.train -c core-knowledge/knowledge_nlu_config.yml --data core-knowledge/data/nlu/nlu.md -o core-knowledge/models --fixed_model_name knowledge_nlu --project current --verbose
 
 train-core:
-	python3 train_knowledge.py
+	cd ./core-services; python3 train_services_core.py
+	cd ./core-knowledge; python3 train_knowledge_core.py
 
-train-online:
-	python3 train_online.py
-
-run-cmdline:
-	python3 -m rasa_core.run -d models/dialogue -u models/current/knowledge_nlu --debug
-
-run-slack:
-	python -m rasa_core.run -d models/dialogue -u models/current/knowledge_nlu --port 5002 --connector slack --credentials slack_credentials.yml --debug
-
-visualize:
-	python3 -m rasa_core.visualize -s data/core/ -d domain.yml -o story_graph.png
+run-flask:
+	python3 app.py

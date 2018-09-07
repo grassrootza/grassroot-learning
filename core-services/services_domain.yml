@@ -11,6 +11,10 @@ intents:
   - request_shelter
   - request_thuthuzela
   - request_24hr_hcf
+  - negate
+  - goodbye
+  - affirm
+  - negate
   - select
 
 slots:
@@ -51,16 +55,37 @@ templates:
           payload: "thuthuzela"
         - title: "Other services"
           payload: "other"
+  utter_services_menu_standalone:
+    - text: "What service are you looking for? Reply with a number of just the name, e.g., shelter"
+      buttons:
+          - title: "A 24 hour hospital or clinic"
+            payload: "24hr_hcf"
+          - title: "A shelter"
+            payload: "shelter"
+          - title: "A Thuthuzela rape care centre"
+            payload: "thuthuzela"
+  utter_services_menu_reset:
+    - text: "What other services would you like? We will just reuse your province or location"
   utter_confirm_24hr_hcf:
     - "Okay, we will send nearby health care facilities. Please send us a pin of where you are now"
   utter_confirm_shelter:
     - "Okay, we will send shelters. Where do you live? Just enter a province or send us a location pin"
   utter_confirm_thuthuzela:
     - "Okay, we will send the TCCs. Where do you live? Just enter a province or send us a location pin"
+  utter_generic_location:
+    - "Okay. Can you send us a pin or tell us what province you are in?"
+  utter_anything_else:
+    - "Anything else?"
+  utter_goodbye:
+    - "We're glad we were helpful"
 
 actions:
   - utter_confirm_gbv_services
   - utter_confirm_24hr_hcf
   - utter_confirm_shelter
   - utter_confirm_thuthuzela
+  - utter_anything_else
+  - utter_services_menu_reset
+  - utter_goodbye
   - core-services.services_actions.ActionRetrieveAndSendServices
+  - core-services.services_actions.ActionServiceTypeReset

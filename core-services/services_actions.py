@@ -1,5 +1,7 @@
 from rasa_core.actions import Action
 from rasa_core.events import SlotSet
+from rasa_core.events import AllSlotsReset
+from rasa_core.events import Restarted
 
 import os
 import requests
@@ -33,13 +35,20 @@ class ActionRetrieveAndSendServices(Action):
     def run(self, dispatcher, tracker, domain):
       # type: (Dispatcher, DialogueStateTracker, Domain) -> List[Event]
       # r = requests.get('http://localhost:3001/province', params = {'province': province})
-      service = tracker.get_slot('service_type')
-      if service == '24hr_hcf':
-        r = self._findClinicsByLongLat(tracker)
+      
+      if (not isServiceTypeSelected(tracker)):
+        dispatcher.utter_template('utter_services_menu_standalone', tracker)
+      elif (not isLocationPresent(tracker)):
+        dispatcher.utter_template('utter_generic_location', tracker)
       else:
-        r = self._findServiceByProvince(tracker)
-      logging.warning('requested: {}'.format(r.url))
-      dispatcher.utter_message("Results: {0}".format(r.text))
+        service = tracker.get_slot('service_type')
+        if service == '24hr_hcf':
+          r = self._findClinicsByLongLat(tracker)
+        else:
+          r = self._findServiceByProvince(tracker)
+        logging.warning('requested: {}'.format(r.url))
+        dispatcher.utter_message("Results: {0}".format(r.text))
+      
       return []
 
 
@@ -58,3 +67,25 @@ class ActionRetrieveAndSendServices(Action):
       logging.info('Getting province: {}, for service: {}'.format(province, service))
       provinceUrl = os.getenv('PROVINCE_SERVICE_URL', 'http://localhost:3001/province')
       return requests.get(provinceUrl, params = { 'province': province_param_map[province], 'service': services_name_map[service] })
+
+
+def isServiceTypeSelected(tracker):
+  return tracker.get_slot('service_type') is not None
+
+def isLocationPresent(tracker):
+  return (tracker.get_slot('province') is not None 
+  or tracker.get_slot('geo_location') is not None 
+  or (tracker.get_slot('latitude') is not None and tracker.get_slot('longitude') is not None))
+
+
+class ActionAllSlotsReset(Action): 	
+    def name(self): 		
+        return 'action_all_slot_reset' 	
+    def run(self, dispatcher, tracker, domain): 		
+        return[AllSlotsReset()]
+
+class ActionServiceTypeReset(Action):
+    def name(self):
+        return 'action_service_type_reset'
+    def run(self, dispatcher, tracker, domain):
+        return[SlotSet('service_type', None)]

@@ -1,0 +1,692 @@
+﻿{
+    "rasa_nlu_data": {
+        "regex_features": [],
+        "entity_synonyms": [
+            {
+                "synonyms": [
+                    "popo",
+                    "limpompo",
+                    "limp"
+                ],
+                "value": "limpopo"
+            },
+            {
+                "synonyms": [
+                    "mpum",
+                    "MP",
+                    "m'langa",
+                    "mpumlanga"
+                ],
+                "value": "mpumalanga"
+            },
+            {
+                "synonyms": [
+                    "W Cape",
+                    "WC",
+                    "W-C",
+                    "W Kaap",
+                    "wes kaap",
+                    "W.C.",
+                    "Wes-Kaap"
+                ],
+                "value": "western_cape"
+            },
+            {
+                "synonyms": [
+                    "NC",
+                    "N.C.",
+                    "N-Cape"
+                ],
+                "value": "northern_cape"
+            },
+            {
+                "synonyms": [
+                    "Empuma Koloni",
+                    "E-C",
+                    "E Cape",
+                    "E Koloni",
+                    "eastern cape",
+                    "EC",
+                    "E-Cape"
+                ],
+                "value": "eastern_cape"
+            },
+            {
+                "synonyms": [
+                    "GP",
+                    "gautng",
+                    "gteng",
+                    "gaut"
+                ],
+                "value": "gauteng"
+            },
+            {
+                "synonyms": [
+                    "orange fs",
+                    "FS"
+                ],
+                "value": "free_state"
+            },
+            {
+                "synonyms": [
+                    "KZN",
+                    "KwaZulu Natal",
+                    "KZ-N",
+                    "Kwa-Zulu Natal",
+                    "Kwa Zulu Natal"
+                ],
+                "value": "kzn"
+            },
+            {
+                "synonyms": [
+                    "north west",
+                    "NW",
+                    "north-west"
+                ],
+                "value": "north_west"
+            }
+        ],
+        "common_examples": [
+            {
+                "text": "limpopo please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 7,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "limpopo"
+                    }
+                ]
+            },
+            {
+                "text": "mpumalanga please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 10,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "mpumalanga"
+                    }
+                ]
+            },
+            {
+                "text": "W Cape",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 6,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "W Cape"
+                    }
+                ]
+            },
+            {
+                "text": "NC pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "NC"
+                    }
+                ]
+            },
+            {
+                "text": "Empuma Koloni",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 13,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "Empuma Koloni"
+                    }
+                ]
+            },
+            {
+                "text": "WC please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "WC"
+                    }
+                ]
+            },
+            {
+                "text": "GP",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "GP"
+                    }
+                ]
+            },
+            {
+                "text": "orange fs please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 9,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "orange fs"
+                    }
+                ]
+            },
+            {
+                "text": "W-C",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 3,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "W-C"
+                    }
+                ]
+            },
+            {
+                "text": "E-C please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 3,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "E-C"
+                    }
+                ]
+            },
+            {
+                "text": "FS",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "FS"
+                    }
+                ]
+            },
+            {
+                "text": "mpumalanga",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 10,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "mpumalanga"
+                    }
+                ]
+            },
+            {
+                "text": "E-C pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 3,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "E-C"
+                    }
+                ]
+            },
+            {
+                "text": "orange fs",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 9,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "orange fs"
+                    }
+                ]
+            },
+            {
+                "text": "WC",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "WC"
+                    }
+                ]
+            },
+            {
+                "text": "gautng please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 6,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "gautng"
+                    }
+                ]
+            },
+            {
+                "text": "E Cape pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 6,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "E Cape"
+                    }
+                ]
+            },
+            {
+                "text": "E Koloni pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 8,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "E Koloni"
+                    }
+                ]
+            },
+            {
+                "text": "mpum",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "mpum"
+                    }
+                ]
+            },
+            {
+                "text": "NC",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "NC"
+                    }
+                ]
+            },
+            {
+                "text": "eastern cape pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 12,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "eastern cape"
+                    }
+                ]
+            },
+            {
+                "text": "GP please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "GP"
+                    }
+                ]
+            },
+            {
+                "text": "W Kaap",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 6,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "W Kaap"
+                    }
+                ]
+            },
+            {
+                "text": "MP",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "MP"
+                    }
+                ]
+            },
+            {
+                "text": "m'langa",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 7,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "m'langa"
+                    }
+                ]
+            },
+            {
+                "text": "KZN",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 3,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "KZN"
+                    }
+                ]
+            },
+            {
+                "text": "gteng pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 5,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "gteng"
+                    }
+                ]
+            },
+            {
+                "text": "popo please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "popo"
+                    }
+                ]
+            },
+            {
+                "text": "EC pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "EC"
+                    }
+                ]
+            },
+            {
+                "text": "limpompo please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 8,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "limpompo"
+                    }
+                ]
+            },
+            {
+                "text": "gauteng pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 7,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "gauteng"
+                    }
+                ]
+            },
+            {
+                "text": "KwaZulu Natal pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 13,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "KwaZulu Natal"
+                    }
+                ]
+            },
+            {
+                "text": "KZ-N please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "KZ-N"
+                    }
+                ]
+            },
+            {
+                "text": "north west pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 10,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "north west"
+                    }
+                ]
+            },
+            {
+                "text": "Kwa-Zulu Natal",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 14,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "Kwa-Zulu Natal"
+                    }
+                ]
+            },
+            {
+                "text": "m'langa please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 7,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "m'langa"
+                    }
+                ]
+            },
+            {
+                "text": "E-Cape please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 6,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "E-Cape"
+                    }
+                ]
+            },
+            {
+                "text": "limpompo pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 8,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "limpompo"
+                    }
+                ]
+            },
+            {
+                "text": "N.C. pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "N.C."
+                    }
+                ]
+            },
+            {
+                "text": "mpumlanga pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 9,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "mpumlanga"
+                    }
+                ]
+            },
+            {
+                "text": "Kwa Zulu Natal pls",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 14,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "Kwa Zulu Natal"
+                    }
+                ]
+            },
+            {
+                "text": "NW",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "NW"
+                    }
+                ]
+            },
+            {
+                "text": "N-Cape",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 6,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "N-Cape"
+                    }
+                ]
+            },
+            {
+                "text": "wes kaap please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 8,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "wes kaap"
+                    }
+                ]
+            },
+            {
+                "text": "W.C.",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "W.C."
+                    }
+                ]
+            },
+            {
+                "text": "north-west",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 10,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "north-west"
+                    }
+                ]
+            },
+            {
+                "text": "NW please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 2,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "NW"
+                    }
+                ]
+            },
+            {
+                "text": "Wes-Kaap",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 8,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "Wes-Kaap"
+                    }
+                ]
+            },
+            {
+                "text": "limp please",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "limp"
+                    }
+                ]
+            },
+            {
+                "text": "gaut",
+                "intent": "select",
+                "entities": [
+                    {
+                        "end": 4,
+                        "entity": "province",
+                        "start": 0,
+                        "value": "gaut"
+                    }
+                ]
+            }
+        ]
+    }
+}

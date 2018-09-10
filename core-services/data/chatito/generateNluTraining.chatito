@@ -1,0 +1,154 @@
+%[select]('training': '2500', 'testing': '100')
+    ~[please?] @[province] ~[please?]
+    @[service_type] ~[please?]
+    @[province] @[service_type]
+    @[service_type] ~[located at?] @[province]
+
+@[service_type]
+    ~[thuthuzela]
+    ~[shelter]
+    ~[24hr_hcf]
+
+~[shelter]
+    shelter
+    shelters
+    homeless shelter
+    victim shelter
+    shlters
+    ster
+    a shelter
+    one shelter
+    close shelter
+
+~[thuthuzela]
+    thuthuzela
+    rape centre
+    rape center
+    rape care
+    tcc
+    the thuthuzela
+    tutuzela
+    the tutuzela
+    tutzela
+    thuthzela
+
+~[24hr_hcf]
+    clinic
+    clinics
+    24hr clinic
+    clnic
+    clnc
+    near clinic
+    closest clinic
+    a clinic
+    the clinic
+
+@[province]
+    ~[gauteng]
+    ~[western_cape]
+    ~[eastern_cape]
+    ~[northern_cape]
+    ~[kzn]
+    ~[limpopo]
+    ~[mpumalanga]
+    ~[free_state]
+    ~[north_west]
+
+~[gauteng]
+    gauteng
+    Gauteng
+    GP
+    GT
+    gaut
+    gautng
+    gteng
+
+~[western_cape]
+    western cape
+    Western Cape
+    W Cape
+    W. Cape
+    WC
+    W-C
+    wes kaap
+    W Kaap
+    Wes-Kaap
+    Western-Cape
+
+~[eastern_cape]
+    eastern cape
+    Eastern Cape
+    EC
+    E-C
+    E Cape
+    E-Cape
+    Empuma Koloni
+    E Koloni
+
+~[northern_cape]
+    northern cape
+    Northern Cape
+    NC
+    N-C
+    N-Cape
+    N Cape
+    N Kaap
+    N-Kaap
+
+~[kzn]
+    KZN
+    KwaZulu Natal
+    Kwa-Zulu Natal
+    Kwa Zulu Natal
+    KwaZuluNatal
+    K-Z-N
+    KZ-N
+
+~[limpopo]
+    limpopo
+    Limpopo
+    LP
+    LIM
+    limpompo
+    limp
+    lpopo
+    popo
+    l-popo
+    limps
+
+~[mpumalanga]
+    mpumalanga
+    Mpumalanga
+    MP
+    m'langa
+    mpum
+    mpuma
+    mpumlanga
+
+~[free_state]
+    FS
+    Free State
+    free state
+    orange free state
+    f state
+    f-s
+    orange fs
+
+~[north_west]
+    north west
+    North West
+    north-west
+    NW
+
+~[please]
+    pls
+    please
+    plz
+    ngicela
+    cela
+    asseblief
+    as'blief
+
+~[located at]
+    in
+    at

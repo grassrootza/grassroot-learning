@@ -143,7 +143,8 @@ def parse_knowledge_domain(domain):
     # agent_response = { 'domain': domain, 'responses': responses_to_user }
     # logging.info('Domain agent response: %s', agent_response)
 
-    reshaped_response = reshape_core_result(domain, responses_to_user[0])
+    to_send = responses_to_user[0] if responses_to_user else {}
+    reshaped_response = reshape_core_result(domain, to_send)
     logging.info('Newly reshaped response: {}'.format(reshaped_response))
     
     resp = jsonify(reshaped_response)

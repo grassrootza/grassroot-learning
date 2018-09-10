@@ -21,3 +21,6 @@ grassroot-nlu/logs/nlu.log
 
 # Some config files
 *_credentials.yml
+
+# Scripts for startup etc
+*.sh

@@ -78,6 +78,8 @@ templates:
     - "Anything else?"
   utter_goodbye:
     - "We're glad we were helpful"
+  utter_restart:
+    - "Okay, we will help you find services. What do you need?"
 
 actions:
   - utter_confirm_gbv_services
@@ -87,5 +89,6 @@ actions:
   - utter_anything_else
   - utter_services_menu_reset
   - utter_goodbye
+  - utter_restart
   - core-services.services_actions.ActionRetrieveAndSendServices
   - core-services.services_actions.ActionServiceTypeReset

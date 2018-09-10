@@ -11,10 +11,13 @@ help:
 	@echo "        Starts the bot on the command line"
 
 train-nlu:
-	python3 -m rasa_nlu.train -c services_nlu_config.yml --data data/nlu/nlu.md -o models --fixed_model_name services_nlu --project current --verbose
+	python3 -m rasa_nlu.train -c services_nlu_config.yml --data data/nlu -o models --fixed_model_name services_nlu --project current --verbose
 
 train-core:
 	python3 train_services_core.py
+
+evaluate-provinces:
+	python3 -m rasa_nlu.evaluate --data data/examples/provinces_testing_data.json --model models/current/services_nlu
 
 run-cmdline:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/services_nlu --debug

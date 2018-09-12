@@ -31,7 +31,8 @@
     - utter_anything_else
 * affirm
     - action_service_type_reset
-    - utter_services_menu_reset
+    - utter_menu_second_service
+    - utter_services_menu
 ## Generated Story (alternate)
 * select{"service_type": "shelter"}
     - slot{"service_type": "shelter"}
@@ -42,7 +43,8 @@
     - utter_anything_else
 * affirm
     - action_service_type_reset
-    - utter_services_menu_reset
+    - utter_menu_second_service
+    - utter_services_menu
 * select{"service_type": "thuthuzela"}
     - action_retrieve_and_send_services
     - utter_goodbye
@@ -50,6 +52,7 @@
 ## Generated Story -7528961615721468854
 * find_services
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type": "shelter"}
     - slot{"service_type": "shelter"}
     - utter_confirm_shelter
@@ -59,7 +62,8 @@
     - utter_anything_else
 * affirm
     - action_service_type_reset
-    - utter_services_menu_reset
+    - utter_menu_second_service
+    - utter_services_menu
 * select{"service_type": "thuthuzela"}
     - slot{"service_type": "thuthuzela"}
     - action_retrieve_and_send_services
@@ -69,6 +73,7 @@
 ## Generated Story 5424264101651828142
 * find_services_gbv
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type": "24hr_hcf"}
     - slot{"service_type": "24hr_hcf"}
     - utter_confirm_24hr_hcf
@@ -80,7 +85,8 @@
 * affirm
     - action_service_type_reset
     - slot{"service_type": null}
-    - utter_services_menu_reset
+    - utter_menu_second_service
+    - utter_services_menu
 * select{"service_type": "shelter"}
     - slot{"service_type": "shelter"}
     - action_retrieve_and_send_services

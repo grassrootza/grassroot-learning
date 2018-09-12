@@ -1,6 +1,7 @@
 ## happy path, from start, for health care facilities
 * find_services
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type":"24hr_hcf"}
     - utter_confirm_24hr_hcf
 > request_province_or_pin
@@ -8,6 +9,7 @@
 ## same as above, for shelters
 * find_services
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type":"shelter"}
     - utter_confirm_shelter
 > request_province_or_pin
@@ -15,6 +17,7 @@
 ## and for thuthuzela
 * find_services
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type":"thuthuzela"}
     - utter_confirm_thuthuzela
 > request_province_or_pin
@@ -22,6 +25,7 @@
 ## happy path, straight to gbv intent
 * find_services_gbv
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type":"24hr_hcf"}
     - utter_confirm_24hr_hcf
 > request_province_or_pin
@@ -29,6 +33,7 @@
 ## same as above, for shelters
 * find_services_gbv
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type":"shelter"}
     - utter_confirm_shelter
 > request_province_or_pin
@@ -36,6 +41,7 @@
 ## and for thuthuzela
 * find_services_gbv
     - utter_confirm_gbv_services
+    - utter_services_menu
 * select{"service_type":"thuthuzela"}
     - utter_confirm_thuthuzela
 > request_province_or_pin
@@ -107,7 +113,8 @@
     - utter_anything_else
 * affirm
     - action_service_type_reset
-    - utter_services_menu_reset
+    - utter_menu_second_service
+    - utter_services_menu
 * select{"service_type": "24hr_hcf"} OR select{"service_type":"shelter"} OR select{"service_type": "thuthuzela"}
 > request_province_or_pin
 

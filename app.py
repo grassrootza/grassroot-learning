@@ -50,25 +50,21 @@ def reshape_nlu_result(domain, nlu_result):
         'responses': []
     }
 
-def reshape_core_result(domain, core_result):
-    logging.info('reshaping core_result: {}'.format(core_result))
+def reshape_core_result(domain, core_results):
+    logging.info('reshaping core_result: {}'.format(core_results))
     
     response_texts = []
     response_menu = []
 
-    if 'text' in core_result:
-        response_texts.append(core_result['text'])
-    
-    if 'data' in core_result:
-        # extracted_text = list(map(lambda button: button['title'], core_result['data']))
-        extracted_text = []
-        for idx, button in enumerate(core_result['data']):
-            extracted_text.append('{}. {}'.format(idx + 1, button['title']))
-        response_texts.extend(extracted_text)
-        response_menu = core_result['data']
-    else:
-        response_menu = []
-        
+    for core_result in core_results:
+        if 'text' in core_result and len(core_result['text']) > 0:
+            response_texts.append(core_result['text'])
+        if 'data' in core_result:
+            extracted_text = []
+            for idx, button in enumerate(core_result['data']):
+                extracted_text.append('{}. {}'.format(idx + 1, button['title']))
+            response_texts.extend(extracted_text)
+            response_menu = core_result['data'] 
     
     logging.info('Extracted response texts: {}'.format(response_texts))
 
@@ -139,11 +135,13 @@ def parse_knowledge_domain(domain):
         responses_to_user = domain_agents[domain].handle_message(user_message, sender_id=user_id)
     else:
         responses_to_user = domain_agents[domain].handle_message(user_message)
+
+    logging.info('raw response: {}'.format(responses_to_user))
     
     # agent_response = { 'domain': domain, 'responses': responses_to_user }
     # logging.info('Domain agent response: %s', agent_response)
 
-    to_send = responses_to_user[0] if responses_to_user else {}
+    to_send = responses_to_user if (responses_to_user and len(responses_to_user) > 0) else {}
     reshaped_response = reshape_core_result(domain, to_send)
     logging.info('Newly reshaped response: {}'.format(reshaped_response))
     

@@ -1,8 +1,74 @@
+%[find_services]('training': '1000', 'testing': '10')
+    ~[please?] ~[where?] ~[find?] ~[help?] ~[service] ~[please?]
+
+%[find_services_gbv]('training': '1000', 'testing': '10')
+    ~[izwe_lami?] ~[pain?] ~[rape?] ~[assault?] ~[violence?]
+
 %[select]('training': '2500', 'testing': '100')
     ~[please?] @[province] ~[please?]
     @[service_type] ~[please?]
     @[province] @[service_type]
     @[service_type] ~[located at?] @[province]
+
+~[where]
+    where
+    ubu
+    kuphi
+    ikuphi
+    kai
+    whr
+    where are
+    where is
+
+~[find]
+    find
+    ngifuna
+    ndifuna
+    thola
+    fumana
+
+~[service]
+    service
+    services
+    isevisis
+
+~[help]
+    help
+    help me
+    sizo
+    hlp
+    usizo
+    Hlp
+    Help!
+    helpe
+    thusa
+
+~[izwe_lami]
+    izwe lami
+    health e
+    izwe-lami
+    health-e
+
+~[pain]
+    pain
+    hurt
+
+~[rape]
+    rape
+    raped
+    ho betoa
+    rapist
+    raping
+
+~[assault]
+    assault
+    asault
+    asslt 
+
+~[violence]
+    violence
+    violent
+    violense
 
 @[service_type]
     ~[thuthuzela]

@@ -37,7 +37,7 @@ class ActionRetrieveAndSendServices(Action):
       # r = requests.get('http://localhost:3001/province', params = {'province': province})
       
       if (not isServiceTypeSelected(tracker)):
-        dispatcher.utter_template('utter_services_menu_standalone', tracker)
+        dispatcher.utter_template('utter_services_menu', tracker)
       elif (not isLocationPresent(tracker)):
         dispatcher.utter_template('utter_generic_location', tracker)
       else:

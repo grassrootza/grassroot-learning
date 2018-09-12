@@ -45,26 +45,17 @@ slots:
 
 templates:
   utter_confirm_gbv_services:
-    - text: "Okay, we will help you find services. What do you need?"
-      buttons:
-        - title: "A 24 hour hospital or clinic"
-          payload: "24hr_hcf"
-        - title: "A shelter"
-          payload: "shelter"
-        - title: "A Thuthuzela rape care centre"
-          payload: "thuthuzela"
-        - title: "Other services"
-          payload: "other"
-  utter_services_menu_standalone:
-    - text: "What service are you looking for? Reply with a number of just the name, e.g., shelter"
+    - "Okay, we will help you find services. What do you need?"
+  utter_services_menu:
+    - text: ''
       buttons:
           - title: "A 24 hour hospital or clinic"
-            payload: "24hr_hcf"
+            payload: "service_type::24hr_hcf"
           - title: "A shelter"
-            payload: "shelter"
+            payload: "service_type::shelter"
           - title: "A Thuthuzela rape care centre"
-            payload: "thuthuzela"
-  utter_services_menu_reset:
+            payload: "service_type::thuthuzela"
+  utter_menu_second_service:
     - text: "What other services would you like? We will just reuse your province or location"
   utter_confirm_24hr_hcf:
     - "Okay, we will send nearby health care facilities. Please send us a pin of where you are now"
@@ -87,7 +78,8 @@ actions:
   - utter_confirm_shelter
   - utter_confirm_thuthuzela
   - utter_anything_else
-  - utter_services_menu_reset
+  - utter_services_menu
+  - utter_menu_second_service
   - utter_goodbye
   - utter_restart
   - core-services.services_actions.ActionRetrieveAndSendServices

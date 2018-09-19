@@ -5,6 +5,7 @@ __pycache__/
 
 # Virtual ENV
 env/
+venv/
 
 # Models built by Rasa
 models/
@@ -24,3 +25,6 @@ grassroot-nlu/logs/nlu.log
 
 # Scripts for startup etc
 *.sh
+
+# Serverless and its plugins
+**/node_modules

@@ -45,42 +45,45 @@ slots:
 
 templates:
   utter_confirm_gbv_services:
-    - "Okay, we will help you find services. What do you need?"
+    - "Welcome to Izwi Lami - My Voice. What help do you need?"
   utter_services_menu:
     - text: ''
       buttons:
-          - title: "A 24 hour hospital or clinic"
+          - title: "24 hour hospital or clinic"
             payload: "service_type::24hr_hcf"
-          - title: "A shelter"
+          - title: "Shelter"
             payload: "service_type::shelter"
-          - title: "A Thuthuzela rape care centre"
+          - title: "Thuthuzela rape care centre"
             payload: "service_type::thuthuzela"
   utter_menu_second_service:
     - text: "What other services would you like? We will just reuse your province or location"
   utter_confirm_24hr_hcf:
-    - "Okay, we will send nearby health care facilities. Please send us a pin of where you are now"
+    - "Okay, we will send you nearby health care facilities. Please attach a location pin of where you are now"
   utter_confirm_shelter:
-    - "Okay, we will send shelters. Where do you live? Just enter a province or send us a location pin"
+    - "Okay, we will send you details of nearby shelters. Where do you live? Just send us a province name or attach a location pin"
   utter_confirm_thuthuzela:
-    - "Okay, we will send the TCCs. Where do you live? Just enter a province or send us a location pin"
+    - "Okay, we will send details of Thuthuzela centres. Where do you live? Just send us a province name or a location pin"
   utter_generic_location:
-    - "Okay. Can you send us a pin or tell us what province you are in?"
+    - "Okay. Can you send us a pin (attach via WhatsApp) or tell us what province you are in?"
+  utter_pre_services:
+    - "These messages have contact information only, not links. Standard rates apply if you dial the numbers below."
+  utter_post_services:
+    - "Remember: ask for the morning after pill, ARVs, vaccinations and counseling at the clinic/hospital. http://bit.ly/2MzUIbU Viewing the map uses data."
   utter_anything_else:
-    - "Anything else?"
+    - "Is there any other service you need? Just type clinic, shelter or thuthuzela and we will reuse your location"
   utter_goodbye:
-    - "We're glad we were helpful"
-  utter_restart:
-    - "Okay, we will help you find services. What do you need?"
+    - "Okay. We're glad we were helpful. Send a message anytime if you need more information."
 
 actions:
   - utter_confirm_gbv_services
   - utter_confirm_24hr_hcf
   - utter_confirm_shelter
   - utter_confirm_thuthuzela
+  - utter_pre_services
+  - utter_post_services
   - utter_anything_else
   - utter_services_menu
   - utter_menu_second_service
   - utter_goodbye
-  - utter_restart
-  - core-services.services_actions.ActionRetrieveAndSendServices
-  - core-services.services_actions.ActionServiceTypeReset
+  - action_retrieve_and_send_services
+  - action_service_type_reset

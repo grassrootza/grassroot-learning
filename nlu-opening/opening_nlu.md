@@ -26,7 +26,26 @@
 - good evening
 - hey there
 
+## intent:restart
+- start again
+- restart
+- start
+- again please
+- again
+- restrt
+- Start
+- Restart
+- Start again
+- No, start again
+- Uh uh again
+- Start again
+- reset
+- Reset
+
 ## intent:find_services
+- izwi lami
+- Izwi Lami
+- Izwe Lami
 - izwe lami
 - pls I'm in pain
 - pain

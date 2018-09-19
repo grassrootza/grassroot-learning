@@ -44,7 +44,10 @@
     thusa
 
 ~[izwe_lami]
+    Izwi Lami
+    Izwe Lami
     izwe lami
+    izwi lami
     health e
     izwe-lami
     health-e
@@ -77,7 +80,9 @@
 
 ~[shelter]
     shelter
+    Shelter
     shelters
+    Shelters
     homeless shelter
     victim shelter
     shlters
@@ -87,7 +92,9 @@
     close shelter
 
 ~[thuthuzela]
+    TCC
     thuthuzela
+    Thuthuzela
     rape centre
     rape center
     rape care
@@ -108,6 +115,8 @@
     closest clinic
     a clinic
     the clinic
+    Clinic
+    Clinics
 
 @[province]
     ~[gauteng]

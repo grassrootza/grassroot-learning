@@ -1,0 +1,2 @@
+action_endpoint:
+  url: "https://mc770m61l5.execute-api.eu-west-1.amazonaws.com/dev"

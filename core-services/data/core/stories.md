@@ -136,3 +136,12 @@
     - utter_goodbye
     - action_restart
 
+## request province, or pin, and provide a province
+> request_province_or_pin
+* select{"province":"gauteng"} OR select{"province":"western_cape"} OR select{"province":"eastern_cape"} OR select{"province":"northern_cape"} OR select{"province":"limpopo"} OR select{"province":"mpumalanga"} OR select{"province":"kzn"} OR select{"province":"north_west"} OR select{"province":"free_state"}
+    - action_retrieve_and_send_services
+    - utter_anything_else
+* select{"service_type": "24hr_hcf"} OR select{"service_type":"shelter"} OR select{"service_type": "thuthuzela"}
+    - action_retrieve_and_send_services
+    - utter_goodbye
+    - action_restart

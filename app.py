@@ -6,9 +6,11 @@ from flask import Flask, request, jsonify
 from datetime import datetime
 
 from rasa_nlu.model import Interpreter
-
 from rasa_core.agent import Agent
-from rasa_core.channels.console import ConsoleInputChannel
+from rasa_core.interpreter import RasaNLUInterpreter
+from rasa_core.channels import CollectingOutputChannel
+
+from rasa_core.utils import EndpointConfig
 
 import logging
 
@@ -18,6 +20,7 @@ application = Flask(__name__)
 
 # Now load up the various interpreters and agents
 opening_nlu = Interpreter.load('./nlu-opening/models/current/opening_nlu')
+services_actions_endpoint = os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 
 intent_domain_map = {
     'find_services': 'service',
@@ -25,11 +28,17 @@ intent_domain_map = {
 }
 
 domain_agents = {
-    "service": Agent.load('core-services/models/dialogue', interpreter = 'core-services/models/current/services_nlu'),
-    "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter='core-knowledge/models/current/knowledge_nlu')
+    "service": Agent.load('core-services/models/dialogue', interpreter = RasaNLUInterpreter('core-services/models/current/services_nlu'),
+        action_endpoint = EndpointConfig(services_actions_endpoint)),
+    "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter= RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu'))
 }
 
 CONFIDENCE_THRESHOLD = 0.7
+
+def reset_all_agents(user_id):
+    # domain_agents['service'].execute_action(user_id, 'action_restart', None)
+    for domain in domain_agents:
+        domain_agents[domain].execute_action(user_id, 'action_restart', CollectingOutputChannel())
 
 """
 Common response format: {
@@ -59,12 +68,12 @@ def reshape_core_result(domain, core_results):
     for core_result in core_results:
         if 'text' in core_result and len(core_result['text']) > 0:
             response_texts.append(core_result['text'])
-        if 'data' in core_result:
+        if 'buttons' in core_result:
             extracted_text = []
-            for idx, button in enumerate(core_result['data']):
+            for idx, button in enumerate(core_result['buttons']):
                 extracted_text.append('{}. {}'.format(idx + 1, button['title']))
             response_texts.extend(extracted_text)
-            response_menu = core_result['data'] 
+            response_menu = core_result['buttons'] 
     
     logging.info('Extracted response texts: {}'.format(response_texts))
 
@@ -87,8 +96,22 @@ def error_catching_nlu_parse(user_message, interpreter):
 
 @application.route('/status')
 def say_hello():
-    return "Hello World! I am alive \n And the configured URLs are: \n clinic service: {} \n province service: {}".format(os.getenv('CLINIC_LAMBDA_URL', 'http://localhost:3001/longlat'), os.getenv('PROVINCE_SERVICE_URL', 'http://localhost:3001/longlat'))
+    return "Hello World! I am alive, on version 0-b. \n And service action URL is: {}".format(services_actions_endpoint)
 
+
+@application.route('/restart', methods=['POST'])
+def reset_user_session():
+    """Resets all domains
+
+    Query params:
+        user_id (str): User ID to reset (required)
+    """
+
+    user_id = request.args.get('user_id')
+    reset_all_agents(user_id)
+    logging.info('Completed restart for {}'.format(user_id))
+    return '', 200
+    
 
 @application.route('/opening/parse', methods=['GET'])
 def parse_unknown_domain():
@@ -105,7 +128,7 @@ def parse_unknown_domain():
     
     primary_result = nlu_result['intent']
     logging.info('NLU result on opening: %s', nlu_result)
-    result_as_response = reshape_nlu_result('opening', nlu_result); 
+    result_as_response = reshape_nlu_result('opening', nlu_result)
     if (primary_result['confidence'] > CONFIDENCE_THRESHOLD):
         # since we are now pretty sure of the result, check if we can skip straight into domain
         if (primary_result['name'] in intent_domain_map):
@@ -132,9 +155,9 @@ def parse_knowledge_domain(domain):
     user_message = request.args.get('message')
     if 'user_id' in request.args:
         user_id = request.args.get('user_id')
-        responses_to_user = domain_agents[domain].handle_message(user_message, sender_id=user_id)
+        responses_to_user = domain_agents[domain].handle_text(user_message, sender_id=user_id)
     else:
-        responses_to_user = domain_agents[domain].handle_message(user_message)
+        responses_to_user = domain_agents[domain].handle_text(user_message)
 
     logging.info('raw response: {}'.format(responses_to_user))
     

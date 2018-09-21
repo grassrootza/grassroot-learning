@@ -7,4 +7,4 @@ help:
 	@echo "        Train the opening NLU using Rasa NLU."
 
 train-nlu:
-	python3 -m rasa_nlu.train -c opening_nlu_config.yml --data opening_nlu.md -o models --fixed_model_name opening_nlu --project current --verbose
+	python3 -m rasa_nlu.train -c opening_nlu_config.yml --data data/nlu -o models --fixed_model_name opening_nlu --project current --verbose

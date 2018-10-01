@@ -19,7 +19,8 @@ logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(leve
 application = Flask(__name__)
 
 # Now load up the various interpreters and agents
-opening_nlu = Interpreter.load('./nlu-opening/models/current/opening_nlu')
+opening_nlu = RasaNLUInterpreter('./nlu-opening/models/current/opening_nlu')
+service_nlu = RasaNLUInterpreter('core-services/models/current/services_nlu')
 services_actions_endpoint = os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 
 intent_domain_map = {
@@ -28,8 +29,7 @@ intent_domain_map = {
 }
 
 domain_agents = {
-    "service": Agent.load('core-services/models/dialogue', interpreter = RasaNLUInterpreter('core-services/models/current/services_nlu'),
-        action_endpoint = EndpointConfig(services_actions_endpoint)),
+    "service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
     "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter= RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu'))
 }
 
@@ -111,7 +111,19 @@ def reset_user_session():
     reset_all_agents(user_id)
     logging.info('Completed restart for {}'.format(user_id))
     return '', 200
-    
+
+
+@application.route('/province', methods=['GET'])
+def parse_user_province():
+    """
+    We use the services NLU for this, because it is by far the heaviest user of province selection
+    """
+    user_message = request.args.get('message')
+    nlu_result = error_catching_nlu_parse(user_message, service_nlu)
+    resp = jsonify(reshape_nlu_result('service', nlu_result))
+    resp.status_code = 200
+    return resp
+
 
 @application.route('/opening/parse', methods=['GET'])
 def parse_unknown_domain():

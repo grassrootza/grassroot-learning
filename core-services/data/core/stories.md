@@ -22,6 +22,19 @@
     - utter_confirm_thuthuzela
 > request_province_or_pin
 
+## a longer story, trying to reinforce memory
+* find_services
+    - utter_confirm_gbv_services
+    - utter_services_menu
+* select{"service_type":"thuthuzela"}
+    - utter_confirm_thuthuzela
+* select{"province":"gauteng"}
+    - action_retrieve_and_send_services
+    - utter_anything_else
+* goodbye
+    - utter_goodbye
+    - action_restart
+
 ## happy path, straight to gbv intent
 * find_services_gbv
     - utter_confirm_gbv_services
@@ -45,6 +58,32 @@
 * select{"service_type":"thuthuzela"}
     - utter_confirm_thuthuzela
 > request_province_or_pin
+
+## happy path, repeating / emphasizing
+* find_services_gbv
+    - utter_confirm_gbv_services
+    - utter_services_menu
+* select{"service_type":"thuthuzela"}
+    - utter_confirm_thuthuzela
+* select{"province":"gauteng"}
+    - action_retrieve_and_send_services
+    - utter_anything_else
+* goodbye
+    - utter_goodbye
+    - action_restart
+
+## happy path, repeating / emphasizing
+* find_services_gbv
+    - utter_confirm_gbv_services
+    - utter_services_menu
+* select{"service_type":"thuthuzela"}
+    - utter_confirm_thuthuzela
+* select{"province":"gauteng"} OR select{"province":"western_cape"} OR select{"province":"eastern_cape"} OR select{"province":"northern_cape"} OR select{"province":"limpopo"} OR select{"province":"mpumalanga"} OR select{"province":"kzn"} OR select{"province":"north_west"} OR select{"province":"free_state"}
+    - action_retrieve_and_send_services
+    - utter_anything_else
+* negate
+    - utter_goodbye
+    - action_restart
 
 ## happy path, shelters information
 * request_shelter

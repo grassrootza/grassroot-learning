@@ -36,9 +36,9 @@ domain_agents = {
 CONFIDENCE_THRESHOLD = 0.7
 
 def reset_all_agents(user_id):
-    # domain_agents['service'].execute_action(user_id, 'action_restart', None)
     for domain in domain_agents:
-        domain_agents[domain].execute_action(user_id, 'action_restart', CollectingOutputChannel())
+        # domain_agents[domain].execute_action(user_id, 'action_restart', CollectingOutputChannel()) # turns out different channel messes up tracker reset ...
+        domain_agents[domain].handle_text('/restart', sender_id = user_id)
 
 """
 Common response format: {
@@ -96,7 +96,7 @@ def error_catching_nlu_parse(user_message, interpreter):
 
 @application.route('/status')
 def say_hello():
-    return "Hello World! I am alive, on version 0-b. \n And service action URL is: {}".format(services_actions_endpoint)
+    return "Hello World! I am alive, on version 0-c. \n And service action URL is: {}".format(services_actions_endpoint)
 
 
 @application.route('/restart', methods=['POST'])

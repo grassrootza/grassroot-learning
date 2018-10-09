@@ -23,7 +23,6 @@ DATETIME_URL = 'http://learning.grassroot.cloud'
 PRE_TOK_URL = 'https://staging.grassroot.org.za/v2/api/whatsapp/user/id'
 group_url = 'https://staging.grassroot.org.za/v2/api/group/fetch/list'
 auth_token = os.getenv("TOKEN_X")
-user_number = os.getenv('USER_NUMBER')
 
 testParentType = 'GROUP'
 testParentUid = str(uuid.uuid4())
@@ -251,7 +250,7 @@ class ActionGetGroup(Action):
         return 'action_get_group'
 
     def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_button_message("Choose a group", get_group_menu_items())
+        dispatcher.utter_button_message("Choose a group", get_group_menu_items(tracker.sender_id))
         return []
 
 
@@ -302,7 +301,7 @@ class CreateMeetingUrl(Action):
         return 'action_create_meeting_url'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         # dispatcher.utter_message("Found uid %s for group %s" % (groupUid, tracker.get_slot("group")))
         meeting_path = '/v2/api/task/create/meeting/%s/%s' % (testParentType, groupUid)
         query_params = '?location=%s&dateTimeEpochMillis=%s&subject=%s&description=%s' % (\
@@ -310,7 +309,7 @@ class CreateMeetingUrl(Action):
                        tracker.get_slot('subject'), tracker.get_slot('description'))
         url = BASE_URL+meeting_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -320,14 +319,14 @@ class CreateVoteUrl(Action):
         return 'action_create_vote_url'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         vote_path = '/v2/api/task/create/vote/%s/%s' % (testParentType, groupUid)
         query_params = '?title=%s&time=%s&voteOptions=[%s]&description=%s' % (\
                        tracker.get_slot('subject'), epoch(formalize(tracker.get_slot("datetime"))),
                        tracker.get_slot('vote_option'), tracker.get_slot('description'))
         url = BASE_URL+vote_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('Contructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -342,7 +341,7 @@ class CreateVoteUrl(Action):
 #                        tracker.get_slot('description'), tracker.get_slot('reminderMinutes'))
 #         url = BASE_URL+group_path+query_params.replace(' ', '%20')
 #         dispatcher.utter_message('Constructed url: %s' % url)
-#         # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+#         # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
 #        return []
 
 
@@ -351,13 +350,13 @@ class CreateVolunteerTodoUrl(Action):
         return 'action_create_volunteer_todo_url'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (testParentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s' % (tracker.get_slot("subject"),
                         formalize(tracker.get_slot("datetime")))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -367,13 +366,13 @@ class CreateValidationTodoUrl(Action):
         return 'create_validation_todo_url'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (testParentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s' % (tracker.get_slot("subject"),
                         epoch(formalize(tracker.get_slot("datetime"))))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -383,12 +382,12 @@ class CreateInfoTodoUrl(Action):
         return 'action_create_info_todo_url'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         todo_path = '/v2/api/task/create/todo/information/%s/%s' % (testParentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s&responseTag=%s' % (tracker.get_slot("subject"),
                         epoch(formalize(tracker.get_slot("datetime"))), tracker.get_slot("response_tag"))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
-        # response = requests.post(url, auth=(user, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, auth=(user, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -398,13 +397,13 @@ class CreateActionTodoUrl(Action):
         return 'action_create_todo_action_url'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         todo_path = '/v2/api/task/create/todo/action/%s/%s' % (testParentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s&' % (tracker.get_slot("subject"),
                         epoch(formalize(tracker.get_slot("datetime"))))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -418,7 +417,7 @@ class CreateLivewireUrl(Action):
         description = tracker.get_slot("description")
         contactName = tracker.get_slot("contact_name")
         contactNumber =  tracker.get_slot("contact_number")
-        groupUid = get_group_uid(tracker.get_slot("group"))
+        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         taskUid = tracker.get_slot("task_uid")
         livewire_type = tracker.get_slot("livewire_type")
         if livewire_type == 'MEETING':
@@ -438,7 +437,7 @@ class CreateLivewireUrl(Action):
                                         longitude, destUid)
         url = BASE_URL+livewire_path+query_params
         dispatcher.utter_message("Contructed url: %s" % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token()}))
+        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
         return []
 
 
@@ -458,9 +457,9 @@ def epoch(formalized_datetime):
         return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
 
 
-def get_token():
+def get_token(sender_id):
     server_user_id = requests.post(PRE_TOK_URL, headers={'Authorization': 'Bearer ' \
-                          + auth_token}, params={'msisdn': '%s' % user_number}).text
+                          + auth_token}, params={'msisdn': '%s' % sender_id}).text
     logging.debug('resp: %s' % server_user_id)
     request_token = requests.post(TOKEN_URL, headers={'Authorization': 'Bearer ' + auth_token},\
                                   params={'userId': server_user_id}).text
@@ -468,17 +467,17 @@ def get_token():
     return request_token
 
 
-def get_group_menu_items():
-    raw_json = json.loads(requests.get(group_url, headers={'Authorization': 'Bearer ' + get_token()}).text)
+def get_group_menu_items(sender_id):
+    raw_json = json.loads(requests.get(group_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
     menu_items = []
     for group in range(len(raw_json)):
         menu_items.append({'title': raw_json[group]['name'], 'payload': raw_json[group]['groupUid']})
     return menu_items
 
 
-def get_group_uid(selected_group):
+def get_group_uid(selected_group, sender_id):
     match = ''
-    raw = get_group_menu_items()
+    raw = get_group_menu_items(sender_id)
     groups = {}
     for i in range(len(raw)):
         groups = {**groups, **{raw[i]['title']: i}}

@@ -1,0 +1,251 @@
+%[create_action_todo]('training': '100', 'testing': '1')
+    ~['action_todo] @[datetime] @[subject]
+    ~['action_todo] @[datetime?] @[subject?]
+    ~['action_todo] @[datetime] @[subject?]
+    ~[please?] ~['action_todo] @[datetime?] @[subject]
+
+%[create_info_todo]('training': '100', 'testing': '1')
+    ~['info_todo] @[datetime] @[subject] @[response_tag]
+    ~[please?] ~['info_todo] @[datetime?] @[subject?] @[response_tag?]
+
+%[create_volunteer_todo]('training': '100', 'testing': '1')
+    ~['volunteer_todo] @[datetime] @[subject]
+    ~['volunteer_todo] @[datetime?] @[subject?]
+    ~['volunteer_todo] @[subject?] @[datetime?]
+    ~[please?] ~['volunteer_todo] @[subject] @[datetime]
+
+%[create_validation_todo]('training': '100', 'testing': '1')
+    ~['validation_todo] @[datetime] @[subject]
+    ~['validation_todo] @[datetime?] @[subject?]
+    ~['validation_todo] @[subject?] @[datetime?]
+    ~[please?] ~['validation_todo] @[subject] @[datetime]
+
+%[create_group]('training': '28', 'testing': '1')
+    ~[group] ~[group_name] @[group]
+    ~[group] ~[group_name?] @[group?]
+    ~[group] @[group?]
+    ~[group] @[group]
+    ~[group] ~[please?]
+    ~[please?] ~[group]
+
+%[call_meeting]('training': '1000', 'testing': '50')
+    ~[meeting] ~[please?] @[location] @[datetime] @[subject] @[group]
+    ~[meeting] @[location?] @[datetime?] @[subject?] @[group?] ~[please?]
+    ~[please?] ~[meeting] @[location] @[datetime]
+    ~[meeting] @[location?] @[datetime?]
+    ~[meeting] @[subject] @[group]
+    ~[meeting] @[subject?] @[group?]
+    ~[meeting] @[subject]
+    ~[meeting] @[group]
+    ~[meeting] @[datetime]
+    ~[meeting] @[location]
+    ~[meeting] ~[please?]
+
+%[call_vote]('training': '250', 'testing': '10')
+    ~[please?] ~[vote] @[datetime] @[subject] ~[between] @[vote_option] ~[and] @[vote_option]
+    ~[vote] @[datetime?] @[subject?] ~[between] @[vote_option] ~[comma] @[vote_option] ~[and] @[vote_option] ~[please?]
+    ~[vote] @[datetime?] @[subject?] ~[between] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option]
+    ~[vote] @[datetime] @[subject]
+    ~[vote] @[datetime]
+    ~[vote] ~[between] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option] ~[comma?] ~[and] @[vote_option]
+    ~[vote] ~[please?] 
+
+%[select]('training': '52', 'testing': '1')
+    @[location]
+    @[group]
+    @[datetime]
+    @[subject]
+    @[response_tag]
+    @[description]
+    @[vote_option]
+    @[reminderMinutes]    
+
+%[affirm]('training': '10', 'testing': '1')
+    ~[yes]
+
+%[negate]('training': '10', 'testing': '1')
+    ~[no]
+
+~[comma]
+    ,
+    ;
+
+~[and]
+    and
+    or
+
+~[please]
+    please
+    plz
+    pliz
+    pleez
+
+~[between]
+    between
+    btwn
+    vote options are
+
+~[action_todo]
+    I call for action
+    I call action
+    Let us call for action
+
+~[info_todo]
+    I need member information  
+~[volunteer_todo]
+    find me volunteers   
+
+~[validation_todo]
+    I need confirmation
+    Find me confirmation
+    I need validation
+    Validate
+    Confirm
+
+~[meeting]
+    call a meeting
+    set a meeting
+    I'd like to have a meeting
+    I'm requesting a meeting
+    Kindly call a meeting
+    Kindly set a meeting
+    meeting
+    call meeting
+    set meeting
+    make a meeting happen
+    create a meeting
+    lets have a meeting
+
+~[vote]
+    call a vote
+    vote
+    lets vote
+    create a vote
+    its time to vote
+    kindly create a vote
+
+~[yes]
+    yes
+    yebo
+    damn right
+    yep
+    thats right
+    exactly
+    good
+    ja
+    E
+    Ee
+    yeah
+    sho
+
+~[no]
+    nay
+    no
+    nope
+    wtf
+    what the fuck
+    the fuck
+    fuck
+    hell no
+    never
+    ca
+    hayi
+    noooooo
+
+@[description]
+    This group is dedicated to tracking the upcoming elections
+    This meeting will address the issue of housing permits in the province
+    This vote will determine who will represent us at next months parliamentary hearings
+    Group  dedicated to empowering the youth of the Mzondi community
+    A meeting to address sanitation in our community
+    A group created to empower the youth in our community
+    A Group created for the parents in our community to keep them all connected to social dynamics
+
+@[location]
+    Germiston
+    Braamfontein
+    Kliptown Youth Centre
+    JoziHub
+    Jozi Hub
+    Braam
+    CBD
+    Joburg CBD
+    Johannesburg cbd
+    Alex
+    Alexander
+    Mzondi
+    FNB Stadium
+    the Valley of Change
+    Mt. Olympus
+    Random Bus Terminus
+
+@[datetime]
+    tomorrow
+    two days from now
+    tomorrow at 2pm
+    tomorrow at 2 o'clock
+    tomorrow at 2 o`clock
+    tuesday at 8 pm
+    monday at 20:00
+    wednesday, 14:00
+    Thursday at 09h00
+    thursday at 09:00
+    thursday at 9am
+    thursday at 9 am
+    friday at 2pm
+    friday at 12:00pm
+    this friday
+    next monday
+    next thursday
+    this monday
+
+@[subject]
+    protest action
+    housing permits
+    a new mayor
+    a new community leader
+    taxi strike
+    pollution
+    sanitation
+    community meeting
+    Violence
+    Corruption
+
+@[group]
+    Mnandini Community Group
+    Dooms Day Union
+    The Social Activists
+    The Social Watch
+    Union of Natural Born Killers
+
+@[vote_option]
+    Yes
+    No
+    Maybe
+    Darth Vader
+    Voldermort
+    Luke Skywalker
+    Bernie Sanders
+    Violence
+    Peace
+    Action
+    Patience
+    Duality
+    Quantum World
+
+@[response_tag]
+    id:
+    addr:
+    id-
+    addr-
+    phone-number:
+    phone-no
+    no
+
+@[reminderMinutes]
+    24 minutes
+    34
+    10
+    5
+    6 days
+    3 days

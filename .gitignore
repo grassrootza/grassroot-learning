@@ -1,9 +1,33 @@
 # IDE files
 .idea/
 __pycache__/
+.vscode/
+
+# Virtual ENV
+env/
+venv/
+
+# Models built by Rasa
+models/
+
+# Rasa logs
+**/rasa_core.log
 
 # Some text file output
 grassroot-nlu/config.pyc            
 grassroot-nlu/nsa/event_listener.txt
 grassroot-nlu/system_status.txt 
 grassroot-nlu/training_output.txt
+grassroot-nlu/logs/nlu.log
+4-core/models/
+4-core/rasa_core.log
+4-core/__pycache__/
+
+# Some config files
+*_credentials.yml
+
+# Scripts for startup etc
+*.sh
+
+# Serverless and its plugins
+**/node_modules

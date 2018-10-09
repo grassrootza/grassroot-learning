@@ -1,0 +1,174 @@
+intents:
+  - affirm
+  - negate
+  - confusion
+  - ignore
+  - call_meeting
+  - call_vote
+  - create_action_todo
+  - create_info_todo
+  - create_volunteer_todo
+  - create_validation_todo
+  - select
+  - create_group
+  - create_livewire
+  - inform
+
+entities:
+ - datetime
+ - location
+ - subject
+ - vote_option
+ - information_required
+ - group
+ - group_name
+ - response_tag
+ - description
+ - reminderMinutes
+ - requested_slot
+ - group_uid
+ - latitude
+ - longitude
+ - task_uid
+ - livewire_type
+ - media_file_keys
+ - destination_uid
+ - contact_name
+ - contact_number
+
+
+slots:
+  requested_slot:
+    type: unfeaturized
+  inform:
+    type: text
+  datetime:
+    type: text
+  location:
+    type: text
+  subject:
+    type: text
+  vote_option:
+    type: text
+  information_required:
+    type: text
+  group:
+    type: text
+  params:
+    type: text
+  description:
+    type: text
+  reminderMinutes:
+    type: text
+  response_tag:
+    type: text
+  group_name:
+    type: text
+  group_uid:
+    type: text
+  latitude:
+    type: text
+  longitude:
+    type: text
+  task_uid:
+    type: text
+  livewire_type:
+    type: text
+  media_file_keys:
+    type: text
+  destination_uid:
+    type: text
+  contact_name:
+    type: text
+  contact_number:
+    type: text
+
+templates:
+  utter_get_livewire_type:
+    - text: "What type of livewire is it?"
+      buttons:
+      - title: Meeting
+        payload: "/select{\"livewire_type\": \"MEETING\"}"
+      - title: Instant Alert
+        payload: "select{\"livewire_type\": \"INSTANT\"}"
+  action_get_group:
+    - text: "Choose a group"
+      buttons:
+      - title: "group"
+        payload: "/select{\"group\":\"group_uid\"}"
+  utter_ask_subject:
+    - "What is this about?"
+  utter_subject:
+    - "Your chosen subject is {subject}"
+  utter_ask_datetime:
+    - "When would you like this to happen?"
+  utter_datetime:
+    - "You want to do this by {datetime}"
+  utter_ask_group:
+    - "Which group of people would you like to this with?"
+  utter_group:
+    - "You have chosen {group} for this action."
+  utter_ask_response_tag:
+    - "How would like incoming responses to be tagged? eg. 'id:', 'addr:', etc"
+  utter_response_tag:
+    - "You have chosen {response_tag} as the response tag for incoming responses."
+  utter_ask_location:
+    - "Where would you like this to happen?"
+  utter_location:
+    - "You want this to happen at {location}."
+  utter_ask_group_name:
+    - "What would you like to call your new group?"
+  utter_group_name:
+    - "You have chosen {group_name} as the name of your new group."
+  utter_ask_todo_info:
+    - "What type of information would you like participants to give you?"
+  utter_todo_info:
+    - "You would like participants to give you their {information_required}."
+  utter_negation:
+    - "We have nuked your request. Thank you for using our service."
+  utter_affirmation:
+    - "We are making it happen for you. Thank you for using our service."
+  utter_ask_description:
+    - "How would you describe it?"
+  utter_vote_options_initialiser:
+    - "Please enter your vote options one by one and enter \"I'm done\" when finished."
+  utter_vote_option:
+    - "Cool, I've recieved your vote option '{vote_option}'"
+  utter_ask_reminder_minutes:
+    - "Reminder minutes set to {reminderMinutes}"
+
+actions:
+  - utter_ask_subject
+  - utter_ask_datetime
+  - utter_ask_group
+  - utter_ask_location
+  - utter_ask_group_name
+  - utter_ask_response_tag
+  - utter_ask_todo_info
+  - utter_negation
+  - utter_affirmation
+  - utter_ask_description
+  - utter_vote_options_initialiser
+  - utter_vote_option
+  - utter_ask_reminder_minutes
+  - utter_get_livewire_type
+  - action_utter_save_selected_group
+  - action_get_vote_option
+  - action_create_meeting_url
+  - action_create_vote_url
+  - action_create_group_url
+  - action_create_volunteer_todo_url
+  - create_validation_todo_url
+  - action_create_todo_action_url
+  - action_create_info_todo_url
+  - action_create_livewire_url
+  - action_save_vote_option
+  - action_create_meeting_routine
+  - action_create_group_routine
+  - action_create_vote_routine
+  - action_todo_info_routine
+  - action_todo_volunteer_routine
+  - action_todo_validation_routine
+  - action_todo_action_routine
+  - action_get_group
+  - action_livewire_routine

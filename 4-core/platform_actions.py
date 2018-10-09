@@ -21,7 +21,7 @@ BASE_URL = 'https://staging.grassroot.org.za'
 TOKEN_URL = 'https://staging.grassroot.org.za/v2/api/whatsapp/user/token'
 DATETIME_URL = 'http://learning.grassroot.cloud'
 PRE_TOK_URL = 'https://staging.grassroot.org.za/v2/api/whatsapp/user/id'
-group_url = 'https://staging.grassroot.org.za/v2/api/group/fetch/list'
+GROUP_URL = 'https://staging.grassroot.org.za/v2/api/group/fetch/list'
 auth_token = os.getenv("TOKEN_X")
 
 testParentType = 'GROUP'
@@ -468,7 +468,7 @@ def get_token(sender_id):
 
 
 def get_group_menu_items(sender_id):
-    raw_json = json.loads(requests.get(group_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
+    raw_json = json.loads(requests.get(GROUP_URL, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
     menu_items = []
     for group in range(len(raw_json)):
         menu_items.append({'title': raw_json[group]['name'], 'payload': raw_json[group]['groupUid']})
@@ -481,9 +481,9 @@ def get_group_uid(selected_group, sender_id):
     groups = {}
     for i in range(len(raw)):
         groups = {**groups, **{raw[i]['title']: i}}
-    THRESHOLD = 0.8
+    threshold = 0.8
     for group in list(groups):
         sim_ratio = SequenceMatcher(None, group.lower(), selected_group.lower()).ratio()
-        if sim_ratio > THRESHOLD:
+        if sim_ratio > threshold:
             match = group
     return raw[groups[match]]['payload']

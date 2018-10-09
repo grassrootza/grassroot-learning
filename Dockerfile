@@ -1,23 +1,37 @@
-#Download base image ubuntu 16.04
-FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
+FROM python:3.6-slim
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update -qq && \
+  apt-get install -y --no-install-recommends \
+  build-essential \
+  wget \
+  openssh-client \
+  graphviz-dev \
+  pkg-config \
+  git-core \
+  openssl \
+  libssl-dev \
+  libffi6 \
+  libffi-dev \
+  libpng-dev \
+  curl && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+  mkdir /app
 
 WORKDIR /app
 
-RUN apk add --no-cache alpine-sdk
-RUN apk add --no-cache openjdk7-jre
+# Copy as early as possible so we can cache ...
+ADD requirements.txt .
 
-ADD ./grassroot-nlu /app
+RUN pip install -r requirements.txt --no-cache-dir
 
-RUN sh depends.sh
+RUN python -m spacy download en_core_web_md && python -m spacy link en_core_web_md en
+
+ADD . .
 
 # EXPOSE 5000
 
-# ENV PATH /app/activate_me.sh:$PATH
-
-# RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-#     locale-gen
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8
-
-# CMD sh activate_me.sh
+ENTRYPOINT [ "python" ]
+CMD [ "app.py" ]

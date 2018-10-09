@@ -1,0 +1,207 @@
+## intent:greet
+- Hi
+- Hey
+- Hi bot
+- Hey bot
+- Hello
+- Good morning
+- hi again
+- hi folks
+- hi Mister
+- hi pal!
+- hi there
+- greetings
+- hello everybody
+- hello is anybody there
+- hello robot
+- hallo
+- heeey
+- hi hi
+- hey
+- hey hey
+- hello there
+- hi
+- hello
+- yo
+- hola
+- hi?
+- hey bot!
+- hello friend
+- good morning
+- hii
+- hello sweet boy
+- yoo
+- hey there
+- hiihihi
+- hello sweatheart
+- hellooo
+- helloooo
+- heyo
+- ayyyy whaddup
+- hello?
+- Hallo
+- heya
+- hey bot
+- howdy
+- Hellllooooooo
+- whats up
+- Hei
+- Well hello there ;)
+- Heya
+- Whats up my bot
+- hiii
+- heyho
+- hey, let's talk
+- hey let's talk
+- jojojo
+- hey dude
+- hello it is me again
+- what up
+- hi there
+- hi
+- howzit
+- hi friend
+- hi there it's me
+- sawubona
+- dumelang
+- sawbona
+- molo
+- dumela
+- help please
+- hi we need help
+
+## intent:mood_affirm
+- yes
+- of course
+- sure
+- yeah
+- ok
+- cool
+- go for it
+- yep
+- yep, will do thank you
+- I'm sure I will!
+- oh awesome!
+- Yes
+- accept
+- I accept
+- i accept
+- ok i accept
+- I changed my mind. I want to accept it
+- ok cool
+- alright
+- i will!
+- ok, I behave now
+- yop
+- oki doki
+- yes please
+- yes please!
+- amayzing
+- confirm
+- nice
+- coolio
+- definitely yes without a doubt
+- yas
+- yup
+- perfect
+- sure thing
+- absolutely
+- Oh, ok
+- Sure
+- hm, i'd like that
+- ja
+- sure!
+- yes i accept
+- amazing!
+- how nice!
+- cool!
+- yay
+- yes accept please
+- great
+- oh cool
+- yes
+- fine
+- yebo
+- Ee
+- E
+- grand
+- go ahead
+- hambisa
+- yebo, ngiyabonga
+- yebo, siyabonga
+- E, leboha
+- E, a leboha
+- E, rea leboha
+- yes that's right
+
+## intent:mood_confused
+- Huh
+- I don't understand
+- That's not right
+- No, you don't understand
+- I don't get it
+- What
+- No man are you stupid
+- What are you on
+- This doesn't work
+- Doesn't work
+- Stupid thing
+- No that isn't right
+- I'm confused
+- What do I do next?
+- You aren't helping
+- This doesn't help
+- Doesn't work
+- Not right
+- This is bad
+- Can't make it work
+- Don't you understand?
+- What's wrong
+- Makes no sense
+
+## intent:request_water
+- Hello we have no water
+- Please we need help with water
+- Hello our water is off now
+- Hi we don't have water
+- There is no water for the last month
+
+## intent:request_more_options
+- none of these
+- more please
+- show me more
+- no it's something else
+- no i need more please
+- more issues
+- what else
+- other options
+- more options
+- next
+- next options
+- other options
+
+## intent:select
+- [housing](issue)
+- [water](issue)
+- Problem with [housing](issue)
+- Don't have [housing](issue)
+- No [water](issue)
+- My [rights](procedure)
+- [rights](procedure)
+- [contact](procedure:obtain_contact)
+- I need to [talk](procedure:obtain_contact) to someone
+- [contact](procedure:obtain_contact) please
+- A [contact](procedure:obtain_contact) pls
+
+## intent:mood_confused
+- I don't understand
+- no this is wrong
+- what, i thought it was different
+- no that's not what i need
+- can i have something else please
+- this is confusing
+
+## intent:go_back
+- please go back
+- no i meant something different
+- go back please

@@ -1,0 +1,952 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>botocore.client &#8212; Grassroot-nlu 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for botocore.client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;). You</span>
+<span class="c1"># may not use this file except in compliance with the License. A copy of</span>
+<span class="c1"># the License is located at</span>
+<span class="c1">#</span>
+<span class="c1"># http://aws.amazon.com/apache2.0/</span>
+<span class="c1">#</span>
+<span class="c1"># or in the &quot;license&quot; file accompanying this file. This file is</span>
+<span class="c1"># distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF</span>
+<span class="c1"># ANY KIND, either express or implied. See the License for the specific</span>
+<span class="c1"># language governing permissions and limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="k">import</span> <span class="n">waiter</span><span class="p">,</span> <span class="n">xform_name</span>
+<span class="kn">from</span> <span class="nn">botocore.auth</span> <span class="k">import</span> <span class="n">AUTH_TYPE_MAPS</span>
+<span class="kn">from</span> <span class="nn">botocore.awsrequest</span> <span class="k">import</span> <span class="n">prepare_request_dict</span>
+<span class="kn">from</span> <span class="nn">botocore.docs.docstring</span> <span class="k">import</span> <span class="n">ClientMethodDocstring</span>
+<span class="kn">from</span> <span class="nn">botocore.docs.docstring</span> <span class="k">import</span> <span class="n">PaginatorDocstring</span>
+<span class="kn">from</span> <span class="nn">botocore.exceptions</span> <span class="k">import</span> <span class="n">ClientError</span><span class="p">,</span> <span class="n">DataNotFoundError</span>
+<span class="kn">from</span> <span class="nn">botocore.exceptions</span> <span class="k">import</span> <span class="n">OperationNotPageableError</span>
+<span class="kn">from</span> <span class="nn">botocore.exceptions</span> <span class="k">import</span> <span class="n">UnknownSignatureVersionError</span>
+<span class="kn">from</span> <span class="nn">botocore.hooks</span> <span class="k">import</span> <span class="n">first_non_none_response</span>
+<span class="kn">from</span> <span class="nn">botocore.model</span> <span class="k">import</span> <span class="n">ServiceModel</span>
+<span class="kn">from</span> <span class="nn">botocore.paginate</span> <span class="k">import</span> <span class="n">Paginator</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">CachedProperty</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">get_service_module_name</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">switch_host_s3_accelerate</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">S3RegionRedirector</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">fix_s3_host</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">switch_to_virtual_host_style</span>
+<span class="kn">from</span> <span class="nn">botocore.utils</span> <span class="k">import</span> <span class="n">S3_ACCELERATE_WHITELIST</span>
+<span class="kn">from</span> <span class="nn">botocore.args</span> <span class="k">import</span> <span class="n">ClientArgsCreator</span>
+<span class="kn">from</span> <span class="nn">botocore.compat</span> <span class="k">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="k">import</span> <span class="n">UNSIGNED</span>
+<span class="c1"># Keep this imported.  There&#39;s pre-existing code that uses</span>
+<span class="c1"># &quot;from botocore.client import Config&quot;.</span>
+<span class="kn">from</span> <span class="nn">botocore.config</span> <span class="k">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">botocore.history</span> <span class="k">import</span> <span class="n">get_global_history_recorder</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">history_recorder</span> <span class="o">=</span> <span class="n">get_global_history_recorder</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">ClientCreator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates client objects for a service.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">endpoint_resolver</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">,</span> <span class="n">event_emitter</span><span class="p">,</span>
+                 <span class="n">retry_handler_factory</span><span class="p">,</span> <span class="n">retry_config_translator</span><span class="p">,</span>
+                 <span class="n">response_parser_factory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exceptions_factory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span> <span class="o">=</span> <span class="n">loader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_resolver</span> <span class="o">=</span> <span class="n">endpoint_resolver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span> <span class="o">=</span> <span class="n">user_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event_emitter</span> <span class="o">=</span> <span class="n">event_emitter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retry_handler_factory</span> <span class="o">=</span> <span class="n">retry_handler_factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retry_config_translator</span> <span class="o">=</span> <span class="n">retry_config_translator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_response_parser_factory</span> <span class="o">=</span> <span class="n">response_parser_factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions_factory</span> <span class="o">=</span> <span class="n">exceptions_factory</span>
+
+    <span class="k">def</span> <span class="nf">create_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">is_secure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">endpoint_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">credentials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scoped_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">api_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">client_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">responses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event_emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+            <span class="s1">&#39;choose-service-name&#39;</span><span class="p">,</span> <span class="n">service_name</span><span class="o">=</span><span class="n">service_name</span><span class="p">)</span>
+        <span class="n">service_name</span> <span class="o">=</span> <span class="n">first_non_none_response</span><span class="p">(</span><span class="n">responses</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">service_name</span><span class="p">)</span>
+        <span class="n">service_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_service_model</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">api_version</span><span class="p">)</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_client_class</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">service_model</span><span class="p">)</span>
+        <span class="n">endpoint_bridge</span> <span class="o">=</span> <span class="n">ClientEndpointBridge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_resolver</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span>
+            <span class="n">service_signing_name</span><span class="o">=</span><span class="n">service_model</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;signingName&#39;</span><span class="p">))</span>
+        <span class="n">client_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_args</span><span class="p">(</span>
+            <span class="n">service_model</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span>
+            <span class="n">verify</span><span class="p">,</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span> <span class="n">endpoint_bridge</span><span class="p">)</span>
+        <span class="n">service_client</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">client_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_retries</span><span class="p">(</span><span class="n">service_client</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_s3_events</span><span class="p">(</span>
+            <span class="n">service_client</span><span class="p">,</span> <span class="n">endpoint_bridge</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span>
+            <span class="n">scoped_config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">service_client</span>
+
+    <span class="k">def</span> <span class="nf">create_client_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">api_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">service_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_service_model</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">api_version</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_client_class</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">service_model</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_client_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">service_model</span><span class="p">):</span>
+        <span class="n">class_attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_methods</span><span class="p">(</span><span class="n">service_model</span><span class="p">)</span>
+        <span class="n">py_name_to_operation_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_name_mapping</span><span class="p">(</span><span class="n">service_model</span><span class="p">)</span>
+        <span class="n">class_attributes</span><span class="p">[</span><span class="s1">&#39;_PY_TO_OP_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">py_name_to_operation_name</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="p">[</span><span class="n">BaseClient</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_event_emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;creating-client-class.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">service_name</span><span class="p">,</span>
+                                 <span class="n">class_attributes</span><span class="o">=</span><span class="n">class_attributes</span><span class="p">,</span>
+                                 <span class="n">base_classes</span><span class="o">=</span><span class="n">bases</span><span class="p">)</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">get_service_module_name</span><span class="p">(</span><span class="n">service_model</span><span class="p">)</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">class_name</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">bases</span><span class="p">),</span> <span class="n">class_attributes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span>
+
+    <span class="k">def</span> <span class="nf">_load_service_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">api_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">json_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span><span class="o">.</span><span class="n">load_service_model</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="s1">&#39;service-2&#39;</span><span class="p">,</span>
+                                                     <span class="n">api_version</span><span class="o">=</span><span class="n">api_version</span><span class="p">)</span>
+        <span class="n">service_model</span> <span class="o">=</span> <span class="n">ServiceModel</span><span class="p">(</span><span class="n">json_model</span><span class="p">,</span> <span class="n">service_name</span><span class="o">=</span><span class="n">service_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">service_model</span>
+
+    <span class="k">def</span> <span class="nf">_register_retries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="n">endpoint_prefix</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span><span class="o">.</span><span class="n">endpoint_prefix</span>
+
+        <span class="c1"># First, we load the entire retry config for all services,</span>
+        <span class="c1"># then pull out just the information we need.</span>
+        <span class="n">original_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s1">&#39;_retry&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">original_config</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">retry_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_config_translator</span><span class="o">.</span><span class="n">build_retry_config</span><span class="p">(</span>
+            <span class="n">endpoint_prefix</span><span class="p">,</span> <span class="n">original_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;retry&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="n">original_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">retries</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Registering retry handlers for service: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                     <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span><span class="o">.</span><span class="n">service_name</span><span class="p">)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_handler_factory</span><span class="o">.</span><span class="n">create_retry_handler</span><span class="p">(</span>
+            <span class="n">retry_config</span><span class="p">,</span> <span class="n">endpoint_prefix</span><span class="p">)</span>
+        <span class="n">unique_id</span> <span class="o">=</span> <span class="s1">&#39;retry-config-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">endpoint_prefix</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;needs-retry.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">endpoint_prefix</span><span class="p">,</span>
+                                    <span class="n">handler</span><span class="p">,</span> <span class="n">unique_id</span><span class="o">=</span><span class="n">unique_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_register_s3_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">endpoint_bridge</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span>
+                            <span class="n">client_config</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span><span class="o">.</span><span class="n">service_name</span> <span class="o">!=</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">S3RegionRedirector</span><span class="p">(</span><span class="n">endpoint_bridge</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_s3_addressing_style</span><span class="p">(</span>
+            <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">s3</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="p">,</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">partition</span>
+        <span class="p">)</span>
+        <span class="c1"># Enable accelerate if the configuration is set to to true or the</span>
+        <span class="c1"># endpoint being used matches one of the accelerate endpoints.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_s3_accelerate</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">s3</span><span class="p">):</span>
+            <span class="c1"># Also make sure that the hostname gets switched to</span>
+            <span class="c1"># s3-accelerate.amazonaws.com</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register_first</span><span class="p">(</span>
+                <span class="s1">&#39;before-sign.s3&#39;</span><span class="p">,</span> <span class="n">switch_host_s3_accelerate</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_s3_presign_signature_version</span><span class="p">(</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_s3_addressing_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">,</span> <span class="n">event_emitter</span><span class="p">,</span>
+                                 <span class="n">partition</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">s3_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s3_config</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">addressing_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_s3_addressing_style</span><span class="p">(</span>
+            <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_s3_addressing_handler</span><span class="p">(</span>
+            <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">,</span> <span class="n">addressing_style</span><span class="p">,</span> <span class="n">partition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">event_emitter</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;before-sign.s3&#39;</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_s3_addressing_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">):</span>
+        <span class="c1"># Use virtual host style addressing if accelerate is enabled or if</span>
+        <span class="c1"># the given endpoint url is an accelerate endpoint.</span>
+        <span class="n">accelerate</span> <span class="o">=</span> <span class="n">s3_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_accelerate_endpoint&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">accelerate</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_s3_accelerate</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;virtual&#39;</span>
+
+        <span class="c1"># If a particular addressing style is configured, use it.</span>
+        <span class="n">configured_addressing_style</span> <span class="o">=</span> <span class="n">s3_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;addressing_style&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">configured_addressing_style</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">configured_addressing_style</span>
+
+    <span class="k">def</span> <span class="nf">_get_s3_addressing_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">,</span>
+                                   <span class="n">addressing_style</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+        <span class="c1"># If virtual host style was configured, use it regardless of whether</span>
+        <span class="c1"># or not the bucket looks dns compatible.</span>
+        <span class="k">if</span> <span class="n">addressing_style</span> <span class="o">==</span> <span class="s1">&#39;virtual&#39;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using S3 virtual host style addressing.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">switch_to_virtual_host_style</span>
+
+        <span class="c1"># If path style is configured, no additional steps are needed. If</span>
+        <span class="c1"># endpoint_url was specified, don&#39;t default to virtual. We could</span>
+        <span class="c1"># potentially default provided endpoint urls to virtual hosted</span>
+        <span class="c1"># style, but for now it is avoided.</span>
+        <span class="k">if</span> <span class="n">addressing_style</span> <span class="o">==</span> <span class="s1">&#39;path&#39;</span> <span class="ow">or</span> <span class="n">endpoint_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using S3 path style addressing.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Defaulting to S3 virtual host style addressing with &quot;</span>
+                     <span class="s2">&quot;path style addressing fallback.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># For dual stack mode, we need to clear the default endpoint url in</span>
+        <span class="c1"># order to use the existing netloc if the bucket is dns compatible.</span>
+        <span class="c1"># Also, the default_endpoint_url of &#39;s3.amazonaws.com&#39; only works</span>
+        <span class="c1"># if we&#39;re in the &#39;aws&#39; partition.  Anywhere else we should</span>
+        <span class="c1"># just use the existing netloc.</span>
+        <span class="k">if</span> <span class="n">s3_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_dualstack_endpoint&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">partition</span> <span class="o">!=</span> <span class="s1">&#39;aws&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+                <span class="n">fix_s3_host</span><span class="p">,</span> <span class="n">default_endpoint_url</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># By default, try to use virtual style with path fallback.</span>
+        <span class="k">return</span> <span class="n">fix_s3_host</span>
+
+    <span class="k">def</span> <span class="nf">_is_s3_accelerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">s3_config</span><span class="p">):</span>
+        <span class="c1"># Accelerate has been explicitly configured.</span>
+        <span class="k">if</span> <span class="n">s3_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">s3_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_accelerate_endpoint&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Accelerate mode is turned on automatically if an endpoint url is</span>
+        <span class="c1"># provided that matches the accelerate scheme.</span>
+        <span class="k">if</span> <span class="n">endpoint_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Accelerate is only valid for Amazon endpoints.</span>
+        <span class="n">netloc</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">netloc</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;amazonaws.com&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># The first part of the url should always be s3-accelerate.</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">netloc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;s3-accelerate&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Url parts between &#39;s3-accelerate&#39; and &#39;amazonaws.com&#39; which</span>
+        <span class="c1"># represent different url features.</span>
+        <span class="n">feature_parts</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># There should be no duplicate url parts.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_parts</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">feature_parts</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Remaining parts must all be in the whitelist.</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span> <span class="ow">in</span> <span class="n">S3_ACCELERATE_WHITELIST</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">feature_parts</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_s3_presign_signature_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_meta</span><span class="p">,</span>
+                                          <span class="n">client_config</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">):</span>
+        <span class="c1"># This will return the manually configured signature version, or None</span>
+        <span class="c1"># if none was manually set. If a customer manually sets the signature</span>
+        <span class="c1"># version, we always want to use what they set.</span>
+        <span class="n">provided_signature_version</span> <span class="o">=</span> <span class="n">_get_configured_signature_version</span><span class="p">(</span>
+            <span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">provided_signature_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check to see if the region is a region that we know about. If we</span>
+        <span class="c1"># don&#39;t know about a region, then we can safely assume it&#39;s a new</span>
+        <span class="c1"># region that is sigv4 only, since all new S3 regions only allow sigv4.</span>
+        <span class="n">regions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_resolver</span><span class="o">.</span><span class="n">get_available_endpoints</span><span class="p">(</span>
+            <span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">client_meta</span><span class="o">.</span><span class="n">partition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">client_meta</span><span class="o">.</span><span class="n">region_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># If it is a region we know about, we want to default to sigv2, so here</span>
+        <span class="c1"># we check to see if it is available.</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_resolver</span><span class="o">.</span><span class="n">construct_endpoint</span><span class="p">(</span>
+            <span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">client_meta</span><span class="o">.</span><span class="n">region_name</span><span class="p">)</span>
+        <span class="n">signature_versions</span> <span class="o">=</span> <span class="n">endpoint</span><span class="p">[</span><span class="s1">&#39;signatureVersions&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;s3&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">signature_versions</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># We now know that we&#39;re in a known region that supports sigv2 and</span>
+        <span class="c1"># the customer hasn&#39;t set a signature version so we default the</span>
+        <span class="c1"># signature version to sigv2.</span>
+        <span class="n">client_meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+            <span class="s1">&#39;choose-signer.s3&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_s3_presign_to_sigv2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_default_s3_presign_to_sigv2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signature_version</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the &#39;s3&#39; (sigv2) signer if presigning an s3 request. This is</span>
+<span class="sd">        intended to be used to set the default signature version for the signer</span>
+<span class="sd">        to sigv2.</span>
+
+<span class="sd">        :type signature_version: str</span>
+<span class="sd">        :param signature_version: The current client signature version.</span>
+
+<span class="sd">        :type signing_name: str</span>
+<span class="sd">        :param signing_name: The signing name of the service.</span>
+
+<span class="sd">        :return: &#39;s3&#39; if the request is an s3 presign request, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-query&#39;</span><span class="p">,</span> <span class="s1">&#39;-presign-post&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">signature_version</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s1">&#39;s3&#39;</span> <span class="o">+</span> <span class="n">suffix</span>
+
+    <span class="k">def</span> <span class="nf">_get_client_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_model</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span>
+                         <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">verify</span><span class="p">,</span> <span class="n">credentials</span><span class="p">,</span>
+                         <span class="n">scoped_config</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span> <span class="n">endpoint_bridge</span><span class="p">):</span>
+        <span class="n">args_creator</span> <span class="o">=</span> <span class="n">ClientArgsCreator</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_event_emitter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_response_parser_factory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions_factory</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">args_creator</span><span class="o">.</span><span class="n">get_client_args</span><span class="p">(</span>
+            <span class="n">service_model</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span>
+            <span class="n">verify</span><span class="p">,</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">scoped_config</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span> <span class="n">endpoint_bridge</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_model</span><span class="p">):</span>
+        <span class="n">op_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">operation_name</span> <span class="ow">in</span> <span class="n">service_model</span><span class="o">.</span><span class="n">operation_names</span><span class="p">:</span>
+            <span class="n">py_operation_name</span> <span class="o">=</span> <span class="n">xform_name</span><span class="p">(</span><span class="n">operation_name</span><span class="p">)</span>
+            <span class="n">op_dict</span><span class="p">[</span><span class="n">py_operation_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_api_method</span><span class="p">(</span>
+                <span class="n">py_operation_name</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">,</span> <span class="n">service_model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">op_dict</span>
+
+    <span class="k">def</span> <span class="nf">_create_name_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_model</span><span class="p">):</span>
+        <span class="c1"># py_name -&gt; OperationName, for every operation available</span>
+        <span class="c1"># for a service.</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">operation_name</span> <span class="ow">in</span> <span class="n">service_model</span><span class="o">.</span><span class="n">operation_names</span><span class="p">:</span>
+            <span class="n">py_operation_name</span> <span class="o">=</span> <span class="n">xform_name</span><span class="p">(</span><span class="n">operation_name</span><span class="p">)</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">py_operation_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">operation_name</span>
+        <span class="k">return</span> <span class="n">mapping</span>
+
+    <span class="k">def</span> <span class="nf">_create_api_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">py_operation_name</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">,</span>
+                           <span class="n">service_model</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_api_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># We&#39;re accepting *args so that we can give a more helpful</span>
+            <span class="c1"># error message than TypeError: _api_call takes exactly</span>
+            <span class="c1"># 1 argument.</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">() only accepts keyword arguments.&quot;</span> <span class="o">%</span> <span class="n">py_operation_name</span><span class="p">)</span>
+            <span class="c1"># The &quot;self&quot; in this scope is referring to the BaseClient.</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_api_call</span><span class="p">(</span><span class="n">operation_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">_api_call</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">py_operation_name</span><span class="p">)</span>
+
+        <span class="c1"># Add the docstring to the client method</span>
+        <span class="n">operation_model</span> <span class="o">=</span> <span class="n">service_model</span><span class="o">.</span><span class="n">operation_model</span><span class="p">(</span><span class="n">operation_name</span><span class="p">)</span>
+        <span class="n">docstring</span> <span class="o">=</span> <span class="n">ClientMethodDocstring</span><span class="p">(</span>
+            <span class="n">operation_model</span><span class="o">=</span><span class="n">operation_model</span><span class="p">,</span>
+            <span class="n">method_name</span><span class="o">=</span><span class="n">operation_name</span><span class="p">,</span>
+            <span class="n">event_emitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_emitter</span><span class="p">,</span>
+            <span class="n">method_description</span><span class="o">=</span><span class="n">operation_model</span><span class="o">.</span><span class="n">documentation</span><span class="p">,</span>
+            <span class="n">example_prefix</span><span class="o">=</span><span class="s1">&#39;response = client.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">py_operation_name</span><span class="p">,</span>
+            <span class="n">include_signature</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">_api_call</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">docstring</span>
+        <span class="k">return</span> <span class="n">_api_call</span>
+
+
+<span class="k">class</span> <span class="nc">ClientEndpointBridge</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bridges endpoint data and client creation</span>
+
+<span class="sd">    This class handles taking out the relevant arguments from the endpoint</span>
+<span class="sd">    resolver and determining which values to use, taking into account any</span>
+<span class="sd">    client configuration options and scope configuration options.</span>
+
+<span class="sd">    This class also handles determining what, if any, region to use if no</span>
+<span class="sd">    explicit region setting is provided. For example, Amazon S3 client will</span>
+<span class="sd">    utilize &quot;us-east-1&quot; by default if no region can be resolved.&quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_ENDPOINT</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{service}</span><span class="s1">.</span><span class="si">{region}</span><span class="s1">.amazonaws.com&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_resolver</span><span class="p">,</span> <span class="n">scoped_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">client_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">service_signing_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_signing_name</span> <span class="o">=</span> <span class="n">service_signing_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_resolver</span> <span class="o">=</span> <span class="n">endpoint_resolver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoped_config</span> <span class="o">=</span> <span class="n">scoped_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span> <span class="o">=</span> <span class="n">client_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_endpoint</span> <span class="o">=</span> <span class="n">default_endpoint</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ENDPOINT</span>
+
+    <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">is_secure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">region_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_default_region</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">)</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_resolver</span><span class="o">.</span><span class="n">construct_endpoint</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resolved</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_endpoint</span><span class="p">(</span>
+                <span class="n">resolved</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assume_endpoint</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span>
+                                         <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_default_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">region_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">region_name</span>
+        <span class="c1"># Use the client_config region if no explicit region was provided.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span><span class="o">.</span><span class="n">region_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span><span class="o">.</span><span class="n">region_name</span>
+
+    <span class="k">def</span> <span class="nf">_create_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolved</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span>
+                         <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">):</span>
+        <span class="n">region_name</span><span class="p">,</span> <span class="n">signing_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pick_region_values</span><span class="p">(</span>
+            <span class="n">resolved</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">endpoint_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_s3_dualstack_mode</span><span class="p">(</span><span class="n">service_name</span><span class="p">):</span>
+                <span class="n">endpoint_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dualstack_endpoint</span><span class="p">(</span>
+                    <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span>
+                    <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;dnsSuffix&#39;</span><span class="p">],</span> <span class="n">is_secure</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Use the sslCommonName over the hostname for Python 2.6 compat.</span>
+                <span class="n">hostname</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sslCommonName&#39;</span><span class="p">,</span> <span class="n">resolved</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hostname&#39;</span><span class="p">))</span>
+                <span class="n">endpoint_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_url</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span>
+                                            <span class="n">resolved</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;protocols&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">signature_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_signature_version</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
+        <span class="n">signing_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_signing_name</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">resolved</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_result</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="o">=</span><span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="n">region_name</span><span class="p">,</span>
+            <span class="n">signing_region</span><span class="o">=</span><span class="n">signing_region</span><span class="p">,</span> <span class="n">signing_name</span><span class="o">=</span><span class="n">signing_name</span><span class="p">,</span>
+            <span class="n">endpoint_url</span><span class="o">=</span><span class="n">endpoint_url</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">resolved</span><span class="p">,</span>
+            <span class="n">signature_version</span><span class="o">=</span><span class="n">signature_version</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_s3_dualstack_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">service_name</span> <span class="o">!=</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># TODO: This normalization logic is duplicated from the</span>
+        <span class="c1"># ClientArgsCreator class.  Consolidate everything to</span>
+        <span class="c1"># ClientArgsCreator.  _resolve_signature_version also has similarly</span>
+        <span class="c1"># duplicated logic.</span>
+        <span class="n">client_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span>
+        <span class="k">if</span> <span class="n">client_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">client_config</span><span class="o">.</span><span class="n">s3</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+                <span class="s1">&#39;use_dualstack_endpoint&#39;</span> <span class="ow">in</span> <span class="n">client_config</span><span class="o">.</span><span class="n">s3</span><span class="p">:</span>
+            <span class="c1"># Client config trumps scoped config.</span>
+            <span class="k">return</span> <span class="n">client_config</span><span class="o">.</span><span class="n">s3</span><span class="p">[</span><span class="s1">&#39;use_dualstack_endpoint&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scoped_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scoped_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;use_dualstack_endpoint&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">enabled</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_create_dualstack_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span>
+                                   <span class="n">dns_suffix</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">):</span>
+        <span class="n">hostname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{service}</span><span class="s1">.dualstack.</span><span class="si">{region}</span><span class="s1">.</span><span class="si">{dns_suffix}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="n">service_name</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region_name</span><span class="p">,</span>
+            <span class="n">dns_suffix</span><span class="o">=</span><span class="n">dns_suffix</span><span class="p">)</span>
+        <span class="c1"># Dualstack supports http and https so were hardcoding this value for</span>
+        <span class="c1"># now.  This can potentially move into the endpoints.json file.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_url</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_assume_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span>
+                         <span class="n">is_secure</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">endpoint_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Expand the default hostname URI template.</span>
+            <span class="n">hostname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_endpoint</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">service</span><span class="o">=</span><span class="n">service_name</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region_name</span><span class="p">)</span>
+            <span class="n">endpoint_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_url</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span>
+                                          <span class="p">[</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Assuming an endpoint for </span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                     <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">)</span>
+        <span class="c1"># We still want to allow the user to provide an explicit version.</span>
+        <span class="n">signature_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_signature_version</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;signatureVersions&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;v4&#39;</span><span class="p">]})</span>
+        <span class="n">signing_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_signing_name</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">resolved</span><span class="o">=</span><span class="p">{})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_result</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="o">=</span><span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="n">region_name</span><span class="p">,</span>
+            <span class="n">signing_region</span><span class="o">=</span><span class="n">region_name</span><span class="p">,</span> <span class="n">signing_name</span><span class="o">=</span><span class="n">signing_name</span><span class="p">,</span>
+            <span class="n">signature_version</span><span class="o">=</span><span class="n">signature_version</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="n">endpoint_url</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{})</span>
+
+    <span class="k">def</span> <span class="nf">_create_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">signing_region</span><span class="p">,</span>
+                       <span class="n">signing_name</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">signature_version</span><span class="p">,</span>
+                       <span class="n">metadata</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;service_name&#39;</span><span class="p">:</span> <span class="n">service_name</span><span class="p">,</span>
+            <span class="s1">&#39;region_name&#39;</span><span class="p">:</span> <span class="n">region_name</span><span class="p">,</span>
+            <span class="s1">&#39;signing_region&#39;</span><span class="p">:</span> <span class="n">signing_region</span><span class="p">,</span>
+            <span class="s1">&#39;signing_name&#39;</span><span class="p">:</span> <span class="n">signing_name</span><span class="p">,</span>
+            <span class="s1">&#39;endpoint_url&#39;</span><span class="p">:</span> <span class="n">endpoint_url</span><span class="p">,</span>
+            <span class="s1">&#39;signature_version&#39;</span><span class="p">:</span> <span class="n">signature_version</span><span class="p">,</span>
+            <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="n">metadata</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_make_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">is_secure</span><span class="p">,</span> <span class="n">supported_protocols</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_secure</span> <span class="ow">and</span> <span class="s1">&#39;https&#39;</span> <span class="ow">in</span> <span class="n">supported_protocols</span><span class="p">:</span>
+            <span class="n">scheme</span> <span class="o">=</span> <span class="s1">&#39;https&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scheme</span> <span class="o">=</span> <span class="s1">&#39;http&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">://</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="n">hostname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_resolve_signing_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">resolved</span><span class="p">):</span>
+        <span class="c1"># CredentialScope overrides everything else.</span>
+        <span class="k">if</span> <span class="s1">&#39;credentialScope&#39;</span> <span class="ow">in</span> <span class="n">resolved</span> \
+                <span class="ow">and</span> <span class="s1">&#39;service&#39;</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;credentialScope&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;credentialScope&#39;</span><span class="p">][</span><span class="s1">&#39;service&#39;</span><span class="p">]</span>
+        <span class="c1"># Use the signingName from the model if present.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_signing_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_signing_name</span>
+        <span class="c1"># Just assume is the same as the service name.</span>
+        <span class="k">return</span> <span class="n">service_name</span>
+
+    <span class="k">def</span> <span class="nf">_pick_region_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolved</span><span class="p">,</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">):</span>
+        <span class="n">signing_region</span> <span class="o">=</span> <span class="n">region_name</span>
+        <span class="k">if</span> <span class="n">endpoint_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Do not use the region name or signing name from the resolved</span>
+            <span class="c1"># endpoint if the user explicitly provides an endpoint_url. This</span>
+            <span class="c1"># would happen if we resolve to an endpoint where the service has</span>
+            <span class="c1"># a &quot;defaults&quot; section that overrides all endpoint with a single</span>
+            <span class="c1"># hostname and credentialScope. This has been the case historically</span>
+            <span class="c1"># for how STS has worked. The only way to resolve an STS endpoint</span>
+            <span class="c1"># was to provide a region_name and an endpoint_url. In that case,</span>
+            <span class="c1"># we would still resolve an endpoint, but we would not use the</span>
+            <span class="c1"># resolved endpointName or signingRegion because we want to allow</span>
+            <span class="c1"># custom endpoints.</span>
+            <span class="n">region_name</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;endpointName&#39;</span><span class="p">]</span>
+            <span class="n">signing_region</span> <span class="o">=</span> <span class="n">region_name</span>
+            <span class="k">if</span> <span class="s1">&#39;credentialScope&#39;</span> <span class="ow">in</span> <span class="n">resolved</span> \
+                    <span class="ow">and</span> <span class="s1">&#39;region&#39;</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;credentialScope&#39;</span><span class="p">]:</span>
+                <span class="n">signing_region</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;credentialScope&#39;</span><span class="p">][</span><span class="s1">&#39;region&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">signing_region</span>
+
+    <span class="k">def</span> <span class="nf">_resolve_signature_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">resolved</span><span class="p">):</span>
+        <span class="n">configured_version</span> <span class="o">=</span> <span class="n">_get_configured_signature_version</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scoped_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">configured_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">configured_version</span>
+
+        <span class="c1"># Pick a signature version from the endpoint metadata if present.</span>
+        <span class="k">if</span> <span class="s1">&#39;signatureVersions&#39;</span> <span class="ow">in</span> <span class="n">resolved</span><span class="p">:</span>
+            <span class="n">potential_versions</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="s1">&#39;signatureVersions&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">service_name</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;s3v4&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;v4&#39;</span> <span class="ow">in</span> <span class="n">potential_versions</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;v4&#39;</span>
+            <span class="c1"># Now just iterate over the signature versions in order until we</span>
+            <span class="c1"># find the first one that is known to Botocore.</span>
+            <span class="k">for</span> <span class="n">known</span> <span class="ow">in</span> <span class="n">AUTH_TYPE_MAPS</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">known</span> <span class="ow">in</span> <span class="n">potential_versions</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">known</span>
+        <span class="k">raise</span> <span class="n">UnknownSignatureVersionError</span><span class="p">(</span>
+            <span class="n">signature_version</span><span class="o">=</span><span class="n">resolved</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;signatureVersions&#39;</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">BaseClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="c1"># This is actually reassigned with the py-&gt;op_name mapping</span>
+    <span class="c1"># when the client creator creates the subclass.  This value is used</span>
+    <span class="c1"># because calls such as client.get_paginator(&#39;list_objects&#39;) use the</span>
+    <span class="c1"># snake_case name, but we need to know the ListObjects form.</span>
+    <span class="c1"># xform_name() does the ListObjects-&gt;list_objects conversion, but</span>
+    <span class="c1"># we need the reverse mapping here.</span>
+    <span class="n">_PY_TO_OP_NAME</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serializer</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">response_parser</span><span class="p">,</span>
+                 <span class="n">event_emitter</span><span class="p">,</span> <span class="n">request_signer</span><span class="p">,</span> <span class="n">service_model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span>
+                 <span class="n">client_config</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">exceptions_factory</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serializer</span> <span class="o">=</span> <span class="n">serializer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_response_parser</span> <span class="o">=</span> <span class="n">response_parser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_signer</span> <span class="o">=</span> <span class="n">request_signer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span> <span class="o">=</span> <span class="n">loader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client_config</span> <span class="o">=</span> <span class="n">client_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">ClientMeta</span><span class="p">(</span><span class="n">event_emitter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client_config</span><span class="p">,</span>
+                               <span class="n">endpoint</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">service_model</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">_PY_TO_OP_NAME</span><span class="p">,</span> <span class="n">partition</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions_factory</span> <span class="o">=</span> <span class="n">exceptions_factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_handlers</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">event_name</span> <span class="o">=</span> <span class="s1">&#39;getattr.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">service_name</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="n">handler</span><span class="p">,</span> <span class="n">event_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">emit_until_response</span><span class="p">(</span>
+            <span class="n">event_name</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">event_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">event_response</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_register_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Register the handler required to sign requests.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;request-created.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span><span class="o">.</span><span class="n">endpoint_prefix</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_request_signer</span><span class="o">.</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_service_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span>
+
+    <span class="k">def</span> <span class="nf">_make_api_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">,</span> <span class="n">api_params</span><span class="p">):</span>
+        <span class="n">operation_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">operation_model</span><span class="p">(</span><span class="n">operation_name</span><span class="p">)</span>
+        <span class="n">service_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">service_name</span>
+        <span class="n">history_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s1">&#39;API_CALL&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="n">service_name</span><span class="p">,</span>
+            <span class="s1">&#39;operation&#39;</span><span class="p">:</span> <span class="n">operation_name</span><span class="p">,</span>
+            <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">api_params</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="k">if</span> <span class="n">operation_model</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Warning: </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">() is deprecated&#39;</span><span class="p">,</span>
+                         <span class="n">service_name</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">)</span>
+        <span class="n">request_context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;client_region&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">region_name</span><span class="p">,</span>
+            <span class="s1">&#39;client_config&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="s1">&#39;has_streaming_input&#39;</span><span class="p">:</span> <span class="n">operation_model</span><span class="o">.</span><span class="n">has_streaming_input</span><span class="p">,</span>
+            <span class="s1">&#39;auth_type&#39;</span><span class="p">:</span> <span class="n">operation_model</span><span class="o">.</span><span class="n">auth_type</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">request_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_request_dict</span><span class="p">(</span>
+            <span class="n">api_params</span><span class="p">,</span> <span class="n">operation_model</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">request_context</span><span class="p">)</span>
+
+        <span class="n">handler</span><span class="p">,</span> <span class="n">event_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">emit_until_response</span><span class="p">(</span>
+            <span class="s1">&#39;before-call.</span><span class="si">{endpoint_prefix}</span><span class="s1">.</span><span class="si">{operation_name}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">endpoint_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">endpoint_prefix</span><span class="p">,</span>
+                <span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span><span class="p">),</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">operation_model</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">request_dict</span><span class="p">,</span>
+            <span class="n">request_signer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_signer</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">request_context</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">event_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">http</span><span class="p">,</span> <span class="n">parsed_response</span> <span class="o">=</span> <span class="n">event_response</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">http</span><span class="p">,</span> <span class="n">parsed_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+                <span class="n">operation_model</span><span class="p">,</span> <span class="n">request_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+            <span class="s1">&#39;after-call.</span><span class="si">{endpoint_prefix}</span><span class="s1">.</span><span class="si">{operation_name}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">endpoint_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">endpoint_prefix</span><span class="p">,</span>
+                <span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span><span class="p">),</span>
+            <span class="n">http_response</span><span class="o">=</span><span class="n">http</span><span class="p">,</span> <span class="n">parsed</span><span class="o">=</span><span class="n">parsed_response</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">operation_model</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">request_context</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">http</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">300</span><span class="p">:</span>
+            <span class="n">error_code</span> <span class="o">=</span> <span class="n">parsed_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Error&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Code&quot;</span><span class="p">)</span>
+            <span class="n">error_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">from_code</span><span class="p">(</span><span class="n">error_code</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">error_class</span><span class="p">(</span><span class="n">parsed_response</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">parsed_response</span>
+
+    <span class="k">def</span> <span class="nf">_convert_to_request_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_params</span><span class="p">,</span> <span class="n">operation_model</span><span class="p">,</span>
+                                 <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">api_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_api_params</span><span class="p">(</span>
+            <span class="n">api_params</span><span class="p">,</span> <span class="n">operation_model</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="n">request_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serializer</span><span class="o">.</span><span class="n">serialize_to_request</span><span class="p">(</span>
+            <span class="n">api_params</span><span class="p">,</span> <span class="n">operation_model</span><span class="p">)</span>
+        <span class="n">prepare_request_dict</span><span class="p">(</span><span class="n">request_dict</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+                             <span class="n">user_agent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client_config</span><span class="o">.</span><span class="n">user_agent</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">request_dict</span>
+
+    <span class="k">def</span> <span class="nf">_emit_api_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_params</span><span class="p">,</span> <span class="n">operation_model</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="c1"># Given the API params provided by the user and the operation_model</span>
+        <span class="c1"># we can serialize the request to a request_dict.</span>
+        <span class="n">operation_name</span> <span class="o">=</span> <span class="n">operation_model</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># Emit an event that allows users to modify the parameters at the</span>
+        <span class="c1"># beginning of the method. It allows handlers to modify existing</span>
+        <span class="c1"># parameters or return a new set of parameters to use.</span>
+        <span class="n">responses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+            <span class="s1">&#39;provide-client-params.</span><span class="si">{endpoint_prefix}</span><span class="s1">.</span><span class="si">{operation_name}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">endpoint_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">endpoint_prefix</span><span class="p">,</span>
+                <span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span><span class="p">),</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">api_params</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">operation_model</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">api_params</span> <span class="o">=</span> <span class="n">first_non_none_response</span><span class="p">(</span><span class="n">responses</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">api_params</span><span class="p">)</span>
+
+        <span class="n">event_name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;before-parameter-build.</span><span class="si">{endpoint_prefix}</span><span class="s1">.</span><span class="si">{operation_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+            <span class="n">event_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">endpoint_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">endpoint_prefix</span><span class="p">,</span>
+                <span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span><span class="p">),</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">api_params</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">operation_model</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">api_params</span>
+
+    <span class="k">def</span> <span class="nf">get_paginator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a paginator for an operation.</span>
+
+<span class="sd">        :type operation_name: string</span>
+<span class="sd">        :param operation_name: The operation name.  This is the same name</span>
+<span class="sd">            as the method name on the client.  For example, if the</span>
+<span class="sd">            method name is ``create_foo``, and you&#39;d normally invoke the</span>
+<span class="sd">            operation as ``client.create_foo(**kwargs)``, if the</span>
+<span class="sd">            ``create_foo`` operation can be paginated, you can use the</span>
+<span class="sd">            call ``client.get_paginator(&quot;create_foo&quot;)``.</span>
+
+<span class="sd">        :raise OperationNotPageableError: Raised if the operation is not</span>
+<span class="sd">            pageable.  You can use the ``client.can_paginate`` method to</span>
+<span class="sd">            check if an operation is pageable.</span>
+
+<span class="sd">        :rtype: L{botocore.paginate.Paginator}</span>
+<span class="sd">        :return: A paginator object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_paginate</span><span class="p">(</span><span class="n">operation_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">OperationNotPageableError</span><span class="p">(</span><span class="n">operation_name</span><span class="o">=</span><span class="n">operation_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">actual_operation_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PY_TO_OP_NAME</span><span class="p">[</span><span class="n">operation_name</span><span class="p">]</span>
+
+            <span class="c1"># Create a new paginate method that will serve as a proxy to</span>
+            <span class="c1"># the underlying Paginator.paginate method. This is needed to</span>
+            <span class="c1"># attach a docstring to the method.</span>
+            <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">Paginator</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="n">paginator_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;page_config&#39;</span><span class="p">][</span>
+                <span class="n">actual_operation_name</span><span class="p">]</span>
+            <span class="c1"># Add the docstring for the paginate method.</span>
+            <span class="n">paginate</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">PaginatorDocstring</span><span class="p">(</span>
+                <span class="n">paginator_name</span><span class="o">=</span><span class="n">actual_operation_name</span><span class="p">,</span>
+                <span class="n">event_emitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">events</span><span class="p">,</span>
+                <span class="n">service_model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span><span class="p">,</span>
+                <span class="n">paginator_config</span><span class="o">=</span><span class="n">paginator_config</span><span class="p">,</span>
+                <span class="n">include_signature</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Rename the paginator class based on the type of paginator.</span>
+            <span class="n">paginator_class_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.Paginator.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">get_service_module_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">service_model</span><span class="p">),</span>
+                <span class="n">actual_operation_name</span><span class="p">))</span>
+
+            <span class="c1"># Create the new paginator class</span>
+            <span class="n">documented_paginator_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span>
+                <span class="n">paginator_class_name</span><span class="p">,</span> <span class="p">(</span><span class="n">Paginator</span><span class="p">,),</span> <span class="p">{</span><span class="s1">&#39;paginate&#39;</span><span class="p">:</span> <span class="n">paginate</span><span class="p">})</span>
+
+            <span class="n">operation_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">operation_model</span><span class="p">(</span><span class="n">actual_operation_name</span><span class="p">)</span>
+            <span class="n">paginator</span> <span class="o">=</span> <span class="n">documented_paginator_cls</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">),</span>
+                <span class="n">paginator_config</span><span class="p">,</span>
+                <span class="n">operation_model</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">paginator</span>
+
+    <span class="k">def</span> <span class="nf">can_paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if an operation can be paginated.</span>
+
+<span class="sd">        :type operation_name: string</span>
+<span class="sd">        :param operation_name: The operation name.  This is the same name</span>
+<span class="sd">            as the method name on the client.  For example, if the</span>
+<span class="sd">            method name is ``create_foo``, and you&#39;d normally invoke the</span>
+<span class="sd">            operation as ``client.create_foo(**kwargs)``, if the</span>
+<span class="sd">            ``create_foo`` operation can be paginated, you can use the</span>
+<span class="sd">            call ``client.get_paginator(&quot;create_foo&quot;)``.</span>
+
+<span class="sd">        :return: ``True`` if the operation can be paginated,</span>
+<span class="sd">            ``False`` otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;page_config&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">page_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span><span class="o">.</span><span class="n">load_service_model</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">service_name</span><span class="p">,</span>
+                    <span class="s1">&#39;paginators-1&#39;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">api_version</span><span class="p">)[</span><span class="s1">&#39;pagination&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;page_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">page_config</span>
+            <span class="k">except</span> <span class="n">DataNotFoundError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;page_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">actual_operation_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PY_TO_OP_NAME</span><span class="p">[</span><span class="n">operation_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">actual_operation_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;page_config&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_waiter_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;waiter_config&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">waiter_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loader</span><span class="o">.</span><span class="n">load_service_model</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">service_name</span><span class="p">,</span>
+                    <span class="s1">&#39;waiters-2&#39;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="o">.</span><span class="n">api_version</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;waiter_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">waiter_config</span>
+            <span class="k">except</span> <span class="n">DataNotFoundError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;waiter_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="s1">&#39;waiter_config&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_waiter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waiter_name</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_waiter_config</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Waiter does not exist: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">waiter_name</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">waiter</span><span class="o">.</span><span class="n">WaiterModel</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">waiter_names</span><span class="p">:</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">xform_name</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">waiter_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Waiter does not exist: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">waiter_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">waiter</span><span class="o">.</span><span class="n">create_waiter_with_client</span><span class="p">(</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">waiter_name</span><span class="p">],</span> <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@CachedProperty</span>
+    <span class="k">def</span> <span class="nf">waiter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all available waiters.&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_waiter_config</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">waiter</span><span class="o">.</span><span class="n">WaiterModel</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1"># Waiter configs is a dict, we just want the waiter names</span>
+        <span class="c1"># which are the keys in the dict.</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">xform_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">waiter_names</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exceptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_exceptions</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions</span>
+
+    <span class="k">def</span> <span class="nf">_load_exceptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exceptions_factory</span><span class="o">.</span><span class="n">create_client_exceptions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ClientMeta</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Holds additional client methods.</span>
+
+<span class="sd">    This class holds additional information for clients.  It exists for</span>
+<span class="sd">    two reasons:</span>
+
+<span class="sd">        * To give advanced functionality to clients</span>
+<span class="sd">        * To namespace additional client attributes from the operation</span>
+<span class="sd">          names which are mapped to methods at runtime.  This avoids</span>
+<span class="sd">          ever running into collisions with operation names.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="p">,</span> <span class="n">service_model</span><span class="p">,</span>
+                 <span class="n">method_to_api_mapping</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client_config</span> <span class="o">=</span> <span class="n">client_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_url</span> <span class="o">=</span> <span class="n">endpoint_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span> <span class="o">=</span> <span class="n">service_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method_to_api_mapping</span> <span class="o">=</span> <span class="n">method_to_api_mapping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span> <span class="o">=</span> <span class="n">partition</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">service_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">region_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client_config</span><span class="o">.</span><span class="n">region_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">endpoint_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_url</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client_config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">method_to_api_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_to_api_mapping</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition</span>
+
+
+<span class="k">def</span> <span class="nf">_get_configured_signature_version</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">client_config</span><span class="p">,</span>
+                                      <span class="n">scoped_config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the manually configured signature version.</span>
+
+<span class="sd">    :returns: the customer configured signature version, or None if no</span>
+<span class="sd">        signature version was configured.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Client config overrides everything.</span>
+    <span class="k">if</span> <span class="n">client_config</span> <span class="ow">and</span> <span class="n">client_config</span><span class="o">.</span><span class="n">signature_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">client_config</span><span class="o">.</span><span class="n">signature_version</span>
+
+    <span class="c1"># Scoped config overrides picking from the endpoint metadata.</span>
+    <span class="k">if</span> <span class="n">scoped_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># A given service may have service specific configuration in the</span>
+        <span class="c1"># config file, so we need to check there as well.</span>
+        <span class="n">service_config</span> <span class="o">=</span> <span class="n">scoped_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">service_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">service_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="n">service_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;signature_version&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">version</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;Switching signature version for service </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                    <span class="s2">&quot;to version </span><span class="si">%s</span><span class="s2"> based on config file override.&quot;</span><span class="p">,</span>
+                    <span class="n">service_name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">version</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Grassroot.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

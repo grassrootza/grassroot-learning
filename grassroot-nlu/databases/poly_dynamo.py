@@ -10,12 +10,9 @@ import re
 class DynamoDB(object):
 
     def db_find(self, table):
-
         x = []
-
         for i in table.find():
             x.append(i)
-
         return x
 
     def db_find_one(self, table, key_val):
@@ -45,16 +42,12 @@ class DynamoDB(object):
     def check_db(self, text):
         table = dynamodb.Table('entries')
         entries = table.scan()['Items']
-
         for entry in entries:
-
             if entry['text'] == text and 'payload' in entry:
                 payload = entry['payload']
                 entry = str_to_dict(payload)
-
                 if entry['parsed']['intent']['confidence'] > 0.6:
                     return entry
-
         return False
 
 
@@ -63,15 +56,11 @@ class DynamoDB(object):
 class DecimalEncoder(json.JSONEncoder):
 
     def default(self, o):
-
         if isinstance(o, decimal.Decimal):
-
             if o % 1 > 0:
                 return float(o)
-
             else:
                 return int(o)
-
         return super(DecimalEncoder, self).default(o)
 
 dynamodb = boto3.resource('dynamodb', region_name='eu-west-1', endpoint_url="https://dynamodb.eu-west-1.amazonaws.com")
@@ -82,9 +71,7 @@ def str_to_dict(string):
 
 
 def create_new(t_name, doc):
-
     table = dynamodb.Table(t_name)
-
     response = table.put_item(
         Item={
             'uid': doc['_id'],
@@ -93,33 +80,24 @@ def create_new(t_name, doc):
             'past_lives': doc['past_lives']
              }
         )
-
     x = list(doc)
-
     if 'payload' in x:
         update(t_name, doc['_id'],doc['text'],doc['payload'])
-
     print("PutItem succeeded")
-
     return json.dumps(response, indent=4, cls=DecimalEncoder)
 
 
 def get(t_name, uid):
-
     table = dynamodb.Table(t_name)
-
     try:
-
         response = table.get_item(
             Key={
                 'year': year,
                 'title': title
             }
         )
-
     except ClientError as e:
         print(e.response['Error']['Message'])
-
     else:
         item = response['Item']
         print("GetItem succeeded:")
@@ -129,9 +107,7 @@ def get(t_name, uid):
 
 
 def update(t_name, uid, text, p):
-
     table = dynamodb.Table(t_name)
-
     response = table.update_item(
         Key={
             'uid': uid,
@@ -143,14 +119,11 @@ def update(t_name, uid, text, p):
         },
         ReturnValues="UPDATED_NEW"
     )
-
     print("UpdateItem succeeded:")
     print(json.dumps(response, indent=4, cls=DecimalEncoder))
 
 
-
 def create_table(name):
-
     table = dynamodb.create_table(
         TableName=name,
         KeySchema=[
@@ -179,8 +152,7 @@ def create_table(name):
             'WriteCapacityUnits': 10
         }
     )
-
-    print("Table status:", table.table_status)
+    # print("Table status:", table.table_status)
 
 
 def ddb_find(t_name, value):
@@ -188,7 +160,6 @@ def ddb_find(t_name, value):
     response = table.query(
         KeyConditionExpression=Key('uid').eq(value)
     )
-
     return response['Items']
 
 
@@ -202,37 +173,25 @@ def clean_and_save(uid):
     y = dirty.replace("'",'"')
     dirty = json.loads(y)
     cleansed = dirty['parsed']
-
     try:
-
         cleansed['intent'] = cleansed['intent']['name']
-
     except:
         pass
-
     if cleansed['entities'] != []:
         leng = len(cleansed['entities'])
-
         for i in range(0,leng):
-
             if cleansed['entities'][i]['entity'] != 'date_time':
-
                 try:
-
                     item = cleansed['entities'][i]
                     item.pop('extractor')
                     item.pop('processors')
-
                 except:
                     pass
-
             else:
                 date_str = cleansed['entities'][i]['value']
                 match = re.search(r'(\d+-\d+-\d+T)', date_str)
-
                 if match:
                     return "value contains suboptimal formats. Instance not saved in training data."
-
         cleansed = {
                     '_id': uid,
                     'text': 'runtime_training_data',
@@ -240,21 +199,14 @@ def clean_and_save(uid):
                     'past_lives': [],
                     'payload': cleansed
                    }
-
         create_new('runtime_training_data', cleansed)
 
-
 try:
-
     create_table('entries')
-
 except:
     pass
-
 try:
-
     create_table('runtime_training_data')
-    
 except:
     pass
     

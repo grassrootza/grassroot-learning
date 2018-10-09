@@ -1,0 +1,51 @@
+%[join_entity]('training': '300', 'testing': '10')
+    ~[hello_short?] ~[want?] ~[join] @[entity_to_join]
+
+~[join]
+    join
+    Join
+    joyina
+    Joyina
+    join to 
+    join with
+    kena
+    to join
+
+~[hello_short]
+    hi
+    hello
+    hey
+    yebo
+    sawubona
+    sbona
+    dumelang
+    hie
+    uhm
+    um
+    yo
+    helo
+    howzit
+
+~[want]
+    want to
+    Want
+    I want
+    funa
+    Ngifuna
+    Ndifuna
+    Ke batla
+    ke batla
+
+@[entity_to_join]
+    NHI
+    PHM
+    AbM
+    ABM
+    Abahlali baseMjondolo
+    Amandla.mobi
+    Recall campaign
+    Anti-smoking campaign
+    Farms
+    Recall campaign
+    recall campaign
+    recall

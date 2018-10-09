@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+parentTypefrom __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -22,11 +22,9 @@ TOKEN_URL = 'https://staging.grassroot.org.za/v2/api/whatsapp/user/token'
 DATETIME_URL = 'http://learning.grassroot.cloud'
 PRE_TOK_URL = 'https://staging.grassroot.org.za/v2/api/whatsapp/user/id'
 GROUP_URL = 'https://staging.grassroot.org.za/v2/api/group/fetch/list'
+
 auth_token = os.getenv("TOKEN_X")
-
-testParentType = 'GROUP'
-testParentUid = str(uuid.uuid4())
-
+parentType = 'GROUP'
 session_vote_options = [{'user_id': []}]
 
 
@@ -86,9 +84,9 @@ class ActionCreateVoteRoutine(FormAction):
 
 
 # class ActionCreateGroupRoutine(FormAction):
-# 
+#
 #     RANDOMIZE = False
-# 
+#
 #     @staticmethod
 #     def required_fields():
 #         return [
@@ -96,10 +94,10 @@ class ActionCreateVoteRoutine(FormAction):
 #             FreeTextFormField("description"),
 #             FreeTextFormField("reminderMinutes")
 #         ]
-# 
+#
 #     def name(self):
 #         return 'action_create_group_routine'
-# 
+#
 #     def submit(self, dispatcher, tracker, domain):
 #         responses = [
 #                      "You have named this group %s" % tracker.get_slot("group_name"),
@@ -241,7 +239,7 @@ class ActionLivewireRoutine(FormAction):
                     ]
 
         dispatcher.utter_message(' '.join(responses))
-        return []                    
+        return []
 
 
 class ActionGetGroup(Action):
@@ -303,7 +301,7 @@ class CreateMeetingUrl(Action):
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
         # dispatcher.utter_message("Found uid %s for group %s" % (groupUid, tracker.get_slot("group")))
-        meeting_path = '/v2/api/task/create/meeting/%s/%s' % (testParentType, groupUid)
+        meeting_path = '/v2/api/task/create/meeting/%s/%s' % (parentType, groupUid)
         query_params = '?location=%s&dateTimeEpochMillis=%s&subject=%s&description=%s' % (\
                        tracker.get_slot('location'), epoch(formalize(tracker.get_slot("datetime"))), \
                        tracker.get_slot('subject'), tracker.get_slot('description'))
@@ -320,7 +318,7 @@ class CreateVoteUrl(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
-        vote_path = '/v2/api/task/create/vote/%s/%s' % (testParentType, groupUid)
+        vote_path = '/v2/api/task/create/vote/%s/%s' % (parentType, groupUid)
         query_params = '?title=%s&time=%s&voteOptions=[%s]&description=%s' % (\
                        tracker.get_slot('subject'), epoch(formalize(tracker.get_slot("datetime"))),
                        tracker.get_slot('vote_option'), tracker.get_slot('description'))
@@ -331,10 +329,10 @@ class CreateVoteUrl(Action):
 
 
 # class CreateGroupUrl(Action):
-# 
+#
 #     def name(self):
 #         return 'action_create_group_url'
-# 
+#
 #     def run(self, dispatcher, tracker, domain):
 #         group_path = '/v2/api/group/modify/create'
 #         query_params = '?name=%s&description=%s&reminderMinutes=%s' % (tracker.get_slot('group'), \
@@ -351,7 +349,7 @@ class CreateVolunteerTodoUrl(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
-        todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (testParentType, groupUid)
+        todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s' % (tracker.get_slot("subject"),
                         formalize(tracker.get_slot("datetime")))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
@@ -367,7 +365,7 @@ class CreateValidationTodoUrl(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
-        todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (testParentType, groupUid)
+        todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s' % (tracker.get_slot("subject"),
                         epoch(formalize(tracker.get_slot("datetime"))))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
@@ -383,7 +381,7 @@ class CreateInfoTodoUrl(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
-        todo_path = '/v2/api/task/create/todo/information/%s/%s' % (testParentType, groupUid)
+        todo_path = '/v2/api/task/create/todo/information/%s/%s' % (parentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s&responseTag=%s' % (tracker.get_slot("subject"),
                         epoch(formalize(tracker.get_slot("datetime"))), tracker.get_slot("response_tag"))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')

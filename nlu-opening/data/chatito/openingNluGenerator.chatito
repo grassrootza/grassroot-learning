@@ -1,6 +1,17 @@
 %[join_entity]('training': '300', 'testing': '10')
     ~[hello_short?] ~[want?] ~[join] @[entity_to_join]
 
+%[affirm]('training': '100', 'testing': '10')
+    ~[yes]
+    ~[yes] ~[yes?] ~[please?]
+    you got that ~[yes]
+    yes that is ~[yes]
+    ~[yes] ~[yes?] ~[yes?] ~[yes?]
+
+%[negate]('training': '50', 'testing': '10')
+    ~[no] ~[no?] ~[please?]
+    ~[no] ~[no?] ~[no?]
+
 ~[join]
     join
     Join
@@ -49,3 +60,42 @@
     Recall campaign
     recall campaign
     recall
+
+~[yes]
+    yes
+    Yes
+    right
+    affirmative
+    yes to that
+    correct
+    yep
+    yes sir
+    ok
+    right
+    allright
+    alright
+    yebo
+    ee
+    ja
+    ja that's right
+    ja absolutely
+    definitely
+
+~[please]
+    pls
+    please
+    plz
+    ngicela
+    cela
+    asseblief
+    as'blief
+
+~[no]
+    no
+    nope
+    negative
+    not correct
+    incorrect
+    no sir
+    wrong
+    cha

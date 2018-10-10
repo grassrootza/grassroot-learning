@@ -1,4 +1,4 @@
-parentTypefrom __future__ import absolute_import
+from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -223,8 +223,8 @@ class ActionLivewireRoutine(FormAction):
         return [
             FreeTextFormField("subject"),
             FreeTextFormField("description"),
-            FreeTextFormField("informer_name"),
-            FreeTextFormField("informer_contact")
+            FreeTextFormField("contact_name"),
+            FreeTextFormField("contact_number")
         ]
 
     def name(self):
@@ -232,12 +232,12 @@ class ActionLivewireRoutine(FormAction):
 
     def submit(self, dispatcher, tracker, domain):
         responses = [
-                     "You have chosen %s as the title of your Livewire post." % tracker.get_slot("subject"),
+                     "Livewire details: You have chosen %s as the title." % tracker.get_slot("subject"),
                      "You have entered '%s' as the content." % tracker.get_slot("description"),
-                     "You have identified yourself as %s" % tracker.get_slot("informer_name"),
-                     "and provided %s as your contact detail." % tracker.get_slot("informer_contact")
+                     "You have identified yourself as %s" % tracker.get_slot("contact_name"),
+                     "and provided %s as your contact detail." % tracker.get_slot("contact_number"),
+                     "You would like this to appear within the group %s" % tracker.get_slot("group")
                     ]
-
         dispatcher.utter_message(' '.join(responses))
         return []
 
@@ -427,7 +427,7 @@ class CreateLivewireUrl(Action):
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
         destUid = tracker.get_slot("destination_uid")
-        livewire_path = '/v2/api/livewire/create/%s' % userUid
+        livewire_path = '/v2/api/livewire/create/%s' % tracker.sender_id
         query_params = '?headline=%s&descriptuion=%s&contactName=%s&contactNumber=%s&groupUid=%s'+\
                         '&taskUid=%s&type=%s&addLocation=%s&mediaFileKeys=%s&latitude=%s&longitude=%s'+\
                         'destUid=%s' & (headline, description, contactName, contactNumber, groupUid, \

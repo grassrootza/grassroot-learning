@@ -136,6 +136,13 @@ templates:
     - "Cool, I've recieved your vote option '{vote_option}'"
   utter_ask_reminder_minutes:
     - "Reminder minutes set to {reminderMinutes}"
+  utter_ask_contact_name:
+    - "Please provide your name or alias."
+  utter_ask_contact_number:
+    - "Now provide a number for people to reach you on with regards to this livewire."
+  utter_ask_livewire_content:
+    - "Please enter the main content of your livewire."
+  
 
 actions:
   - utter_ask_subject
@@ -152,6 +159,9 @@ actions:
   - utter_vote_option
   - utter_ask_reminder_minutes
   - utter_get_livewire_type
+  - utter_ask_livewire_content
+  - utter_ask_contact_name
+  - utter_ask_contact_number
   - action_utter_save_selected_group
   - action_get_vote_option
   - action_create_meeting_url

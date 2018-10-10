@@ -173,14 +173,17 @@
 * select{"subject": "New Clinic Open"}
   - action_livewire_routine
   - slot{"subject": "New Clinic Open"}
+  - utter_ask_livewire_content
   - slot{"requested_slot": "description"}
 *  select{"description": "A new clinic has open within our community"}
   - action_livewire_routine
   - slot{"description": "A new clinic has opened within our comminity"}
+  - utter_ask_contact_name
   - slot{"requested_slot": "contact_name"}
 * select{"contact_name": "Jack Ryan"}
   - action_livewire_routine
   - slot{"contact_name": "Jack Ryan"}
+  - utter_ask_contact_number
   - slot{"requested_slot": "contact_number"}
 * select{"contact_number": "011 111 1111"}
   - action_livewire_routine

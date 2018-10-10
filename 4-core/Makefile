@@ -9,7 +9,7 @@ help:
 	@echo "        Train the natural language understanding using Rasa NLU."
 	@echo "    train-core"
 	@echo "        Train a dialogue model using Rasa core."
-    @echo "    run-core"
+    @echo "    run-core-nlu"
     @echo "        Launch a core-nlu instance"
 	@echo "    train-online"
 	@echo "        Initiates interactive training."
@@ -17,8 +17,8 @@ help:
 	@echo "        Visualizes bot logic"
 
 
-run-action-server:
-	python3 -m rasa_core_sdk.endpoint --actions platform_actions
+train-online:
+	python3 train_online.py
 
 train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data nlu.json -o models --fixed_model_name nlu --project current --verbose
@@ -26,11 +26,14 @@ train-nlu:
 train-core:
 	python3 -m rasa_core.train -d platform_domain.yml -s data/stories.md -o models/dialogue
 
-run-core:
+run-core-nlu:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/nlu --endpoints endpoints.yml --verbose
 
-train-online:
-	python3 train_online.py
+run core-solo:
+    python3 -m rasa_core.run -d models/dialogue --endpoints endpoints.yml --verbose
+
+run-action-server:
+	python3 -m rasa_core.run -d models/dialogue --endpoints endpoints.yml
 
 visualize:
 	python3 -m rasa_core.visualize -s data/core/ -d domain.yml -o story_graph.png

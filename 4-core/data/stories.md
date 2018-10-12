@@ -21,7 +21,6 @@
 * select{"vote_option": "yes"}
   - action_save_vote_option
 * affirm
-  - utter_affirmation
   - action_create_vote_url
   - action_restart
 
@@ -50,7 +49,6 @@
   - action_create_meeting_routine
   - slot{"datetime": "soon"}
 * affirm
-  - utter_affirmation
   - action_create_meeting_url
   - action_restart
 
@@ -76,7 +74,6 @@
   - slot{"datetime": "later"}
   - action_todo_volunteer_routine
 * affirm
-  - utter_affirmation
   - action_create_volunteer_todo_url
   - action_restart
 
@@ -101,7 +98,6 @@
   - action_todo_validation_routine
   - slot{"datetime": "later"}
 * affirm
-  - utter_affirmation
   - create_validation_todo_url
   - action_restart
 
@@ -131,7 +127,6 @@
   - action_todo_info_routine
   - slot{"datetime": "later"}
 * affirm
-  - utter_affirmation
   - action_create_info_todo_url
   - action_restart
 
@@ -157,7 +152,6 @@
   - slot{"datetime": "later"}
   - action_todo_action_routine
 * affirm
-  - utter_affirmation
   - action_create_todo_action_url
   - action_restart
 
@@ -189,7 +183,6 @@
   - action_livewire_routine
   - slot{"contact_number": "011 111 1111"}
 * affirm
-  - utter_affirmation
   - action_create_livewire_url
   - action_restart
 
@@ -213,7 +206,6 @@
 #   - action_create_group_routine
 #   - slot{"reminderMinutes": "30 minutes"}
 # * affirm
-#   - utter_affirmation
 #   - action_create_group_url
 #   - action_restart
 

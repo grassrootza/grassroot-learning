@@ -30,7 +30,6 @@ entities:
  - latitude
  - longitude
  - task_uid
- - livewire_type
  - media_file_keys
  - destination_uid
  - contact_name
@@ -84,18 +83,11 @@ slots:
     type: text
 
 templates:
-  utter_get_livewire_type:
-    - text: "What type of livewire is it?"
-      buttons:
-      - title: Meeting
-        payload: "/select{\"livewire_type\": \"MEETING\"}"
-      - title: Instant Alert
-        payload: "select{\"livewire_type\": \"INSTANT\"}"
   action_get_group:
     - text: "Choose a group"
       buttons:
       - title: "group"
-        payload: "/select{\"group\":\"group_uid\"}"
+        payload: '/select{"group": "group_uid"}'
   utter_ask_subject:
     - "What is this about?"
   utter_subject:
@@ -126,8 +118,8 @@ templates:
     - "You would like participants to give you their {information_required}."
   utter_negation:
     - "We have nuked your request. Thank you for using our service."
-  utter_affirmation:
-    - "We are making it happen for you. Thank you for using our service."
+#  utter_affirmation:
+#    - "We are making it happen for you. Thank you for using our service."
   utter_ask_description:
     - "How would you describe it?"
   utter_vote_options_initialiser:
@@ -158,7 +150,6 @@ actions:
   - utter_vote_options_initialiser
   - utter_vote_option
   - utter_ask_reminder_minutes
-  - utter_get_livewire_type
   - utter_ask_livewire_content
   - utter_ask_contact_name
   - utter_ask_contact_number

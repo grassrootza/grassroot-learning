@@ -6,13 +6,15 @@ help:
 	@echo "    run-action-server"
 	@echo "        Activates the action server"
 	@echo "    train-nlu"
-	@echo "        Train the natural language understanding using Rasa NLU."
+	@echo "        Train the natural language understanding using Rasa NLU"
 	@echo "    train-core"
-	@echo "        Train a dialogue model using Rasa core."
+	@echo "        Train a dialogue model using Rasa core"
     @echo "    run-core-nlu"
     @echo "        Launch a core-nlu instance"
+    @echo "    run-core-solo"
+    @echo "        Run rasa core without nlu"
 	@echo "    train-online"
-	@echo "        Initiates interactive training."
+	@echo "        Initiates interactive training"
 	@echo "    visualize"
 	@echo "        Visualizes bot logic"
 
@@ -29,11 +31,11 @@ train-core:
 run-core-nlu:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/nlu --endpoints endpoints.yml --verbose
 
-run core-solo:
+run-core-solo:
     python3 -m rasa_core.run -d models/dialogue --endpoints endpoints.yml --verbose
 
 run-action-server:
-	python3 -m rasa_core.run -d models/dialogue --endpoints endpoints.yml
+	python3 -m rasa_core_sdk.endpoint --actions platform_actions
 
 visualize:
 	python3 -m rasa_core.visualize -s data/core/ -d domain.yml -o story_graph.png

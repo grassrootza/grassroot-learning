@@ -25,8 +25,8 @@ GROUP_URL = 'https://staging.grassroot.org.za/v2/api/group/fetch/list'
 
 auth_token = os.getenv("TOKEN_X")
 parentType = 'GROUP'
-session_vote_options = [{'user_id': []}]
-session_media_files = [{'user_id': []}]
+session_vote_options = {'user_id': []}
+session_media_files = {'user_id': []}
 
 
 class ActionCreateMeetingRoutine(FormAction):
@@ -46,7 +46,7 @@ class ActionCreateMeetingRoutine(FormAction):
         return 'action_create_meeting_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        responses = ["You are %s" % tracker.sender_id,
+        responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
                      "You have described this meeting as %s." % tracker.get_slot("description"),
@@ -233,12 +233,12 @@ class ActionLivewireRoutine(FormAction):
 
     def submit(self, dispatcher, tracker, domain):
         responses = [
-                     "%s livewire details: You have chosen %s as the title." % \
-                     (tracker.get_slot("livewire_type"), tracker.get_slot("subject")),
+                     "You have chosen %s as the title." % tracker.get_slot("subject"),
                      "You have entered '%s' as the content." % tracker.get_slot("description"),
                      "You have identified yourself as %s" % tracker.get_slot("contact_name"),
                      "and provided %s as your contact detail." % tracker.get_slot("contact_number"),
-                     "You would like this to appear within the group %s" % tracker.get_slot("group")
+                     # "you have also included %s media file." % traker.get_slot("session_media_keys"),
+                     "You would like this to appear within the group %s." % tracker.get_slot("group"),
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -265,33 +265,28 @@ class ActionSaveGroup(Action):
 
 
 class ActionGetVoteOption(Action):
+
     def name(self):
         return 'action_get_vote_option'
 
     def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message("tracker state: %s" % tracker.current_state(True))
-
-        vote_option = tracker.get_slot('vote_option')
-        dispatcher.utter_message("Found vote option: %s" % vote_option)
-        # dispatcher.utter_message("Working with the following slot values: %s" % tracker.current_slot_values())
-        result = SlotSet("vote_option", vote_option)
-        dispatcher.utter_message('Slot setting returned %s' % result)
+        dispatcher.utter_message("What are your vote options?")
         return []
 
 
 class ActionStoreVoteOption(Action):
+
     def name(self):
         return 'action_store_vote_option'
 
     def run(self, dispatcher, tracker, domain):
-        vote_option = tracker.get_slot('vote_option')
-        dispatcher.utter_message("tracker state: %s" % tracker.current_state(True))
+        vote_option = (tracker.latest_message)['text']
 
-        user_id = 'xxxx'
-        if user_id in list(session_vote_options[0]):
-            session_vote_options[0][user_id].append(vote_option)
+        user_id = tracker.sender_id
+        if user_id in list(session_vote_options):
+            session_vote_options[user_id].append(vote_option)
         else:
-            session_vote_options[0][user_id] = [vote_option]
+            session_vote_options[user_id] = [vote_option]
         return []
 
 
@@ -329,11 +324,12 @@ class CreateVoteUrl(Action):
         vote_path = '/v2/api/task/create/vote/%s/%s' % (parentType, groupUid)
         query_params = '?title=%s&time=%s&voteOptions=[%s]&description=%s' % (\
                        tracker.get_slot('subject'), epoch(formalize(tracker.get_slot("datetime"))),
-                       tracker.get_slot('vote_option'), tracker.get_slot('description'))
+                       get_session_data(tracker.sender_id, session_vote_options), tracker.get_slot('description'))
         url = BASE_URL+vote_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         dispatcher.utter_message('Contructed url: %s' % url)
         # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        clean_session(tracker.sender_id)
         return []
 
 
@@ -353,6 +349,7 @@ class CreateVoteUrl(Action):
 
 
 class CreateVolunteerTodoUrl(Action):
+
     def name(self):
         return 'action_create_volunteer_todo_url'
 
@@ -445,7 +442,7 @@ class CreateLivewireUrl(Action):
         taskUid = tracker.get_slot("task_uid")
         livewire_type = 'INSTANT'
         addLocation = False
-        mediaFileKeys = tracker.get_slot("media_file_keys")
+        mediaFileKeys = get_session_data(tracker.sender_id, session_media_files)
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
         destUid = tracker.get_slot("destination_uid")
@@ -454,15 +451,30 @@ class CreateLivewireUrl(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         livewire_path = '/v2/api/livewire/create/%s' % tracker.sender_id
-        query_params = '?headline=%s&descriptuion=%s&contactName=%s&contactNumber=%s&groupUid=%s'+\
-                        '&taskUid=%s&type=%s&addLocation=%s&mediaFileKeys=%s&latitude=%s&longitude=%s'+\
-                        'destUid=%s' & (headline, description, contactName, contactNumber, groupUid, \
-                                        taskUid, livewire_type, addLocation, mediaFileKeys, latitude, \
-                                        longitude, destUid)
+        query_params = '?headline=%s&description=%s&contactName=%s&contactNumber=%s&groupUid=%s&taskUid=%s&type=%s&addLocation=%s&mediaFileKeys=%s&latitude=%s&longitude=%s&destUid=%s' % \
+                       (headline, description, contactName, contactNumber, groupUid, taskUid, livewire_type, addLocation, mediaFileKeys, latitude, longitude, destUid)
         url = BASE_URL+livewire_path+query_params
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         dispatcher.utter_message("Contructed url: %s" % url)
         # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        clean_session(tracker.sender_id)
+        return []
+
+
+class ActionSaveMediaFile(Action):
+
+    def name(self):
+        return 'action_save_media_file'
+
+    def run(self, dispatcher, tracker, domain):
+        media_file = tracker.get_slot("media_file_id")
+        if media_file != None:
+            if tracker.sender_id in list(session_media_files):
+                session_media_files[sender_id].append(media_file)
+                return [SlotSet('media_file_keys', session_media_files[tracker.sender_id])]
+            else:
+                session_media_files[sender_id] = [media_file]
+                return [SlotSet('media_file_keys', session_media_files[tracker.sender_id])]
         return []
 
 
@@ -516,3 +528,18 @@ def get_group_uid(selected_group, sender_id):
     except KeyError as e:
         logging.error(e)
         return ''
+
+
+def get_session_data(sender_id, data):
+    if sender_id in list(data):
+        return data[sender_id]
+    else:
+        return None
+
+
+def clean_session(sender_id):
+    data = [session_media_files, session_vote_options]
+    for session_data in data:
+        if sender_id in list(session_data):
+            session_data.pop(sender_id)
+    return

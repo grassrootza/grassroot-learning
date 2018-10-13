@@ -1,3 +1,7 @@
+%[create_livewire]('training': '5')
+    ~[livewire] ~[about?] @[subject?]
+    ~[livewire] ~[media_file_id?]
+
 %[create_action_todo]('training': '100', 'testing': '1')
     ~['action_todo] @[datetime] @[subject]
     ~['action_todo] @[datetime?] @[subject?]
@@ -85,15 +89,27 @@
     btwn
     vote options are
 
+~[livewire]
+    create a livewire alert
+    form a livewire alert
+    send out a livewire
+    issue livewire
+    create an alert
+    livewire
+
 ~[action_todo]
     I call for action
     I call action
     Let us call for action
+    action
 
 ~[info_todo]
-    I need member information  
+    I need member information
+    Get me information
+
 ~[volunteer_todo]
-    find me volunteers   
+    find me volunteers
+    volunteers  
 
 ~[validation_todo]
     I need confirmation
@@ -137,6 +153,9 @@
     Ee
     yeah
     sho
+    done
+    correct
+    complete
 
 ~[no]
     nay
@@ -151,6 +170,11 @@
     ca
     hayi
     noooooo
+
+~[media_file_id]
+    f66cfc83-6c11-4775-98c1-44fe774a81a5
+    249dcb06-4864-499e-8707-bfdcdb666417
+    2b9cb035-14b9-4ed9-b664-1de11188541f
 
 @[description]
     This group is dedicated to tracking the upcoming elections

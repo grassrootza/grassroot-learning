@@ -134,6 +134,8 @@ templates:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_ask_livewire_content:
     - "Please enter the main content of your livewire."
+  utter_ask_media_files:
+    - "Would you like to add any images? Add them below and enter 'Done' when finished."
   
 
 actions:
@@ -153,6 +155,7 @@ actions:
   - utter_ask_livewire_content
   - utter_ask_contact_name
   - utter_ask_contact_number
+  - utter_ask_media_files
   - action_utter_save_selected_group
   - action_get_vote_option
   - action_create_meeting_url
@@ -173,3 +176,4 @@ actions:
   - action_todo_action_routine
   - action_get_group
   - action_livewire_routine
+  - action_save_media_file

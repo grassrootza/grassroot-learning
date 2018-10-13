@@ -182,6 +182,9 @@
 * select{"contact_number": "011 111 1111"}
   - action_livewire_routine
   - slot{"contact_number": "011 111 1111"}
+  - utter_ask_media_files
+* select{"media_file_keys": []}
+  - action_save_media_file
 * affirm
   - action_create_livewire_url
   - action_restart

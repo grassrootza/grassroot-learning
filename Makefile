@@ -16,7 +16,7 @@ train-nlu:
 	python3 -m rasa_nlu.train -c core-services/services_nlu_config.yml --data core-services/data/nlu -o core-services/models --fixed_model_name services_nlu --project current --verbose
 
 train-core:
-	cd ./core-services; python3 train_services_core.py
+	cd ./core-services; python3 train_services_core.py --aug 100 --epochs 25 --batch 128 --memdepth 10 # heavy duty as this is for going live
 	cd ./core-knowledge; python3 train_knowledge_core.py
 
 run-flask:

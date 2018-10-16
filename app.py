@@ -4,6 +4,9 @@ import json
 import logging
 import threading
 from flask import Flask, request, jsonify
+from werkzeug.exceptions import default_exceptions
+from werkzeug.exceptions import HTTPException
+
 from datetime import datetime
 from rasa_nlu.model import Interpreter
 from rasa_core.agent import Agent
@@ -179,6 +182,7 @@ def parse_knowledge_domain(domain):
         user_id: The user ID, for tracking within Rasa core (can be any type of value, as long as consistent within session)
     """
     user_message = request.args.get('message')
+    logging.info('Parsing {} in domain {}'.format(user_message, domain))
     if 'user_id' in request.args:
         user_id = request.args.get('user_id')
         responses_to_user = domain_agents[domain].handle_text(user_message, sender_id=user_id)
@@ -199,7 +203,18 @@ def parse_knowledge_domain(domain):
     return resp
 
 
+@application.errorhandler(Exception)
+def make_json_error(ex):
+    logging.error("Failure! : {}".format(ex))
+    response = jsonify(error=str(ex))
+    response.status_code = (ex.code
+                            if isinstance(ex, HTTPException)
+                            else 500)
+    return response
+
+
 if __name__ == "__main__":
     logging.info("Starting up Grassroot Rasa components")
     application.debug = True
+        
     application.run(host='0.0.0.0')

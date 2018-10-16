@@ -13,6 +13,7 @@ intents:
   - create_group
   - create_livewire
   - inform
+  - out_of_scope
 
 entities:
  - datetime

@@ -453,7 +453,7 @@ class CreateLivewireUrl(Action):
         livewire_path = '/v2/api/livewire/create/%s' % tracker.sender_id
         query_params = '?headline=%s&description=%s&contactName=%s&contactNumber=%s&groupUid=%s&taskUid=%s&type=%s&addLocation=%s&mediaFileKeys=%s&latitude=%s&longitude=%s&destUid=%s' % \
                        (headline, description, contactName, contactNumber, groupUid, taskUid, livewire_type, addLocation, mediaFileKeys, latitude, longitude, destUid)
-        url = BASE_URL+livewire_path+query_params
+        url = BASE_URL+livewire_path+query_params.replace(' ', '%20')
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         dispatcher.utter_message("Contructed url: %s" % url)
         # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
@@ -543,3 +543,10 @@ def clean_session(sender_id):
         if sender_id in list(session_data):
             session_data.pop(sender_id)
     return
+
+
+
+# def intent(input):
+
+
+# def restart_on_intent(intent):

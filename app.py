@@ -1,21 +1,22 @@
-import os
 import re
+import os
 import json
-
+import logging
+import threading
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import default_exceptions
 from werkzeug.exceptions import HTTPException
 
 from datetime import datetime
-
 from rasa_nlu.model import Interpreter
 from rasa_core.agent import Agent
+
+from flask import Flask, request, jsonify
+from datetime import datetime
+
 from rasa_core.interpreter import RasaNLUInterpreter
 from rasa_core.channels import CollectingOutputChannel
-
 from rasa_core.utils import EndpointConfig
-
-import logging
 
 logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s", level=logging.DEBUG)
 
@@ -24,24 +25,36 @@ application = Flask(__name__)
 # Now load up the various interpreters and agents
 opening_nlu = RasaNLUInterpreter('./nlu-opening/models/current/opening_nlu')
 service_nlu = RasaNLUInterpreter('core-services/models/current/services_nlu')
+platform_nlu = RasaNLUInterpreter('4-core/models/current/nlu')
 services_actions_endpoint = os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
+platform_actions_endpoint = os.getenv('PLATFORM_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 
 intent_domain_map = {
     'find_services': 'service',
-    'request_knowledge': 'knowledge'
+    'request_knowledge': 'knowledge',
+    'call_meeting': 'platform',
+    'call_vote': 'platform',
+    'create_group': 'platform',
+    'create_action_todo': 'platform',
+    'create_info_todo': 'platform',
+    'create_volunteer_todo': 'platform',
+    'create_validation_todo': 'platform',
+    'update': 'platform',
+    'create_group': 'platform'
 }
 
 domain_agents = {
     "service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
-    "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter= RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu'))
+    "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
+    "platform" : Agent.load('4-core/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
 }
 
 CONFIDENCE_THRESHOLD = 0.7
 
 def reset_all_agents(user_id):
+    # domain_agents['service'].execute_action(user_id, 'action_restart', None)
     for domain in domain_agents:
-        # domain_agents[domain].execute_action(user_id, 'action_restart', CollectingOutputChannel()) # turns out different channel messes up tracker reset ...
-        domain_agents[domain].handle_text('/restart', sender_id = user_id)
+        domain_agents[domain].execute_action(user_id, 'action_restart', CollectingOutputChannel())
 
 """
 Common response format: {
@@ -109,7 +122,7 @@ def error_catching_nlu_parse(user_message, interpreter):
 
 @application.route('/status')
 def say_hello():
-    return "Hello World! I am alive, on version 0-c. \n And service action URL is: {}".format(services_actions_endpoint)
+    return "Hello World! I am alive, on version 0-c. \n Service action URL is: {}, and platform action URL is: {}".format(services_actions_endpoint, platform_actions_endpoint)
 
 
 @application.route('/restart', methods=['POST'])

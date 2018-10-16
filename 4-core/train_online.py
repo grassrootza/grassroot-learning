@@ -17,8 +17,8 @@ def train_agent():
                                       output_path="models/dialogue",
                                       nlu_model_path='models/intent',
                                       max_history=2,
-                                      kwargs={"batch_size": 50,
-                                              "epochs": 200,
+                                      kwargs={"batch_size": 64,
+                                              "epochs": 50,
                                               "max_training_samples": 300
                                               })
 

@@ -62,6 +62,16 @@ def reshape_nlu_result(domain, nlu_result):
         'responses': []
     }
 
+def empty_result(domain, error):
+    return {
+        'domain': domain,
+        'intent': '',
+        'intent_list': [],
+        'entities': [],
+        'responses': [],
+        'error': error
+    }
+
 def reshape_core_result(domain, core_results):
     logging.info('reshaping core_result: {}'.format(core_results))
     
@@ -169,6 +179,12 @@ def parse_knowledge_domain(domain):
     """
     user_message = request.args.get('message')
     logging.info('Parsing {} in domain {}'.format(user_message, domain))
+    if domain not in domain_agents:
+        logging.error('Error! Sent invalid domain: {}'.format(domain))
+        response = jsonify(empty_result(domain, 'Invalid domain sent to core'))
+        response.status_code = 200 # error will trigger fail upstream, so rather return 'don't know what this means', in effect 
+        return response
+
     if 'user_id' in request.args:
         user_id = request.args.get('user_id')
         responses_to_user = domain_agents[domain].handle_text(user_message, sender_id=user_id)

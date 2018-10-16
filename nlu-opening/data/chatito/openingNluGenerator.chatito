@@ -12,6 +12,11 @@
     ~[no] ~[no?] ~[please?]
     ~[no] ~[no?] ~[no?]
 
+%[confusion]('training': '40', 'testing': '5')
+    ~[dont_know]
+    ~[confused]
+    ~[no?] [confused]
+
 ~[join]
     join
     Join
@@ -63,6 +68,7 @@
 
 ~[yes]
     yes
+    🙂
     Yes
     right
     affirmative
@@ -71,9 +77,11 @@
     yep
     yes sir
     ok
+    K
     right
     allright
     alright
+    alrite
     yebo
     ee
     ja
@@ -93,9 +101,49 @@
 ~[no]
     no
     nope
+    nuh
+    nah
     negative
     not correct
     incorrect
     no sir
     wrong
     cha
+    nee
+    nie
+
+~[dont_know]
+    angazi
+    Angazi
+    Andazi
+    ndazi
+    ngazi
+    I don't know
+    Don't know
+    Huh
+    Huhh
+    No idea
+    Ha ke tsebe
+    Weet nie
+    Ek weet nie
+    ?
+    ??
+    🤔
+
+~[confused]
+    What?
+    What
+    I'm confused
+    I'm lost
+    Lost
+    Completely lost
+    Very lost
+    😕
+    What's going on
+    You don't make sense
+    Doesn't make sense
+    No sense
+    This is dumb
+    What the
+    Weird
+    😡

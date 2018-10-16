@@ -17,7 +17,7 @@ train-core: # default
 	python3 train_services_core.py
 
 train-core-quick: # for local experimenting etc
-	python3 train_services_core.py --aug 20 --epochs 15 --batch 128 --memdepth 5
+	python3 train_services_core.py --aug 10 --epochs 50 --batch 128 --memdepth 8
 
 evaluate-provinces:
 	python3 -m rasa_nlu.evaluate --data data/examples/provinces_testing_data.json --model models/current/services_nlu

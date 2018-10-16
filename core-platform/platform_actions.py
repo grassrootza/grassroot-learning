@@ -133,7 +133,7 @@ class ActionTodoInfoRoutine(FormAction):
                      "Participants may respond until %s" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % tracker.get_slot("group")
                     ]
-        responses.utter_message(' '.join(responses))
+        dispatcher.utter_message(' '.join(responses))
         return []
 
 
@@ -418,7 +418,7 @@ class CreateActionTodoUrl(Action):
         if groupUid == '':
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
-        todo_path = '/v2/api/task/create/todo/action/%s/%s' % (testParentType, groupUid)
+        todo_path = '/v2/api/task/create/todo/action/%s/%s' % (parentType, groupUid)
         query_params = '?subject=%s&dueDateTime=%s&' % (tracker.get_slot("subject"),
                         epoch(formalize(tracker.get_slot("datetime"))))
         url = BASE_URL+todo_path+query_params.replace(' ', '%20')
@@ -470,10 +470,10 @@ class ActionSaveMediaFile(Action):
         media_file = tracker.get_slot("media_file_id")
         if media_file != None:
             if tracker.sender_id in list(session_media_files):
-                session_media_files[sender_id].append(media_file)
+                session_media_files[tracker.sender_id].append(media_file)
                 return [SlotSet('media_file_keys', session_media_files[tracker.sender_id])]
             else:
-                session_media_files[sender_id] = [media_file]
+                session_media_files[tracker.sender_id] = [media_file]
                 return [SlotSet('media_file_keys', session_media_files[tracker.sender_id])]
         return []
 

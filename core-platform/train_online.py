@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 def train_agent():
-    return train.train_dialogue_model(domain_file="domain.yml",
-                                      stories_file="data/stories.md",
+    return train.train_dialogue_model(domain_file="actions_domain.yml",
+                                      stories_file="data/core/stories.md",
                                       output_path="models/dialogue",
                                       nlu_model_path='models/intent',
                                       max_history=2,

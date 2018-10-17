@@ -8,7 +8,7 @@ from rasa_core.policies.keras_policy import KerasPolicy
 from rasa_core.policies.memoization import MemoizationPolicy
 
 if __name__ == '__main__':
-    agent = Agent("platform_domain.yml",
+    agent = Agent("actions_domain.yml",
                   policies=[MemoizationPolicy(), KerasPolicy()])
 
     agent.visualize("data/core/stories.md",

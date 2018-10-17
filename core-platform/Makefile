@@ -26,7 +26,7 @@ train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name nlu --project current --verbose
 
 train-core:
-	python3 -m rasa_core.train -d platform_domain.yml -s data/core -o models/dialogue
+	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue
 
 run-core-nlu:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/nlu --endpoints endpoints.yml --verbose
@@ -38,4 +38,4 @@ run-action-server:
 	python3 -m rasa_core_sdk.endpoint --actions platform_actions
 
 visualize:
-	python3 -m rasa_core.visualize -s data/core/ -d domain.yml -o story_graph.png
+	python3 -m rasa_core.visualize -s data/core/ -d actions_domain.yml -o story_graph.png

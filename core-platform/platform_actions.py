@@ -495,11 +495,8 @@ def epoch(formalized_datetime):
 
 
 def get_token(sender_id):
-    server_user_id = requests.post(PRE_TOK_URL, headers={'Authorization': 'Bearer ' \
-                                   + auth_token}, params={'msisdn': '%s' % sender_id}).text
-    logging.debug('resp: %s' % server_user_id)
     request_token = requests.post(TOKEN_URL, headers={'Authorization': 'Bearer ' + auth_token},\
-                                  params={'userId': server_user_id}).text
+                                  params={'userId': '%s' % sender_id}).text
     logging.debug('request_token: %s' % request_token)
     return request_token
 

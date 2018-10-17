@@ -31,3 +31,6 @@ core-platform/__pycache__/
 
 # Serverless and its plugins
 **/node_modules
+
+# Also graphs
+**/graph.png

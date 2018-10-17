@@ -32,29 +32,28 @@ platform_actions_endpoint = os.getenv('PLATFORM_ACTION_ENDPOINT_URL', 'http://lo
 intent_domain_map = {
     'find_services': 'service',
     'request_knowledge': 'knowledge',
-    'call_meeting': 'platform',
-    'call_vote': 'platform',
-    'create_group': 'platform',
-    'create_action_todo': 'platform',
-    'create_info_todo': 'platform',
-    'create_volunteer_todo': 'platform',
-    'create_validation_todo': 'platform',
-    'update': 'platform',
-    'create_group': 'platform'
+    'call_meeting': 'action',
+    'call_vote': 'action',
+    'create_group': 'action',
+    'create_action_todo': 'action',
+    'create_info_todo': 'action',
+    'create_volunteer_todo': 'action',
+    'create_validation_todo': 'action',
+    'update': 'action',
+    'create_group': 'action'
 }
 
 domain_agents = {
     "service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
     "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
-    "platform" : Agent.load('core-platform/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
+    "action" : Agent.load('core-platform/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
 }
 
 CONFIDENCE_THRESHOLD = 0.7
 
 def reset_all_agents(user_id):
-    # domain_agents['service'].execute_action(user_id, 'action_restart', None)
     for domain in domain_agents:
-        domain_agents[domain].execute_action(user_id, 'action_restart', CollectingOutputChannel())
+        domain_agents[domain].handle_text('/restart', sender_id = user_id)
 
 """
 Common response format: {
@@ -122,7 +121,7 @@ def error_catching_nlu_parse(user_message, interpreter):
 
 @application.route('/status')
 def say_hello():
-    return "Hello World! I am alive, on version 0-c. \n Service action URL is: {}, and platform action URL is: {}".format(services_actions_endpoint, platform_actions_endpoint)
+    return "Hello World! I am alive, on version 0-d. \n Service action URL is: {}, and platform action URL is: {}".format(services_actions_endpoint, platform_actions_endpoint)
 
 
 @application.route('/restart', methods=['POST'])

@@ -1,28 +1,31 @@
+%[find_action]('training': '19', 'testing': '1')
+    ~[like?] ~[action] ~[please?] 
+
 %[create_livewire]('training': '5')
     ~[livewire] ~[about?] @[subject?]
     ~[livewire] ~[media_file_id?]
 
 %[create_action_todo]('training': '100', 'testing': '1')
-    ~['action_todo] @[datetime] @[subject]
-    ~['action_todo] @[datetime?] @[subject?]
-    ~['action_todo] @[datetime] @[subject?]
+    ~[action_todo] @[datetime] @[subject]
+    ~[action_todo] @[datetime?] @[subject?]
+    ~[action_todo] @[datetime] @[subject?]
     ~[please?] ~['action_todo] @[datetime?] @[subject]
 
 %[create_info_todo]('training': '100', 'testing': '1')
-    ~['info_todo] @[datetime] @[subject] @[response_tag]
+    ~[info_todo] @[datetime] @[subject] @[response_tag]
     ~[please?] ~['info_todo] @[datetime?] @[subject?] @[response_tag?]
 
 %[create_volunteer_todo]('training': '100', 'testing': '1')
-    ~['volunteer_todo] @[datetime] @[subject]
-    ~['volunteer_todo] @[datetime?] @[subject?]
-    ~['volunteer_todo] @[subject?] @[datetime?]
+    ~[volunteer_todo] @[datetime] @[subject]
+    ~[volunteer_todo] @[datetime?] @[subject?]
+    ~[volunteer_todo] @[subject?] @[datetime?]
     ~[please?] ~['volunteer_todo] @[subject] @[datetime]
 
 %[create_validation_todo]('training': '100', 'testing': '1')
-    ~['validation_todo] @[datetime] @[subject]
-    ~['validation_todo] @[datetime?] @[subject?]
-    ~['validation_todo] @[subject?] @[datetime?]
-    ~[please?] ~['validation_todo] @[subject] @[datetime]
+    ~[validation_todo] @[datetime] @[subject]
+    ~[validation_todo] @[datetime?] @[subject?]
+    ~[validation_todo] @[subject?] @[datetime?]
+    ~[please?] ~[validation_todo] @[subject] @[datetime]
 
 %[create_group]('training': '28', 'testing': '1')
     ~[group] ~[group_name] @[group]
@@ -88,6 +91,13 @@
     between
     btwn
     vote options are
+
+~[like]
+    I would like
+
+~[action]
+    an action
+    action
 
 ~[livewire]
     create a livewire alert

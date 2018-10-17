@@ -1,4 +1,4 @@
-%[find_action]('training': '19', 'testing': '1')
+%[take_action]('training': '19', 'testing': '1')
     ~[like?] ~[action] ~[please?] 
 
 %[create_livewire]('training': '5')

@@ -1,5 +1,5 @@
 intents:
-  - find_actions
+  - take_action
   - affirm
   - negate
   - confusion

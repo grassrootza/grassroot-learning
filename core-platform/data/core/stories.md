@@ -1,5 +1,5 @@
 ## a new beginning
-* find_actions
+* take_action
   - utter_actions_initialiser
   - utter_actions_menu
 > check_what_user_wants

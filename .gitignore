@@ -19,12 +19,9 @@ grassroot-nlu/nsa/event_listener.txt
 grassroot-nlu/system_status.txt 
 grassroot-nlu/training_output.txt
 grassroot-nlu/logs/nlu.log
-<<<<<<< HEAD
-4-core/models/
-4-core/rasa_core.log
-4-core/__pycache__/
-=======
->>>>>>> wip-rasa-core
+core-platform/models/
+core-platform/rasa_core.log
+core-platform/__pycache__/
 
 # Some config files
 *_credentials.yml

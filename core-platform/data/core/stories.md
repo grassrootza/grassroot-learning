@@ -1,31 +1,11 @@
-## vote
-* call_vote
-  - action_get_group
-* select{"group": "Veritas"}
-  - action_utter_save_selected_group
-  - slot{"group": "Veritas"}
-  - action_create_vote_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "world domination"}
-  - action_create_vote_routine
-  - slot{"subject": "world domination"}
-  - slot{"requested_slot": "description"}
-* select{"description": "None"}
-  - action_create_vote_routine
-  - slot{"description": "world domination"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_create_vote_routine
-  - slot{"datetime": "later"}
-  - utter_vote_options_initialiser
-* select{"vote_option": "yes"}
-  - action_save_vote_option
-* affirm
-  - action_create_vote_url
-  - action_restart
+## a new beginning
+* find_actions
+  - utter_actions_initialiser
+  - utter_actions_menu
+> check_what_user_wants
 
-
-## meeting
+## user wants a meeting
+> check_what_user_wants
 * call_meeting
   - action_get_group
 * select{"group": "Veritas"}
@@ -48,115 +28,61 @@
 * select{"datetime": "soon"}
   - action_create_meeting_routine
   - slot{"datetime": "soon"}
+  - utter_confirm_request
+> check_meeting_correctness
+
+## request is correct, send request to server
+> check_meeting_correctness
 * affirm
   - action_create_meeting_url
   - action_restart
 
+## request is wrong
+> check_meeting_correctness
+* negate
+  - utter_negation
+  - action_restart
 
-## todo path 1
-* create_volunteer_todo
+## user wants to vote
+> check_what_user_wants
+* call_vote
   - action_get_group
 * select{"group": "Veritas"}
   - action_utter_save_selected_group
   - slot{"group": "Veritas"}
-  - action_todo_volunteer_routine
+  - action_create_vote_routine
   - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_volunteer_routine
-  - slot{"subject": "protest"}
+* select{"subject": "world domination"}
+  - action_create_vote_routine
+  - slot{"subject": "world domination"}
   - slot{"requested_slot": "description"}
-* select{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - action_todo_volunteer_routine
-  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
+* select{"description": "None"}
+  - action_create_vote_routine
+  - slot{"description": "world domination"}
   - slot{"requested_slot": "datetime"}
 * select{"datetime": "later"}
-  - action_todo_volunteer_routine
+  - action_create_vote_routine
   - slot{"datetime": "later"}
-  - action_todo_volunteer_routine
+  - utter_vote_options_initialiser
+* select{"vote_option": "yes"}
+  - action_save_vote_option
+  - utter_confirm_request
+> check_vote_correctness
+
+## request is correct, send request to server
+> check_vote_correctness
 * affirm
-  - action_create_volunteer_todo_url
+  - action_create_vote_url
   - action_restart
 
-
-## todo path 1
-* create_validation_todo
-  - action_get_group
-* select{"group": "Veritas"}
-  - action_utter_save_selected_group
-  - slot{"group": "Veritas"}
-  - action_todo_validation_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_validation_routine
-  - slot{"subject": "protest"}
-  - slot{"requested_slot": "description"}
-* select{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - action_todo_validation_routine
-  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_validation_routine
-  - slot{"datetime": "later"}
-* affirm
-  - create_validation_todo_url
+## request is wrong
+> check_vote_correctness
+* negate
+  - utter_negation
   - action_restart
 
-
-## todo path 1
-* create_info_todo
-  - action_get_group
-* select{"group": "Veritas"}
-  - action_utter_save_selected_group
-  - slot{"group": "Veritas"}
-  - action_todo_info_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_info_routine
-  - slot{"subject": "protest"}
-  - action_todo_info_routine
-  - slot{"requested_slot": "information_required"}
-* select{"information_required": "id numbers"}
-  - action_todo_info_routine
-  - slot{"information_required": "id numbers"}
-  - slot{"requested_slot": "response_tag"}
-* select{"response_tag": "id: "}
-  - action_todo_info_routine
-  - slot{"response_tag": "id: "}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_info_routine
-  - slot{"datetime": "later"}
-* affirm
-  - action_create_info_todo_url
-  - action_restart
-
-
-## todo path 1
-* create_action_todo
-  - action_get_group
-* select{"group": "Veritas"}
-  - action_utter_save_selected_group
-  - slot{"group": "Veritas"}
-  - action_todo_action_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_action_routine
-  - slot{"subject": "protest"}
-  - slot{"requested_slot": "description"}
-* select{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - action_todo_action_routine
-  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_action_routine
-  - slot{"datetime": "later"}
-  - action_todo_action_routine
-* affirm
-  - action_create_todo_action_url
-  - action_restart
-
-
-## livewire
+## user wants to post a livewire
+> check_what_user_wants
 * create_livewire
   - action_get_group
 * select{"group": "Veritas"}
@@ -185,34 +111,17 @@
   - utter_ask_media_files
 * select{"media_file_keys": []}
   - action_save_media_file
+  - utter_confirm_request
+> check_livewire_correctness
+
+## request is correct, send request to server
+> check_livewire_correctness
 * affirm
   - action_create_livewire_url
   - action_restart
 
-
-## group
-# * create_group
-#  _name
-#   - action_create_group_routine
-#   - slot{"requested_slot": "group_name"}
-# * select{"group_name": "Python Everywhere"}
-#   - action_create_group_routine
-#   - slot{"group_name": "Python Everywhere"}
-#   - utter_ask_description
-#   - slot{"requested_slot": "description"}
-#* select{"description": "None"}
-#   - action_create_group_routine
-#   - slot{"description": "None"}
-#   - utter_ask_reminder_minutes
-#   - slot{"requested_slot": "reminderMinutes"}
-#* select{"reminderMinutes": "30 minutes"}
-#   - action_create_group_routine
-#   - slot{"reminderMinutes": "30 minutes"}
-# * affirm
-#   - action_create_group_url
-#   - action_restart
-
-
+## request is wrong
+> check_livewire_correctness
 * negate
   - utter_negation
   - action_restart

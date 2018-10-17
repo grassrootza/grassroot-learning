@@ -11,5 +11,5 @@ if __name__ == '__main__':
     agent = Agent("platform_domain.yml",
                   policies=[MemoizationPolicy(), KerasPolicy()])
 
-    agent.visualize("data/stories.md",
+    agent.visualize("data/core/stories.md",
                     output_file="graph.png", max_history=2)

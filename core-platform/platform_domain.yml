@@ -1,4 +1,5 @@
 intents:
+  - find_actions
   - affirm
   - negate
   - confusion
@@ -67,9 +68,9 @@ slots:
   group_uid:
     type: text
   latitude:
-    type: text
+    type: float
   longitude:
-    type: text
+    type: float
   task_uid:
     type: text
   livewire_type:
@@ -84,6 +85,25 @@ slots:
     type: text
 
 templates:
+  utter_actions_intitialiser:
+    - "Welcome to Grassroot Actions. What would you like to do?"
+  utter_actions_menu:
+    - text: "Welcome to Grassroot Actions. What would you like to do?"
+      buttons:
+          - title: "call a meeting"
+            payload: "call_meeting"
+          - title: "call a vote"
+            payload: "call_vote"
+          - title: "find volunteers"
+            payload: "create_volunteer_todo"
+          - title: "get group member information"
+            payload: "create_info_todo"
+          - title: "validate an action"
+            payload: "create_validation_todo"
+          - title: "call for action"
+            payload: "create_action_todo"
+          - title: "post a livewire"
+            payload: "create_livewire"
   action_get_group:
     - text: "Choose a group"
       buttons:
@@ -137,6 +157,8 @@ templates:
     - "Please enter the main content of your livewire."
   utter_ask_media_files:
     - "Would you like to add any images? Add them below and enter 'Done' when finished."
+  utter_confirm_request:
+    - "Is this correct?"
   
 
 actions:
@@ -178,3 +200,6 @@ actions:
   - action_get_group
   - action_livewire_routine
   - action_save_media_file
+  - utter_actions_initialiser
+  - utter_actions_menu
+  - utter_confirm_request

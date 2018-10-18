@@ -125,3 +125,150 @@
 * negate
   - utter_negation
   - action_restart
+
+## user wants volunteers
+> check_what_user_wants
+* create_volunteer_todo
+  - action_get_group
+* select{"group": "Veritas"}
+  - action_utter_save_selected_group
+  - slot{"group": "Veritas"}
+  - action_todo_volunteer_routine
+  - slot{"requested_slot": "subject"}
+* select{"subject": "protest"}
+  - action_todo_volunteer_routine
+  - slot{"subject": "protest"}
+  - slot{"requested_slot": "description"}
+* select{"description": "Volunteer gathering to clean up our neighbourhood."}
+  - action_todo_volunteer_routine
+  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
+  - slot{"requested_slot": "datetime"}
+* select{"datetime": "later"}
+  - action_todo_volunteer_routine
+  - slot{"datetime": "later"}
+  - action_todo_volunteer_routine
+  - utter_confirm_request
+> check_volunteer_action_correctness
+
+## all is well, send to server
+> check_volunteer_action_correctness
+* affirm
+  - action_create_volunteer_todo_url
+  - action_restart
+
+## request is wrong
+> check_volunteer_action_correctness
+* negate
+  - utter_negation
+  - action_restart
+
+## user wants group member information
+> check_what_user_wants
+* create_info_todo
+  - action_get_group
+* select{"group": "Veritas"}
+  - action_utter_save_selected_group
+  - slot{"group": "Veritas"}
+  - action_todo_info_routine
+  - slot{"requested_slot": "subject"}
+* select{"subject": "protest"}
+  - action_todo_info_routine
+  - slot{"subject": "protest"}
+  - action_todo_info_routine
+  - slot{"requested_slot": "information_required"}
+* select{"information_required": "id numbers"}
+  - action_todo_info_routine
+  - slot{"information_required": "id numbers"}
+  - slot{"requested_slot": "response_tag"}
+* select{"response_tag": "id: "}
+  - action_todo_info_routine
+  - slot{"response_tag": "id: "}
+  - slot{"requested_slot": "datetime"}
+* select{"datetime": "later"}
+  - action_todo_info_routine
+  - slot{"datetime": "later"}
+  - utter_confirm_request
+> check_info_action_correctness
+
+## all clear, proceed to server
+> check_info_action_correctness
+* affirm
+  - action_create_info_todo_url
+  - action_restart
+
+## request is wrong
+> check_info_action_correctness
+* negate
+  - utter_negation
+  - action_restart
+
+## user wants to call for action
+> check_what_user_wants
+* create_action_todo
+  - action_get_group
+* select{"group": "Veritas"}
+  - action_utter_save_selected_group
+  - slot{"group": "Veritas"}
+  - action_todo_action_routine
+  - slot{"requested_slot": "subject"}
+* select{"subject": "protest"}
+  - action_todo_action_routine
+  - slot{"subject": "protest"}
+  - slot{"requested_slot": "description"}
+* select{"description": "Volunteer gathering to clean up our neighbourhood."}
+  - action_todo_action_routine
+  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
+  - slot{"requested_slot": "datetime"}
+* select{"datetime": "later"}
+  - action_todo_action_routine
+  - slot{"datetime": "later"}
+  - action_todo_action_routine
+  - utter_confirm_request
+> check_action_correctness
+
+## request is correct, send to server
+> check_action_correctness
+* affirm
+  - action_create_todo_action_url
+  - action_restart
+
+## request is wrong
+> check_action_correctness
+* negate
+  - utter_negation
+  - action_restart
+
+## user seeks validation
+> check_what_user_wants
+* create_validation_todo
+  - action_get_group
+* select{"group": "Veritas"}
+  - action_utter_save_selected_group
+  - slot{"group": "Veritas"}
+  - action_todo_validation_routine
+  - slot{"requested_slot": "subject"}
+* select{"subject": "protest"}
+  - action_todo_validation_routine
+  - slot{"subject": "protest"}
+  - slot{"requested_slot": "description"}
+* select{"description": "Volunteer gathering to clean up our neighbourhood."}
+  - action_todo_validation_routine
+  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
+  - slot{"requested_slot": "datetime"}
+* select{"datetime": "later"}
+  - action_todo_validation_routine
+  - slot{"datetime": "later"}
+  - utter_confirm_request
+> check_validation_correctness
+
+## request is correct, send to server
+> check_validation_carrectness
+* affirm
+  - create_validation_todo_url
+  - action_restart
+
+## request is wrong
+> check_validation_carrectness
+* negate
+  - utter_negation
+  - action_restart

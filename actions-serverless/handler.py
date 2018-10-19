@@ -9,6 +9,7 @@ logger.setLevel(level=logging.INFO)
 
 action_executor = ActionExecutor()
 action_executor.register_package('services_actions')
+action_executor.register_package('platform_actions')
 
 def act(event, context):
     logger.info('event from the proxy: {}'.format(event))

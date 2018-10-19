@@ -159,7 +159,7 @@ templates:
     - "Would you like to add any images? Add them below and enter 'Done' when finished."
   utter_confirm_request:
     - "Is this correct?"
-  
+
 
 actions:
   - utter_ask_subject
@@ -181,14 +181,14 @@ actions:
   - utter_ask_media_files
   - action_utter_save_selected_group
   - action_get_vote_option
-  - action_create_meeting_url
-  - action_create_vote_url
-  - action_create_group_url
-  - action_create_volunteer_todo_url
-  - create_validation_todo_url
-  - action_create_todo_action_url
-  - action_create_info_todo_url
-  - action_create_livewire_url
+  - action_create_meeting_complete
+  - action_create_vote_complete
+  - action_create_group_complete
+  - action_create_volunteer_todo_complete
+  - create_validation_todo_complete
+  - action_create_todo_action_complete
+  - action_create_info_todo_complete
+  - action_create_livewire_complete
   - action_save_vote_option
   - action_create_meeting_routine
   - action_create_group_routine

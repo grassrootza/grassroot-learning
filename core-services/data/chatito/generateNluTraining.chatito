@@ -1,0 +1,229 @@
+%[find_services]('training': '1000', 'testing': '10')
+    ~[please?] ~[where?] ~[find?] ~[help?] ~[service] ~[please?]
+
+%[find_services_gbv]('training': '1000', 'testing': '10')
+    ~[izwe_lami?] ~[pain?] ~[rape?] ~[assault?] ~[violence?]
+
+%[select]('training': '2500', 'testing': '100')
+    ~[please?] @[province] ~[please?]
+    @[service_type] ~[please?]
+    @[province] @[service_type]
+    @[service_type] ~[located at?] @[province]
+
+~[where]
+    where
+    ubu
+    kuphi
+    ikuphi
+    kai
+    whr
+    where are
+    where is
+
+~[find]
+    find
+    ngifuna
+    ndifuna
+    thola
+    fumana
+
+~[service]
+    service
+    services
+    isevisis
+
+~[help]
+    help
+    help me
+    sizo
+    hlp
+    usizo
+    Hlp
+    Help!
+    helpe
+    thusa
+
+~[izwe_lami]
+    Izwi Lami
+    Izwe Lami
+    izwe lami
+    izwi lami
+    health e
+    izwe-lami
+    health-e
+
+~[pain]
+    pain
+    hurt
+
+~[rape]
+    rape
+    raped
+    ho betoa
+    rapist
+    raping
+
+~[assault]
+    assault
+    asault
+    asslt 
+
+~[violence]
+    violence
+    violent
+    violense
+
+@[service_type]
+    ~[thuthuzela]
+    ~[shelter]
+    ~[24hr_hcf]
+
+~[shelter]
+    shelter
+    Shelter
+    shelters
+    Shelters
+    homeless shelter
+    victim shelter
+    shlters
+    ster
+    a shelter
+    one shelter
+    close shelter
+
+~[thuthuzela]
+    TCC
+    thuthuzela
+    Thuthuzela
+    rape centre
+    rape center
+    rape care
+    tcc
+    the thuthuzela
+    tutuzela
+    the tutuzela
+    tutzela
+    thuthzela
+
+~[24hr_hcf]
+    clinic
+    clinics
+    24hr clinic
+    clnic
+    clnc
+    near clinic
+    closest clinic
+    a clinic
+    the clinic
+    Clinic
+    Clinics
+
+@[province]
+    ~[gauteng]
+    ~[western_cape]
+    ~[eastern_cape]
+    ~[northern_cape]
+    ~[kzn]
+    ~[limpopo]
+    ~[mpumalanga]
+    ~[free_state]
+    ~[north_west]
+
+~[gauteng]
+    gauteng
+    Gauteng
+    GP
+    GT
+    gaut
+    gautng
+    gteng
+
+~[western_cape]
+    western cape
+    Western Cape
+    W Cape
+    W. Cape
+    WC
+    W-C
+    wes kaap
+    W Kaap
+    Wes-Kaap
+    Western-Cape
+
+~[eastern_cape]
+    eastern cape
+    Eastern Cape
+    EC
+    E-C
+    E Cape
+    E-Cape
+    Empuma Koloni
+    E Koloni
+
+~[northern_cape]
+    northern cape
+    Northern Cape
+    NC
+    N-C
+    N-Cape
+    N Cape
+    N Kaap
+    N-Kaap
+
+~[kzn]
+    KZN
+    KwaZulu Natal
+    Kwa-Zulu Natal
+    Kwa Zulu Natal
+    KwaZuluNatal
+    K-Z-N
+    KZ-N
+
+~[limpopo]
+    limpopo
+    Limpopo
+    LP
+    LIM
+    limpompo
+    limp
+    lpopo
+    popo
+    l-popo
+    limps
+
+~[mpumalanga]
+    mpumalanga
+    Mpumalanga
+    MP
+    m'langa
+    mpum
+    mpuma
+    mpumlanga
+
+~[free_state]
+    FS
+    Free State
+    free state
+    orange free state
+    f state
+    f-s
+    orange fs
+
+~[north_west]
+    north west
+    North West
+    north-west
+    NW
+
+~[please]
+    pls
+    please
+    plz
+    ngicela
+    cela
+    asseblief
+    as'blief
+
+~[located at]
+    in
+    at

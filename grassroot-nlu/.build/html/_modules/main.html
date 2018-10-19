@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>main &#8212; Grassroot-nlu 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for main</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rm logs/*&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
+    
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">logger</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="displayLogs"><a class="viewcode-back" href="../index.html#main.displayLogs">[docs]</a><span class="k">def</span> <span class="nf">displayLogs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;tails the log file&quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;tail -f logs/nlu.log&quot;</span><span class="p">)</span></div>
+
+<span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">displayLogs</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">rootLogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Ignition.&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">Response</span>
+
+<span class="kn">from</span> <span class="nn">config</span> <span class="k">import</span> <span class="n">intent_interpreter</span><span class="p">,</span> <span class="n">vote_interpreter</span><span class="p">,</span> <span class="n">group_interpreter</span><span class="p">,</span> <span class="n">todo_interpreter</span><span class="p">,</span> \
+            <span class="n">meeting_interpreter</span><span class="p">,</span> <span class="n">updates_interpreter</span><span class="p">,</span> <span class="n">database</span>
+<span class="kn">from</span> <span class="nn">databases.poly_database</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">databases.poly_Mongo</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">databases.poly_dynamo</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../index.html#main.index">[docs]</a><span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Renders the home page.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;textbox.html&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># emulator/tester</span>
+<span class="c1"># @app.route(&#39;/&#39;, methods=[&quot;POST&quot;])</span>
+<span class="c1"># def parse_view():</span>
+<span class="c1">#     Main entry point. Requires a POST call </span>
+<span class="c1">#     text_data = request.form[&#39;text&#39;]</span>
+<span class="c1">#     uid = request.form[&#39;uid&#39;]</span>
+<span class="c1">#     ret_val = process_identifier(text_data)</span>
+<span class="c1"># </span>
+<span class="c1">#     if ret_val == &#39;new_entry&#39;:</span>
+<span class="c1">#         user_bound = process_gateway(text_data)</span>
+<span class="c1">#         data = user_bound[&#39;uid&#39;]</span>
+<span class="c1">#         return render_html_template(&quot;response.html&quot;,var1=json.dumps(user_bound[&#39;parsed&#39;]), var2=data)</span>
+<span class="c1"># </span>
+<span class="c1">#     elif ret_val == &#39;affirm&#39;:</span>
+<span class="c1">#         user_bound = &quot;Your request is being processed...&quot;</span>
+<span class="c1">#         save_as_training_instance(uid)</span>
+<span class="c1">#         return render_html_template(&quot;processing.html&quot;,var1=user_bound)</span>
+<span class="c1"># </span>
+<span class="c1">#     elif ret_val == &#39;reset&#39;:</span>
+<span class="c1">#         return render_template(&quot;textbox.html&quot;)</span>
+<span class="c1"># </span>
+<span class="c1">#     elif ret_val == &#39;update&#39;:</span>
+<span class="c1">#         new_parsed = add_detail_to_text(text_data, uid)</span>
+<span class="c1">#         return render_html_template(&quot;response.html&quot;, var1=json.dumps(new_parsed[&#39;parsed&#39;]), var2=new_parsed[&#39;uid&#39;])</span>
+<span class="c1"># </span>
+<span class="c1">#     else:</span>
+<span class="c1">#         user_bound = add_detail_to_previous_text_state(ret_val, uid)</span>
+<span class="c1">#         return str(user_bound)</span>
+
+
+<span class="c1"># REST method</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/parse&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="parse_rest"><a class="viewcode-back" href="../index.html#main.parse_rest">[docs]</a><span class="k">def</span> <span class="nf">parse_rest</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Main entry point. API path is &#39;/parse?text=query&#39;, where query is the text you want parsed.&quot;&quot;&quot;</span>
+    <span class="n">text_data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+    <span class="n">uid</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;uid&#39;</span><span class="p">)</span>
+    <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;received a parse request.</span><span class="se">\n</span><span class="s2">text: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">uid: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">text_data</span><span class="p">,</span> <span class="n">uid</span><span class="p">))</span>
+    <span class="n">destiny</span> <span class="o">=</span> <span class="n">process_identifier</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+    <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Request is destined to &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">destiny</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">destiny</span> <span class="o">==</span> <span class="s1">&#39;new_entry&#39;</span><span class="p">:</span>
+        <span class="n">entity_to_return</span> <span class="o">=</span> <span class="n">process_gateway</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+        <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;returning entity 2: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">entity_to_return</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">entity_to_return</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">destiny</span> <span class="o">==</span> <span class="s1">&#39;update&#39;</span><span class="p">:</span>
+        <span class="n">entity_to_return</span> <span class="o">=</span> <span class="n">add_detail_to_text</span><span class="p">(</span><span class="n">text_data</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+        <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;returning entity: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">entity_to_return</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">entity_to_return</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">destiny</span> <span class="o">==</span> <span class="s1">&#39;reset&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;textbox.html&quot;</span><span class="p">)</span>
+
+    <span class="c1"># elif destiny == &#39;update&#39;:</span>
+    <span class="c1">#     new_parsed = add_detail_to_text(text_data, uid)</span>
+    <span class="c1">#     return render_html_template(&quot;response.html&quot;, var1=json.dumps(new_parsed[&#39;parsed&#39;]), var2=new_parsed[&#39;uid&#39;])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">entity_to_return</span> <span class="o">=</span> <span class="n">process_gateway</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+        <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;returning entity 2: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">entity_to_return</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">entity_to_return</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span></div>
+
+
+<span class="c1"># for tests</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/shutdown&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">shutdown</span><span class="p">():</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;werkzeug.server.shutdown&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Not running with the Werkzeug Server :(&#39;</span><span class="p">)</span>
+    <span class="n">func</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s1">&#39;Server shutting down&#39;</span>
+
+
+<div class="viewcode-block" id="process_identifier"><a class="viewcode-back" href="../index.html#main.process_identifier">[docs]</a><span class="k">def</span> <span class="nf">process_identifier</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Identifies where a process will go. This process produces a certain amount of</span>
+<span class="sd">    redundancy and is most like to change or be deprecated soon.&quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">intent_interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;affirm&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;update&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;update&#39;</span>
+    <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;negate&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;entities&#39;</span><span class="p">]</span>  <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;entities&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;reset&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;new_entry&#39;</span></div>
+
+
+<div class="viewcode-block" id="add_detail_to_previous_text_state"><a class="viewcode-back" href="../index.html#main.add_detail_to_previous_text_state">[docs]</a><span class="k">def</span> <span class="nf">add_detail_to_previous_text_state</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="n">uid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Called when a process is identified with the &#39;update&#39; intent.</span>
+<span class="sd">    searches database for text with uid and appends new_value to it. It</span>
+<span class="sd">    then sends it for parsing and returns output&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">old_text</span> <span class="o">=</span> <span class="n">load_old_text</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;uid&#39;</span><span class="p">:</span><span class="n">uid</span><span class="p">})</span>
+        <span class="n">new_text</span> <span class="o">=</span> <span class="n">old_text</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">new_value</span>
+        <span class="n">new_parsed</span> <span class="o">=</span> <span class="n">process_gateway</span><span class="p">(</span><span class="n">new_text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>
+
+            <span class="k">if</span> <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">old_text</span><span class="p">:</span>
+                <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">old_text</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">old_text</span><span class="p">)</span>
+
+        <span class="n">update_database</span><span class="p">(</span><span class="n">new_parsed</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">render_html_template</span><span class="p">(</span><span class="s2">&quot;response.html&quot;</span><span class="p">,</span> <span class="n">var1</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;parsed&#39;</span><span class="p">]),</span> <span class="n">var2</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;Ooops. Looks like the application&#39;s misbehaved. A report has been issued to its creators.&quot;</span></div>
+        <span class="c1"># notify() # proposed email service that notifies developers about errors in real time.</span>
+        <span class="c1"># the idea here is that the less emails you recieve, the better. Bad code will blow up your phone</span>
+        <span class="c1"># like a toll free hotline.</span>
+        <span class="c1"># A single gmail account will suffice per organisation. Pass login info on container start up</span>
+
+
+
+<div class="viewcode-block" id="add_detail_to_text"><a class="viewcode-back" href="../index.html#main.add_detail_to_text">[docs]</a><span class="k">def</span> <span class="nf">add_detail_to_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">uid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Called when a process is identified with the &#39;update&#39; intent.</span>
+<span class="sd">    searches database for text with uid and appends new_value to it. It</span>
+<span class="sd">    then sends it for parsing and returns output&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">find_previous_entry</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;uid&#39;</span><span class="p">:</span><span class="n">uid</span><span class="p">})</span>
+        <span class="n">old_text</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
+        <span class="n">new_text</span> <span class="o">=</span> <span class="n">old_text</span><span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">text</span>
+        <span class="n">new_parsed</span> <span class="o">=</span> <span class="n">process_gateway</span><span class="p">(</span><span class="n">new_text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>
+
+            <span class="k">if</span> <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">old_text</span><span class="p">:</span>
+                <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">old_text</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_parsed</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">old_text</span><span class="p">)</span>
+
+        <span class="n">update_database</span><span class="p">(</span><span class="n">new_parsed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_parsed</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">rootLogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;Ooops. Looks like the application&#39;s misbehaved. A report has been issued to its creators.&quot;</span></div>
+        <span class="c1"># notify() # proposed email service that notifies developers about errors in real time.</span>
+        <span class="c1"># the idea here is that the less emails you recieve, the better. Bad code will blow up your phone</span>
+        <span class="c1"># like a toll free hotline.</span>
+        <span class="c1"># A single gmail account will suffice per organisation. Pass login info on container start up</span>
+
+
+<span class="k">def</span> <span class="nf">render_html_template</span><span class="p">(</span><span class="n">template</span><span class="p">,</span><span class="n">var1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">var1</span><span class="o">=</span><span class="n">var1</span><span class="p">,</span> <span class="n">var2</span><span class="o">=</span><span class="n">var2</span><span class="p">)</span>
+
+
+<span class="n">purgables</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;extractor&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="process_gateway"><a class="viewcode-back" href="../index.html#main.process_gateway">[docs]</a><span class="k">def</span> <span class="nf">process_gateway</span><span class="p">(</span><span class="n">text_to_parse</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function is responsible for assigning uids to new texts and saving text to db,</span>
+<span class="sd">    sending them for parsing and returning them. Before parsing it will</span>
+<span class="sd">    check database for requested text and if it already exists it is returned.&quot;&quot;&quot;</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">check_database</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">text_to_parse</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">recall</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">recall</span>   <span class="c1"># suitable entry exists. Return said entry. Process complete.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_entry</span> <span class="o">=</span> <span class="p">{</span>
+                     <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text_to_parse</span><span class="p">,</span>
+                     <span class="s1">&#39;_id&#39;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                     <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()),</span>
+                     <span class="s1">&#39;past_lives&#39;</span><span class="p">:</span> <span class="p">[]</span>
+                    <span class="p">}</span>
+
+        <span class="n">insert_one</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">new_entry</span><span class="p">)</span>
+
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">new_entry</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="n">new_entry</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">uid</span><span class="p">,</span> <span class="n">new_entry</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">new_entry</span><span class="p">[</span><span class="s1">&#39;past_lives&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="parser"><a class="viewcode-back" href="../index.html#main.parser">[docs]</a><span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">date_time</span><span class="p">,</span> <span class="n">past_life</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function handles the nlu parsing. It first extracts intent and</span>
+<span class="sd">    if nature of intent requires entity extraction the text is then parsed </span>
+<span class="sd">    by a secondary extractor. It also formalises informal datetime strings</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">intent_raw</span> <span class="o">=</span> <span class="n">intent_interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">intent</span> <span class="o">=</span> <span class="n">intent_raw</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">intent</span> <span class="o">==</span> <span class="s1">&#39;call_meeting&#39;</span><span class="p">:</span>
+        <span class="n">parse</span> <span class="o">=</span> <span class="n">meeting_interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">intent</span> <span class="o">==</span> <span class="s1">&#39;call_vote&#39;</span><span class="p">:</span>
+        <span class="n">parse</span> <span class="o">=</span> <span class="n">vote_interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s1">&#39;todo&#39;</span> <span class="ow">in</span> <span class="n">intent</span><span class="p">:</span>
+        <span class="n">parse</span> <span class="o">=</span> <span class="n">todo_interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">intent</span> <span class="o">==</span> <span class="s1">&#39;create_group&#39;</span><span class="p">:</span>
+        <span class="n">parse</span> <span class="o">=</span> <span class="n">group_interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parse</span> <span class="o">=</span> <span class="n">intent_raw</span> 
+
+    <span class="n">parsed_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;parsed&#39;</span><span class="p">:</span> <span class="n">parse</span><span class="p">,</span> <span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="n">uid</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">date_time</span><span class="p">,</span> <span class="s1">&#39;past_lives&#39;</span><span class="p">:</span> <span class="n">past_life</span><span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">update_database</span><span class="p">(</span><span class="n">parsed_data</span><span class="p">)</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">time_formalizer</span><span class="p">(</span><span class="n">parse</span><span class="p">)</span>
+    <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;parsed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parsed</span>
+    <span class="k">if</span> <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;parsed&#39;</span><span class="p">][</span><span class="s1">&#39;entities&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;parsed&#39;</span><span class="p">][</span><span class="s1">&#39;entities&#39;</span><span class="p">])):</span>
+            <span class="k">if</span> <span class="s2">&quot;extractor&quot;</span> <span class="ow">in</span> <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;parsed&#39;</span><span class="p">][</span><span class="s1">&#39;entities&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;parsed&#39;</span><span class="p">][</span><span class="s1">&#39;entities&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;extractor&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parsed_data</span></div>
+
+
+<div class="viewcode-block" id="update_database"><a class="viewcode-back" href="../index.html#main.update_database">[docs]</a><span class="k">def</span> <span class="nf">update_database</span><span class="p">(</span><span class="n">new_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;updates database with new_data from parser. This is the database</span>
+<span class="sd">    process_gateway() searches for past entries that are suitable to be returned&quot;&quot;&quot;</span>
+    <span class="n">update_db</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">new_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_as_training_instance"><a class="viewcode-back" href="../index.html#main.save_as_training_instance">[docs]</a><span class="k">def</span> <span class="nf">save_as_training_instance</span><span class="p">(</span><span class="n">uid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Turns all affirmed parsed values into training data.&quot;&quot;&quot;</span> 
+    <span class="n">find_clean_and_save</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="n">uid</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="time_formalizer"><a class="viewcode-back" href="../index.html#main.time_formalizer">[docs]</a><span class="k">def</span> <span class="nf">time_formalizer</span><span class="p">(</span><span class="n">parsed_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Formalises datetime values recieved from parser() by extracting target value from parsed</span>
+<span class="sd">    text and sending it to formalizer_helper()&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;entities&#39;</span><span class="p">])):</span>
+        <span class="k">if</span> <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;entities&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;entity&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;datetime&#39;</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;entities&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="n">formal</span> <span class="o">=</span> <span class="n">formalizer_helper</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">parsed_data</span><span class="p">[</span><span class="s1">&#39;entities&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formal</span>
+    <span class="k">return</span> <span class="n">parsed_data</span></div>
+
+
+<div class="viewcode-block" id="formalizer_helper"><a class="viewcode-back" href="../index.html#main.formalizer_helper">[docs]</a><span class="k">def</span> <span class="nf">formalizer_helper</span><span class="p">(</span><span class="n">time_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;time_formalizer&#39;s helper. Responsible for sending out api requests&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://learning.grassroot.cloud/datetime?date_string=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">time_string</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Grassroot.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

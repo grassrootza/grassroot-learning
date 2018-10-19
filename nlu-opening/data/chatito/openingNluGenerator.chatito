@@ -1,0 +1,149 @@
+%[join_entity]('training': '300', 'testing': '10')
+    ~[hello_short?] ~[want?] ~[join] @[entity_to_join]
+
+%[affirm]('training': '100', 'testing': '10')
+    ~[yes]
+    ~[yes] ~[yes?] ~[please?]
+    you got that ~[yes]
+    yes that is ~[yes]
+    ~[yes] ~[yes?] ~[yes?] ~[yes?]
+
+%[negate]('training': '50', 'testing': '10')
+    ~[no] ~[no?] ~[please?]
+    ~[no] ~[no?] ~[no?]
+
+%[confusion]('training': '40', 'testing': '5')
+    ~[dont_know]
+    ~[confused]
+    ~[no?] [confused]
+
+~[join]
+    join
+    Join
+    joyina
+    Joyina
+    join to 
+    join with
+    kena
+    to join
+
+~[hello_short]
+    hi
+    hello
+    hey
+    yebo
+    sawubona
+    sbona
+    dumelang
+    hie
+    uhm
+    um
+    yo
+    helo
+    howzit
+
+~[want]
+    want to
+    Want
+    I want
+    funa
+    Ngifuna
+    Ndifuna
+    Ke batla
+    ke batla
+
+@[entity_to_join]
+    NHI
+    PHM
+    AbM
+    ABM
+    Abahlali baseMjondolo
+    Amandla.mobi
+    Recall campaign
+    Anti-smoking campaign
+    Farms
+    Recall campaign
+    recall campaign
+    recall
+
+~[yes]
+    yes
+    🙂
+    Yes
+    right
+    affirmative
+    yes to that
+    correct
+    yep
+    yes sir
+    ok
+    K
+    right
+    allright
+    alright
+    alrite
+    yebo
+    ee
+    ja
+    ja that's right
+    ja absolutely
+    definitely
+
+~[please]
+    pls
+    please
+    plz
+    ngicela
+    cela
+    asseblief
+    as'blief
+
+~[no]
+    no
+    nope
+    nuh
+    nah
+    negative
+    not correct
+    incorrect
+    no sir
+    wrong
+    cha
+    nee
+    nie
+
+~[dont_know]
+    angazi
+    Angazi
+    Andazi
+    ndazi
+    ngazi
+    I don't know
+    Don't know
+    Huh
+    Huhh
+    No idea
+    Ha ke tsebe
+    Weet nie
+    Ek weet nie
+    ?
+    ??
+    🤔
+
+~[confused]
+    What?
+    What
+    I'm confused
+    I'm lost
+    Lost
+    Completely lost
+    Very lost
+    😕
+    What's going on
+    You don't make sense
+    Doesn't make sense
+    No sense
+    This is dumb
+    What the
+    Weird
+    😡

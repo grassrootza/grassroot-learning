@@ -1,1 +1,0 @@
-This is where our working model shall be. Not this file dummy, I mean it's containing directory.

@@ -24,7 +24,6 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
 
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
-MEETING_PATH = 
 
 parentType = 'GROUP'
 session_vote_options = {'user_id': []}
@@ -311,8 +310,7 @@ class CreateMeetingComplete(Action):
                                          'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
                                          'subject': tracker.get_slot("subject"),
                                          'description': tracker.get_slot("description")
-                                         }
-                                )
+                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Constructed url for create meeting: %s' % response.url)
         logging.info('Dispatched to platform, response: %s' % response)

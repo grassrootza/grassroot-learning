@@ -34,7 +34,7 @@
 ## request is correct, send request to server
 > check_meeting_correctness
 * affirm
-  - action_create_meeting_url
+  - action_create_meeting_complete
   - action_restart
 
 ## request is wrong
@@ -72,7 +72,7 @@
 ## request is correct, send request to server
 > check_vote_correctness
 * affirm
-  - action_create_vote_url
+  - action_create_vote_complete
   - action_restart
 
 ## request is wrong
@@ -117,7 +117,7 @@
 ## request is correct, send request to server
 > check_livewire_correctness
 * affirm
-  - action_create_livewire_url
+  - action_create_livewire_complete
   - action_restart
 
 ## request is wrong
@@ -153,7 +153,7 @@
 ## all is well, send to server
 > check_volunteer_action_correctness
 * affirm
-  - action_create_volunteer_todo_url
+  - action_create_volunteer_todo_complete
   - action_restart
 
 ## request is wrong
@@ -193,7 +193,7 @@
 ## all clear, proceed to server
 > check_info_action_correctness
 * affirm
-  - action_create_info_todo_url
+  - action_create_info_todo_complete
   - action_restart
 
 ## request is wrong
@@ -229,7 +229,7 @@
 ## request is correct, send to server
 > check_action_correctness
 * affirm
-  - action_create_todo_action_url
+  - action_create_todo_action_complete
   - action_restart
 
 ## request is wrong
@@ -264,7 +264,7 @@
 ## request is correct, send to server
 > check_validation_carrectness
 * affirm
-  - create_validation_todo_url
+  - create_validation_todo_complete
   - action_restart
 
 ## request is wrong

@@ -8,12 +8,9 @@ step-library:
           pip install awscli --upgrade --user
 
 jobs:
-  build:
+  deps:
     docker:
       - image: circleci/python:3.6.1
-        auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
     steps:
       - checkout
       - restore_cache:
@@ -26,23 +23,52 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-            python -m spacy download en_core_web_md && python -m spacy link en_core_web_md en
+            python -m spacy download en_core_web_md && python -m spacy link en_core_web_md en --force
       - save_cache:
           key: v1-dependencies-{{ checksum "requirements.txt" }}
           paths:
             - "venv"
-      - setup_remote_docker
+  
+  train:
+    docker:
+      - image: circleci/python:3.6.1
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
       - run:
-          name: Run training 
+          name: Train NLU 
           command: |
             . venv/bin/activate
-            make train-nlu
-            make train-core
+            make train-nlu 
       - run:
-        name: Build Docker image
-        command: |
-          export VERSION=${CIRCLE_BRANCH}-${CIRCLE_SHA1}
-          docker build -f Dockerfile -t grassroot-rasa:${VERSION} .
+          name: Train core
+          command: |
+            . venv/bin/activate
+            make train-core
+      - save_cache:
+          key: v1-models-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - nlu-opening
+            - core-knowledge
+            - core-services
+            - core-platform
+
+  containerize:
+    docker:
+      - image: circleci/python:3.6.1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+            - v1-models-{{ .Branch }}-{{ .Revision }}
+      - run:
+          name: Build Docker image
+          command: |
+            export VERSION=${CIRCLE_BRANCH}-${CIRCLE_SHA1}
+            docker build -f Dockerfile -t grassroot-rasa:${VERSION} .
       - *fetch-aws-cli
       - run:
           name: Tag and upload image to ECR
@@ -126,16 +152,22 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build:
+      - deps
+      - train:
+          requires:
+            - deps
           filters:
             branches:
-              only: wip-rasa-core
+              only: wip-circle-revision
+      - containerize:
+          requires:
+            - train
       # - selenium_test:
       #     requires:
       #       - build
       - deploy:
           requires:
-            - build
+            - containerize
           filters:
             branches:
               only: master

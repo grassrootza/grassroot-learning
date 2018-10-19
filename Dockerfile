@@ -29,7 +29,11 @@ RUN pip install -r requirements.txt --no-cache-dir
 
 RUN python -m spacy download en_core_web_md && python -m spacy link en_core_web_md en
 
-ADD . .
+COPY app.py .
+COPY nlu-opening nlu-opening
+COPY core-services core-services
+COPY core-platform core-platform
+COPY core-knowledge core-knowledge
 
 # EXPOSE 5000
 

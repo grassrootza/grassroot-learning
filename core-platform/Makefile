@@ -23,7 +23,7 @@ train-online:
 	python3 train_online.py
 
 train-nlu:
-	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name nlu --project current --verbose
+	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
 
 train-core:
 	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue

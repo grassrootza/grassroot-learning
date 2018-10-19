@@ -24,6 +24,7 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
 
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
+MEETING_PATH = 
 
 parentType = 'GROUP'
 session_vote_options = {'user_id': []}
@@ -302,12 +303,18 @@ class CreateMeetingComplete(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         meeting_path = '/task/create/meeting/%s/%s' % (parentType, groupUid)
-        query_params = '?location=%s&dateTimeEpochMillis=%s&subject=%s&description=%s' % (\
-                       tracker.get_slot('location'), epoch(formalize(tracker.get_slot("datetime"))), \
-                       tracker.get_slot('subject'), tracker.get_slot('description'))
-        url = BASE_URL+meeting_path+query_params.replace(' ', '%20')
+        url = BASE_URL + meeting_path
         logging.info('Constructed url for create meeting: %s' % url)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)})
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'location': tracker.get_slot("location"),
+                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'subject': tracker.get_slot("subject"),
+                                         'description': tracker.get_slot("description")
+                                         }
+                                )
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Constructed url for create meeting: %s' % response.url)
         logging.info('Dispatched to platform, response: %s' % response)
         clean_session(tracker.sender_id)
         return []
@@ -324,15 +331,16 @@ class CreateVoteComplete(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         vote_path = '/task/create/vote/%s/%s' % (parentType, groupUid)
-
-        # Clean up here, e.g., find way to pass params as dict to request and let it take care of matters
-        query_params = '?title=%s&time=%s&voteOptions=[%s]&description=%s' % (\
-                       tracker.get_slot('subject'), epoch(formalize(tracker.get_slot("datetime"))),
-                       get_session_data(tracker.sender_id, session_vote_options), tracker.get_slot('description'))
-        url = BASE_URL + vote_path + query_params.replace(' ', '%20')
-        
-        logging.info('Contructed url for create vote: %s' % url)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)})
+        url = BASE_URL + vote_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'title': tracker.get_slot("subject"),
+                                         'time': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'voteOptions': get_session_data(tracker.sender_id, session_vote_options),
+                                         'description': tracker.get_slot("description")
+                                         })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Contructed url for create vote: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
         clean_session(tracker.sender_id)
         return []
@@ -349,12 +357,15 @@ class CreateVolunteerTodoUrl(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
-        query_params = '?subject=%s&dueDateTime=%s' % (tracker.get_slot("subject"),
-                        formalize(tracker.get_slot("datetime")))
-        url = BASE_URL+todo_path+query_params.replace(' ', '%20')
+        url = BASE_URL + todo_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
+                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        logging.info('Contructed url for create volunteer todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         return []
 
 
@@ -369,12 +380,14 @@ class CreateValidationTodoUrl(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
-        query_params = '?subject=%s&dueDateTime=%s' % (tracker.get_slot("subject"),
-                        epoch(formalize(tracker.get_slot("datetime"))))
-        url = BASE_URL+todo_path+query_params.replace(' ', '%20')
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
+                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        logging.info('Contructed url for create validation todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         return []
 
 
@@ -389,12 +402,15 @@ class CreateInfoTodoUrl(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/information/%s/%s' % (parentType, groupUid)
-        query_params = '?subject=%s&dueDateTime=%s&responseTag=%s' % (tracker.get_slot("subject"),
-                        epoch(formalize(tracker.get_slot("datetime"))), tracker.get_slot("response_tag"))
-        url = BASE_URL+todo_path+query_params.replace(' ', '%20')
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'responseTag': tracker.get_slot("response_tag")
+                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, auth=(user, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        logging.info('Contructed url for create information todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         return []
 
 
@@ -409,12 +425,14 @@ class CreateActionTodoUrl(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/action/%s/%s' % (parentType, groupUid)
-        query_params = '?subject=%s&dueDateTime=%s&' % (tracker.get_slot("subject"),
-                        epoch(formalize(tracker.get_slot("datetime"))))
-        url = BASE_URL+todo_path+query_params.replace(' ', '%20')
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
+                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        dispatcher.utter_message('Constructed url: %s' % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        logging.info('Contructed url for create action todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         return []
 
 
@@ -441,12 +459,25 @@ class CreateLivewireUrl(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         livewire_path = '/v2/api/livewire/create/%s' % tracker.sender_id
-        query_params = '?headline=%s&description=%s&contactName=%s&contactNumber=%s&groupUid=%s&taskUid=%s&type=%s&addLocation=%s&mediaFileKeys=%s&latitude=%s&longitude=%s&destUid=%s' % \
-                       (headline, description, contactName, contactNumber, groupUid, taskUid, livewire_type, addLocation, mediaFileKeys, latitude, longitude, destUid)
-        url = BASE_URL+livewire_path+query_params.replace(' ', '%20')
+        url = BASE_URL + livewire_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'headline': tracker.get_slot("subject"),
+                                         'description': description,
+                                         'contactName': contactName,
+                                         'contactNumber': contactNumber,
+                                         'groupUid': groupUid,
+                                         'taskUid': taskUid,
+                                         'type': livewire_type,
+                                         'addLocation': addLocation,
+                                         'mediaFileKeys': mediaFileKeys,
+                                         'latitude': latitude,
+                                         'longitude': longitude,
+                                         'destUid': destUid
+                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        dispatcher.utter_message("Contructed url: %s" % url)
-        # response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)}))
+        logging.info('Contructed livewire url: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         clean_session(tracker.sender_id)
         return []
 

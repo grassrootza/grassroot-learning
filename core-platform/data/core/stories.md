@@ -7,6 +7,7 @@
 ## user wants a meeting
 > check_what_user_wants
 * call_meeting
+  - slot{"action": "call_meeting"}
   - action_get_group
 * select{"group": "Veritas"}
   - action_utter_save_selected_group
@@ -21,7 +22,7 @@
   - action_create_meeting_routine
   - slot{"description": "none"}
   - slot{"requested_slot": "location"}
-* select{"loaction": "Nowhere"}
+* select{"location": "Nowhere"}
   - action_create_meeting_routine
   - slot{"location": "Nowhere"}
   - slot{"requested_slot": "datetime"}
@@ -46,6 +47,7 @@
 ## user wants to vote
 > check_what_user_wants
 * call_vote
+  - slot{"action": "call_vote"}
   - action_get_group
 * select{"group": "Veritas"}
   - action_utter_save_selected_group

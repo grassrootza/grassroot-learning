@@ -41,6 +41,8 @@ entities:
 slots:
   requested_slot:
     type: unfeaturized
+  action:
+    type: text
   inform:
     type: text
   datetime:

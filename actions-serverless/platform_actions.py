@@ -18,6 +18,7 @@ import os
 logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s", level=logging.DEBUG)
 
 auth_token = os.getenv('TOKEN_X')
+
 BASE_URL = os.getenv('BASE_URL', 'https://staging.grassroot.org.za/v2/api')
 DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
 
@@ -27,6 +28,51 @@ GROUP_PATH = '/group/fetch/minimal/filtered'
 parentType = 'GROUP'
 session_vote_options = {'user_id': []}
 session_media_files = {'user_id': []}
+
+permissionsMap = {
+    'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS',
+    'create_meeting': 'GROUP_PERMISSION_CREATE_GROUP_MEETING',
+    'call_vote': 'GROUP_PERMISSION_CREATE_GROUP_VOTE'
+}
+
+class ActionGetGroup(Action):
+
+    def name(self):
+        return 'action_get_group'
+
+    def run(self, dispatcher, tracker, domain):
+        current_action = tracker.get_slot("action")
+        if current_action is None: 
+            current_action = "default"
+        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
+        dispatcher.utter_button_message("Choose a group", get_group_menu_items(tracker.sender_id, permissionsMap[current_action]))
+        return []
+
+
+def get_group_menu_items(sender_id, required_permission = permissionsMap['default']):
+    full_url = BASE_URL + GROUP_PATH + "?requiredPermission=" + required_permission 
+    raw_json = json.loads(requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
+    page_content = raw_json['content']
+    logging.info('Page content: %s' % page_content)
+    menu_items = []
+    try:
+        logging.info('How many groups do we have? %d' % len(page_content))
+        for group in range(len(page_content)):
+            menu_items.append({'title': page_content[group]['name'], 'payload': 'group::' + page_content[group]['groupUid']})
+    except KeyError as e:
+        logging.error('GAAAH! The child of Fort Knox sprang a leak and is dying. platform_actions.py: get_group_menu_items(): %s' % str(e))
+        return []
+    return menu_items
+
+
+class ActionSaveGroup(Action):
+
+    def name(self):
+        return 'action_utter_save_selected_group'
+
+    def run(self, dispatcher, tracker, domain):
+        group = (tracker.latest_message)['text']
+        return [SlotSet("group", group)]
 
 
 class ActionCreateMeetingRoutine(FormAction):
@@ -219,26 +265,6 @@ class ActionLivewireRoutine(FormAction):
         return []
 
 
-class ActionGetGroup(Action):
-
-    def name(self):
-        return 'action_get_group'
-
-    def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_button_message("Choose a group", get_group_menu_items(tracker.sender_id))
-        return []
-
-
-class ActionSaveGroup(Action):
-
-    def name(self):
-        return 'action_utter_save_selected_group'
-
-    def run(self, dispatcher, tracker, domain):
-        group = (tracker.latest_message)['text']
-        return [SlotSet("group", group)]
-
-
 class ActionGetVoteOption(Action):
 
     def name(self):
@@ -298,10 +324,13 @@ class CreateVoteComplete(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         vote_path = '/task/create/vote/%s/%s' % (parentType, groupUid)
+
+        # Clean up here, e.g., find way to pass params as dict to request and let it take care of matters
         query_params = '?title=%s&time=%s&voteOptions=[%s]&description=%s' % (\
                        tracker.get_slot('subject'), epoch(formalize(tracker.get_slot("datetime"))),
                        get_session_data(tracker.sender_id, session_vote_options), tracker.get_slot('description'))
-        url = BASE_URL+vote_path+query_params.replace(' ', '%20')
+        url = BASE_URL + vote_path + query_params.replace(' ', '%20')
+        
         logging.info('Contructed url for create vote: %s' % url)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)})
         logging.info('Received response from platform: %s' % response)
@@ -462,36 +491,6 @@ def get_token(sender_id):
     return request_token
 
 
-def get_group_menu_items(sender_id):
-    raw_json = json.loads(requests.get(BASE_URL + GROUP_PATH, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
-    menu_items = []
-    try:
-        for group in range(len(raw_json)):
-            menu_items.append({'title': raw_json[group]['name'], 'payload': raw_json[group]['groupUid']})
-    except KeyError as e:
-        logging.error('platform_actions.py: get_group_menu_items(): %s' % str(e))
-        return []
-    return menu_items
-
-
-def get_group_uid(selected_group, sender_id):
-    try:
-        match = ''
-        raw = get_group_menu_items(sender_id)
-        groups = {}
-        for i in range(len(raw)):
-            groups = {**groups, **{raw[i]['title']: i}}
-        threshold = 0.8
-        for group in list(groups):
-            sim_ratio = SequenceMatcher(None, group.lower(), selected_group.lower()).ratio()
-            if sim_ratio > threshold:
-                match = group
-        return raw[groups[match]]['payload']
-    except KeyError as e:
-        logging.error(e)
-        return ''
-
-
 def get_session_data(sender_id, data):
     if sender_id in list(data):
         return data[sender_id]
@@ -507,6 +506,24 @@ def clean_session(sender_id):
     return
 
 
+# Used in all subsequent
+def get_group_uid(selected_group, sender_id):
+    return selected_group
+#     try:
+#         match = ''
+#         raw = get_group_menu_items(sender_id)
+#         groups = {}
+#         for i in range(len(raw)):
+#             groups = {**groups, **{raw[i]['title']: i}}
+#         threshold = 0.8
+#         for group in list(groups):
+#             sim_ratio = SequenceMatcher(None, group.lower(), selected_group.lower()).ratio()
+#             if sim_ratio > threshold:
+#                 match = group
+#         return raw[groups[match]]['payload']
+#     except KeyError as e:
+#         logging.error(e)
+#         return ''
 
 # def intent(input):
 

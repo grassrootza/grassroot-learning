@@ -268,7 +268,7 @@ class ActionStoreVoteOption(Action):
 class CreateMeetingComplete(Action):
 
     def name(self):
-        return 'action_create_meeting_do'
+        return 'action_create_meeting_complete'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
@@ -290,7 +290,7 @@ class CreateMeetingComplete(Action):
 class CreateVoteComplete(Action):
 
     def name(self):
-        return 'action_create_vote_do'
+        return 'action_create_vote_complete'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
@@ -312,7 +312,7 @@ class CreateVoteComplete(Action):
 class CreateVolunteerTodoUrl(Action):
 
     def name(self):
-        return 'action_create_volunteer_todo_url'
+        return 'action_create_volunteer_todo_complete'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
@@ -332,7 +332,7 @@ class CreateVolunteerTodoUrl(Action):
 class CreateValidationTodoUrl(Action):
 
     def name(self):
-        return 'create_validation_todo_url'
+        return 'create_validation_todo_complete'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
@@ -352,7 +352,7 @@ class CreateValidationTodoUrl(Action):
 class CreateInfoTodoUrl(Action):
 
     def name(self):
-        return 'action_create_info_todo_url'
+        return 'action_create_info_todo_complete'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
@@ -372,7 +372,7 @@ class CreateInfoTodoUrl(Action):
 class CreateActionTodoUrl(Action):
 
     def name(self):
-        return 'action_create_todo_action_url'
+        return 'action_create_todo_action_complete'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
@@ -392,7 +392,7 @@ class CreateActionTodoUrl(Action):
 class CreateLivewireUrl(Action):
 
     def name(self):
-        return 'action_create_livewire_url'
+        return 'action_create_livewire_complete'
 
     def run(self, dispatcher, tracker, domain):
         headline = tracker.get_slot("subject")
@@ -465,8 +465,12 @@ def get_token(sender_id):
 def get_group_menu_items(sender_id):
     raw_json = json.loads(requests.get(BASE_URL + GROUP_PATH, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
     menu_items = []
-    for group in range(len(raw_json)):
-        menu_items.append({'title': raw_json[group]['name'], 'payload': raw_json[group]['groupUid']})
+    try:
+        for group in range(len(raw_json)):
+            menu_items.append({'title': raw_json[group]['name'], 'payload': raw_json[group]['groupUid']})
+    except KeyError as e:
+        logging.error('platform_actions.py: get_group_menu_items(): %s' % str(e))
+        return []
     return menu_items
 
 

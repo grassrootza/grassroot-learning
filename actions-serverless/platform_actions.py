@@ -71,8 +71,8 @@ class ActionSaveGroup(Action):
         return 'action_utter_save_selected_group'
 
     def run(self, dispatcher, tracker, domain):
-        group = (tracker.latest_message)['text']
-        return [SlotSet("group", group)]
+        # group = (tracker.latest_message)['text']
+        return []
 
 
 class ActionCreateMeetingRoutine(FormAction):

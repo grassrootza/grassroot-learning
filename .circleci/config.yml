@@ -166,7 +166,7 @@ workflows:
       #       - build
       - deploy:
           requires:
-            - build
+            - containerize
           filters:
             branches:
               only: master

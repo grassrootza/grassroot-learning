@@ -24,6 +24,7 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
 
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
+GROUP_NAME_PATH = '/v2/api/group/fetch/minimal/filtered'
 
 parentType = 'GROUP'
 session_vote_options = {'user_id': []}
@@ -65,14 +66,10 @@ def get_group_menu_items(sender_id, required_permission = permissionsMap['defaul
     return menu_items
 
 
-class ActionSaveGroup(Action):
-
-    def name(self):
-        return 'action_utter_save_selected_group'
-
-    def run(self, dispatcher, tracker, domain):
-        # group = (tracker.latest_message)['text']
-        return []
+def get_group_name(groupUid):
+    response = requests.get(BASE_URL + GROUP_NAME_PATH)
+    logging.debug('Got this back from group name retrieval: %s' % response)
+    return groupUid
 
 
 class ActionCreateMeetingRoutine(FormAction):
@@ -97,7 +94,7 @@ class ActionCreateMeetingRoutine(FormAction):
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
                      "You have described this meeting as %s." % tracker.get_slot("description"),
                      "You want this to happen %s." % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % tracker.get_slot("group")
+                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group"))
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -124,7 +121,7 @@ class ActionCreateVoteRoutine(FormAction):
                      "You have chosen %s as your subject of your vote." % tracker.get_slot("subject"),
                      "You have described this vote as %s" % tracker.get_slot("description"),
                      "You want this to happen %s" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % tracker.get_slot("group")
+                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group"))
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -152,7 +149,7 @@ class ActionTodoInfoRoutine(FormAction):
                      "You have described this todo as %s" % tracker.get_slot("description"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
                      "Participants may respond until %s" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % tracker.get_slot("group")
+                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group"))
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -178,7 +175,7 @@ class ActionTodoVolunteerRoutine(FormAction):
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
                      "You have described this volunteer task as %s" % tracker.get_slot("description"),
                      "You want this to happen %s" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % tracker.get_slot("group")
+                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group"))
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -204,7 +201,7 @@ class ActionTodoValidationRoutine(FormAction):
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
                      "You have described this validation as %s." % tracker.get_slot("description"),
                      "You want everyone to have responded by %s." % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % tracker.get_slot("group")
+                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group"))
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -230,7 +227,7 @@ class ActionTodoActionRoutine(FormAction):
                     "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
                     "You have described this action as %s" % tracker.get_slot("description"),
                     "You want this to happen %s" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % tracker.get_slot("group")
+                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group"))
                    ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -259,7 +256,7 @@ class ActionLivewireRoutine(FormAction):
                      "You have identified yourself as %s" % tracker.get_slot("contact_name"),
                      "and provided %s as your contact detail." % tracker.get_slot("contact_number"),
                      # "you have also included %s media file." % traker.get_slot("session_media_keys"),
-                     "You would like this to appear within the group %s." % tracker.get_slot("group"),
+                     "You would like this to appear within the group %s." % get_group_name(tracker.get_slot("group"))
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -336,7 +333,7 @@ class CreateVoteComplete(Action):
                                          'time': epoch(formalize(tracker.get_slot("datetime"))),
                                          'voteOptions': get_session_data(tracker.sender_id, session_vote_options),
                                          'description': tracker.get_slot("description")
-                                         })
+                                        })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create vote: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
@@ -344,7 +341,7 @@ class CreateVoteComplete(Action):
         return []
 
 
-class CreateVolunteerTodoUrl(Action):
+class CreateVolunteerTodoComplete(Action):
 
     def name(self):
         return 'action_create_volunteer_todo_complete'
@@ -360,14 +357,14 @@ class CreateVolunteerTodoUrl(Action):
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                         })
+                                        })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create volunteer todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
         return []
 
 
-class CreateValidationTodoUrl(Action):
+class CreateValidationTodoComplete(Action):
 
     def name(self):
         return 'create_validation_todo_complete'
@@ -382,14 +379,14 @@ class CreateValidationTodoUrl(Action):
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                         })
+                                        })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create validation todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
         return []
 
 
-class CreateInfoTodoUrl(Action):
+class CreateInfoTodoComplete(Action):
 
     def name(self):
         return 'action_create_info_todo_complete'
@@ -405,14 +402,14 @@ class CreateInfoTodoUrl(Action):
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
                                          'responseTag': tracker.get_slot("response_tag")
-                                         })
+                                        })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create information todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
         return []
 
 
-class CreateActionTodoUrl(Action):
+class CreateActionTodoComplete(Action):
 
     def name(self):
         return 'action_create_todo_action_complete'
@@ -434,7 +431,7 @@ class CreateActionTodoUrl(Action):
         return []
 
 
-class CreateLivewireUrl(Action):
+class CreateLivewireComplete(Action):
 
     def name(self):
         return 'action_create_livewire_complete'

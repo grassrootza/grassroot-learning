@@ -10,7 +10,6 @@
   - slot{"action": "call_meeting"}
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_create_meeting_routine
   - slot{"requested_slot": "subject"}
@@ -50,7 +49,6 @@
   - slot{"action": "call_vote"}
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_create_vote_routine
   - slot{"requested_slot": "subject"}
@@ -88,7 +86,6 @@
 * create_livewire
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_livewire_routine
   - slot{"requested_slot": "subject"}
@@ -133,7 +130,6 @@
 * create_volunteer_todo
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_todo_volunteer_routine
   - slot{"requested_slot": "subject"}
@@ -169,7 +165,6 @@
 * create_info_todo
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_todo_info_routine
   - slot{"requested_slot": "subject"}
@@ -209,7 +204,6 @@
 * create_action_todo
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_todo_action_routine
   - slot{"requested_slot": "subject"}
@@ -245,7 +239,6 @@
 * create_validation_todo
   - action_get_group
 * select{"group": "Veritas"}
-  - action_utter_save_selected_group
   - slot{"group": "Veritas"}
   - action_todo_validation_routine
   - slot{"requested_slot": "subject"}

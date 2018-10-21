@@ -5,10 +5,8 @@ TEST_PATH=./
 help:
 	@echo "    run-action-server"
 	@echo "        Activates the action server"
-	@echo "    train-nlu"
-	@echo "        Train the natural language understanding using Rasa NLU"
-	@echo "    train-core"
-	@echo "        Train a dialogue model using Rasa core"
+	@echo "    train-nlu-core"
+	@echo "        Train dialogue and nlu models"
 	@echo "    run-core-nlu"
 	@echo "        Launch a core-nlu instance"
 	@echo "    run-core-solo"
@@ -22,10 +20,8 @@ help:
 train-online:
 	python3 train_online.py
 
-train-nlu:
+train-nlu-core:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
-
-train-core:
 	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10
 
 run-core-nlu:

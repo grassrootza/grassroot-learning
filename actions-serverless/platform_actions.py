@@ -375,6 +375,7 @@ class CreateValidationTodoComplete(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -397,6 +398,7 @@ class CreateInfoTodoComplete(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/information/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -420,6 +422,7 @@ class CreateActionTodoComplete(Action):
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []
         todo_path = '/v2/api/task/create/todo/action/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),

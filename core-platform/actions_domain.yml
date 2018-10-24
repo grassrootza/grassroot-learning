@@ -91,22 +91,7 @@ templates:
   utter_actions_intitialiser:
     - "Welcome to Grassroot Actions. What would you like to do?"
   utter_actions_menu:
-    - text: "Welcome to Grassroot Actions. What would you like to do?"
-      buttons:
-          - title: "call a meeting"
-            payload: "call_meeting"
-          - title: "call a vote"
-            payload: "call_vote"
-          - title: "find volunteers"
-            payload: "create_volunteer_todo"
-          - title: "get group member information"
-            payload: "create_info_todo"
-          - title: "validate an action"
-            payload: "create_validation_todo"
-          - title: "call for action"
-            payload: "create_action_todo"
-          - title: "post a livewire"
-            payload: "create_livewire"
+    - "Welcome to Grassroot Actions. Here you can set meeting, call votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
   action_get_group:
     - text: "Choose a group"
       buttons:

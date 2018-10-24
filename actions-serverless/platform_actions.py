@@ -53,10 +53,10 @@ class ActionGetGroup(Action):
 def get_group_menu_items(sender_id, required_permission = permissionsMap['default']):
     full_url = BASE_URL + GROUP_PATH + "?requiredPermission=" + required_permission 
     raw_json = json.loads(requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
-    page_content = raw_json['content']
-    logging.info('Page content: %s' % page_content)
-    menu_items = []
     try:
+        page_content = raw_json['content']
+        logging.info('Page content: %s' % page_content)
+        menu_items = []
         logging.info('How many groups do we have? %d' % len(page_content))
         for group in range(len(page_content)):
             menu_items.append({'title': page_content[group]['name'], 'payload': 'group::' + page_content[group]['groupUid']})

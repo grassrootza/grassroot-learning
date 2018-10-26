@@ -55,7 +55,10 @@
     ~[vote] @[datetime] @[subject]
     ~[vote] @[datetime]
     ~[vote] ~[between] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option] ~[comma?] ~[and] @[vote_option]
-    ~[vote] ~[please?] 
+    ~[vote] ~[please?]
+
+%[next_page]('training': '3')
+    ~[load_more]
 
 %[select]('training': '52', 'testing': '1')
     @[location]
@@ -98,6 +101,8 @@
 ~[action]
     an action
     action
+    I'd like to act
+    action please
 
 ~[livewire]
     create a livewire alert
@@ -106,12 +111,6 @@
     issue livewire
     create an alert
     livewire
-
-~[action_todo]
-    I call for action
-    I call action
-    Let us call for action
-    action
 
 ~[info_todo]
     I need member information
@@ -185,6 +184,11 @@
     f66cfc83-6c11-4775-98c1-44fe774a81a5
     249dcb06-4864-499e-8707-bfdcdb666417
     2b9cb035-14b9-4ed9-b664-1de11188541f
+
+~[load_more]
+    load more
+    load_more
+    more
 
 @[description]
     This group is dedicated to tracking the upcoming elections

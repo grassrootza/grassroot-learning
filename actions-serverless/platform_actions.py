@@ -42,6 +42,7 @@ class ActionGetGroup(Action):
         return 'action_get_group'
 
     def run(self, dispatcher, tracker, domain):
+        logging.info("Detected user: %s" % tracker.sender_id)
         current_action = tracker.get_slot("action")
         if current_action is None: 
             current_action = "default"
@@ -50,26 +51,88 @@ class ActionGetGroup(Action):
         return []
 
 
-def get_group_menu_items(sender_id, required_permission = permissionsMap['default']):
-    full_url = BASE_URL + GROUP_PATH + "?requiredPermission=" + required_permission 
-    raw_json = json.loads(requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)}).text)
+class ActionGetGroup(Action):
+
+    def name(self):
+        return 'action_get_group'
+
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message("Detected user: %s" % tracker.sender_id)
+        dispatcher.utter_message("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
+        current_action = tracker.get_slot("action")
+        if current_action is None: 
+            current_action = "default"
+        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
+        dispatcher.utter_button_message("Choose a group", get_group_menu_items(tracker.sender_id, tracker.get_slot("page"), permissionsMap[current_action]))
+        return []
+
+
+def get_group_menu_items(sender_id, page,required_permission = permissionsMap['default']):
+    full_url = BASE_URL + GROUP_PATH
+    request = requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)},
+                                                  params={
+                                                          'pageNumber': page,
+                                                          'requiredPermission': required_permission
+                                                         }
+                          )
+    raw_json = json.loads(request.text)
+    logging.info('Sent group-fetch url: %s' % request.url)
+    logging.info("Content of response, raw: %s" % raw_json)
     try:
         page_content = raw_json['content']
         logging.info('Page content: %s' % page_content)
         menu_items = []
         logging.info('How many groups do we have? %d' % len(page_content))
         for group in range(len(page_content)):
-            menu_items.append({'title': page_content[group]['name'], 'payload': 'group::' + page_content[group]['groupUid']})
+            menu_items.append({
+                               'title': page_content[group]['name'],
+                               'payload': 'group::' + page_content[group]['groupUid']
+                              })
+        if raw_json['last'] == False:
+            menu_items.append({
+                               'title': 'Load More Groups',
+                               'payload': 'next_page'
+                              })
     except KeyError as e:
         logging.error('GAAAH! The child of Fort Knox sprang a leak and is dying. platform_actions.py: get_group_menu_items(): %s' % str(e))
         return []
     return menu_items
 
 
+def get_token(sender_id):
+    request_token = requests.post(BASE_URL + TOKEN_PATH, headers={'Authorization': 'Bearer ' + auth_token},\
+                                  params={'userId': '%s' % sender_id}).text
+    logging.debug('request_token: %s' % request_token)
+    return request_token
+
+
 def get_group_name(groupUid):
     response = requests.get(BASE_URL + GROUP_NAME_PATH)
     logging.debug('Got this back from group name retrieval: %s' % response)
     return groupUid
+
+
+class ActionEvaluateIntent(Action):
+
+    def name(self):
+        return 'action_evaluate_intent'
+
+    def run(self, tracker, dispatcher, domain):
+        user_input = tracker.get_slot("group")
+        dispatcher.utter_message("Users entered %s" % user_input)
+
+        if user_input == 'load_more':
+            pageNumber = tracker.get_slot("page")
+            if pageNumber == None:
+                pageNumber = 0
+            next_page = pageNumber + 1
+            SlotSet("page", next_page)
+            SlotSet("group", None)
+            dispatcher.utter_message("loading more groups")
+            group_extractor = ActionGetGroup()
+            return group_extractor.run(dispatcher, tracker, domain)
+        return []
+
 
 
 class ActionCreateMeetingRoutine(FormAction):
@@ -511,13 +574,6 @@ def epoch(formalized_datetime):
         logging.debug(e)
         utc_time = datetime.strptime(formalized_datetime, '%d-%m-%YT%H:%M')
         return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
-
-
-def get_token(sender_id):
-    request_token = requests.post(BASE_URL + TOKEN_PATH, headers={'Authorization': 'Bearer ' + auth_token},\
-                                  params={'userId': '%s' % sender_id}).text
-    logging.debug('request_token: %s' % request_token)
-    return request_token
 
 
 def get_session_data(sender_id, data):

@@ -1,4 +1,5 @@
 intents:
+  - next_page
   - take_action
   - affirm
   - negate
@@ -17,6 +18,7 @@ intents:
   - out_of_scope
 
 entities:
+ - page
  - action
  - datetime
  - location
@@ -42,6 +44,8 @@ entities:
 slots:
   requested_slot:
     type: unfeaturized
+  page:
+    type: text
   action:
     type: text
   inform:

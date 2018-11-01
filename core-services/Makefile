@@ -17,10 +17,16 @@ train-core: # default
 	python3 train_services_core.py
 
 train-core-quick: # for local experimenting etc
-	python3 train_services_core.py --aug 10 --epochs 50 --batch 128 --memdepth 8
+	python3 train_services_core.py --aug 10 --epochs 50 --batch 128 --memdepth 0
 
 evaluate-provinces:
 	python3 -m rasa_nlu.evaluate --data data/examples/provinces_testing_data.json --model models/current/services_nlu
 
-run-cmdline:
-	python3 -m rasa_core.run -d models/dialogue -u models/current/services_nlu --debug
+run-core:
+	python3 -m rasa_core.run -d models/dialogue -u models/current/services_nlu --endpoints endpoints.yml --debug
+
+run-nlu:
+	python3 -m rasa_nlu.server --path models/current/services_nlu/
+
+evaluate:
+	python3 -m rasa_core.evaluate -s data/core/test.md -d models/dialogue -o matrix.pdf

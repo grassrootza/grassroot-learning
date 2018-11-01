@@ -20,8 +20,10 @@ help:
 train-online:
 	python3 train_online.py
 
-train-nlu-core:
+train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
+
+train-core:
 	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10
 
 run-core-nlu:

@@ -19,7 +19,7 @@ logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(leve
 
 auth_token = os.getenv('TOKEN_X')
 
-BASE_URL = os.getenv('BASE_URL', 'https://staging.grassroot.org.za/v2/api')
+BASE_URL = os.getenv('PLATFORM_BASE_URL', 'https://staging.grassroot.org.za/v2/api')
 DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
 
 TOKEN_PATH = '/whatsapp/user/token'
@@ -35,20 +35,6 @@ permissionsMap = {
     'create_meeting': 'GROUP_PERMISSION_CREATE_GROUP_MEETING',
     'call_vote': 'GROUP_PERMISSION_CREATE_GROUP_VOTE'
 }
-
-class ActionGetGroup(Action):
-
-    def name(self):
-        return 'action_get_group'
-
-    def run(self, dispatcher, tracker, domain):
-        logging.info("Detected user: %s" % tracker.sender_id)
-        current_action = tracker.get_slot("action")
-        if current_action is None: 
-            current_action = "default"
-        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Choose a group", get_group_menu_items(tracker.sender_id, permissionsMap[current_action]))
-        return []
 
 
 class ActionGetGroup(Action):

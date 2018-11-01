@@ -32,5 +32,7 @@ core-platform/__pycache__/
 # Serverless and its plugins
 **/node_modules
 
-# Also graphs
+# Also graphs and evaluation outputs
 **/graph.png
+**/matrix.pdf
+**/failed_stories.md

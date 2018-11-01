@@ -17,9 +17,9 @@ train-nlu:
 	python3 -m rasa_nlu.train -c core-platform/config.yml --data core-platform/data/nlu -o core-platform/models --fixed_model_name platform_nlu --project current --verbose
 
 train-core:
-	cd ./core-services; python3 train_services_core.py --aug 10 --epochs 50 --batch 128 --memdepth 8 # note that too high an aug factor seems to create over-fitting
+	cd ./core-services; python3 train_services_core.py --aug 10 --epochs 50 --batch 128 --memdepth 0 # note that too high an aug factor seems to create over-fitting
 	cd ./core-knowledge; python3 train_knowledge_core.py
-	cd ./core-platform; python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue
+	cd ./core-platform; python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10
 
 run-flask:
 	python3 app.py

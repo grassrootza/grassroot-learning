@@ -135,6 +135,10 @@
     - slot{"latitude": -26.1947954}
     - slot{"longitude": 28.036162200000035}
     - action_retrieve_and_send_services
+    - utter_anything_else
+* goodbye
+    - utter_goodbye
+    - action_restart
 
 ## request province, or pin, and provide a province
 > request_province_or_pin

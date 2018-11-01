@@ -88,10 +88,8 @@ jobs:
           name: deploy
           command: |
             sudo -H pip install awscli
-            sudo -H pip install awsebcli
             echo "Deploying version $CIRCLE_BRANCH-$CIRCLE-SHA1"
-            sed -i "s/<TAG>/$CIRCLE_BRANCH-$CIRCLE_SHA1/" ./Dockerrun.aws.json
-            eb deploy learning-staging
+            aws ecs update-service --cluster grassroot-rasa --service grassroot-rasa-prod-https --force-new-deployment
             
   test:
     docker:

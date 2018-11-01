@@ -1,0 +1,89 @@
+entities:
+  - province
+  - geo_location
+  - service_type
+  - longitude
+  - latitude
+
+intents:
+  - find_services
+  - find_services_gbv
+  - request_shelter
+  - request_thuthuzela
+  - request_24hr_hcf
+  - negate
+  - goodbye
+  - affirm
+  - negate
+  - select
+
+slots:
+  service_type:
+    type: categorical
+    values:
+      - shelter
+      - thuthuzela
+      - 24hr_hcf
+  province:
+    type: categorical
+    values:
+      - gauteng
+      - western_cape
+      - eastern_cape
+      - northern_cape
+      - kzn
+      - limpopo
+      - mpumalanga
+      - free_state
+      - north_west
+  geo_location:
+    type: text
+  longitude:
+    type: float
+  latitude:
+    type: float
+
+templates:
+  utter_confirm_gbv_services:
+    - "Welcome to Izwi Lami - My Voice. What help do you need?"
+  utter_services_menu:
+    - text: ''
+      buttons:
+          - title: "24 hour hospital or clinic"
+            payload: "service_type::24hr_hcf"
+          - title: "Shelter"
+            payload: "service_type::shelter"
+          - title: "Thuthuzela rape care centre"
+            payload: "service_type::thuthuzela"
+  utter_menu_second_service:
+    - text: "What other services would you like? We will just reuse your province or location"
+  utter_confirm_24hr_hcf:
+    - "Okay, we will send you nearby health care facilities. Please attach a location pin of where you are now"
+  utter_confirm_shelter:
+    - "Okay, we will send you details of nearby shelters. Where do you live? Just send us a province name or attach a location pin"
+  utter_confirm_thuthuzela:
+    - "Okay, we will send details of Thuthuzela centres. Where do you live? Just send us a province name or a location pin"
+  utter_generic_location:
+    - "Okay. Can you send us a pin (attach via WhatsApp) or tell us what province you are in?"
+  utter_pre_services:
+    - "These messages have contact information only, not links. Standard rates apply if you dial the numbers below."
+  utter_post_services:
+    - "Remember: ask for the morning after pill, ARVs, vaccinations and counseling at the clinic/hospital. http://bit.ly/2MzUIbU Viewing the map uses data."
+  utter_anything_else:
+    - "Is there any other service you need? Just type clinic, shelter or thuthuzela and we will reuse your location"
+  utter_goodbye:
+    - "Okay. We're glad we were helpful. Send a message anytime if you need more information."
+
+actions:
+  - utter_confirm_gbv_services
+  - utter_confirm_24hr_hcf
+  - utter_confirm_shelter
+  - utter_confirm_thuthuzela
+  - utter_pre_services
+  - utter_post_services
+  - utter_anything_else
+  - utter_services_menu
+  - utter_menu_second_service
+  - utter_goodbye
+  - action_retrieve_and_send_services
+  - action_service_type_reset

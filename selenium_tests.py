@@ -5,12 +5,12 @@ import requests
 from selenium import webdriver
 
 def start_light_app():
-    os.system('python grassroot-nlu/main.py')
+    os.system('python grassroot-nlu/main.py --no-nlu')
 
 def test_light_build():
     driver = webdriver.Chrome(service_args=['--verbose'])
     threading.Thread(target=start_light_app).start()
-    time.sleep(40)
+    time.sleep(200)
     # driver.get('http://localhost:5000/')
     x = requests.get('http://localhost:5000/').content
     print('x: %s' % x)

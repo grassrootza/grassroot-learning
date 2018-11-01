@@ -156,13 +156,10 @@ workflows:
             - deps
           filters:
             branches:
-              only: wip-circle-revision
+              only: master
       - containerize:
           requires:
             - train
-      # - selenium_test:
-      #     requires:
-      #       - build
       - deploy:
           requires:
             - containerize

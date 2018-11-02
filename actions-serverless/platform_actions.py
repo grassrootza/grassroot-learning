@@ -43,8 +43,8 @@ class ActionGetGroup(Action):
         return 'action_get_group'
 
     def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message("Detected user: %s" % tracker.sender_id)
-        dispatcher.utter_message("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
+        logging.info("Detected user: %s" % tracker.sender_id)
+        logging.info("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
         current_action = tracker.get_slot("action")
         if current_action is None: 
             current_action = "default"
@@ -72,7 +72,7 @@ def get_group_menu_items(sender_id, page,required_permission = permissionsMap['d
         for group in range(len(page_content)):
             menu_items.append({
                                'title': page_content[group]['name'],
-                               'payload': 'group::' + page_content[group]['groupUid']
+                               'payload': 'group_uid::' + page_content[group]['groupUid']
                               })
         if raw_json['last'] == False:
             menu_items.append({
@@ -343,7 +343,7 @@ class CreateMeetingComplete(Action):
         return 'action_create_meeting_complete'
 
     def run(self, dispatcher, tracker, domain):
-        groupUid = get_group_uid(tracker.get_slot("group"), tracker.sender_id)
+        groupUid = tracker.get_slot("group_uid")
         if groupUid == '':
             dispatcher.utter_message('Could not find %s within registered groups.' % tracker.get_slot("group"))
             return []

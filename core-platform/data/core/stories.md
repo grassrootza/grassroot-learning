@@ -9,8 +9,8 @@
 * call_meeting
   - slot{"action": "call_meeting"}
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_create_meeting_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "world domination"}
@@ -48,8 +48,8 @@
 * call_vote
   - slot{"action": "call_vote"}
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_create_vote_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "world domination"}
@@ -63,9 +63,46 @@
 * select{"datetime": "later"}
   - action_create_vote_routine
   - slot{"datetime": "later"}
-  - utter_vote_options_initialiser
-* select{"vote_option": "yes"}
-  - action_save_vote_option
+  - utter_ask_options_type
+> check_default_or_custom
+
+## user is okay with default yes/no options
+> check_default_or_custom
+* negate
+  - action_default_vote_options
+  - slot{"vote_options": ["vote", "options"]}
+  - utter_vote_status
+  - utter_confirm_request
+> check_vote_correctness
+
+## user would like custom vote options
+> check_default_or_custom
+* affirm
+  - utter_ask_vote_option
+* select{"temp": "vote option"}
+  - slot{"temp": "vote option"}
+  - action_add_to_vote_options
+  - slot{"vote_options": ["vote", "options"]}
+  - utter_vote_option
+  - utter_add_another
+> check_for_more
+
+## user would like to add another vote option
+> check_for_more
+* affirm
+  - utter_ask_vote_option
+* select{"temp": "vote option"}
+  - slot{"temp": "vote option"}
+  - action_add_to_vote_options
+  - slot{"vote_options": ["vote", "options"]}
+  - utter_vote_option
+  - utter_add_another
+> check_for_more
+
+## user is done adding vote options
+> check_for_more
+* negate
+  - utter_vote_status
   - utter_confirm_request
 > check_vote_correctness
 
@@ -85,8 +122,8 @@
 > check_what_user_wants
 * create_livewire
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_livewire_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "New Clinic Open"}
@@ -129,8 +166,8 @@
 > check_what_user_wants
 * create_volunteer_todo
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_volunteer_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -164,8 +201,8 @@
 > check_what_user_wants
 * create_info_todo
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_info_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -203,8 +240,8 @@
 > check_what_user_wants
 * create_action_todo
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_action_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -238,8 +275,8 @@
 > check_what_user_wants
 * create_validation_todo
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_validation_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}

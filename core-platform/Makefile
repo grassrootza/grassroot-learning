@@ -15,7 +15,9 @@ help:
 	@echo "        Initiates interactive training"
 	@echo "    visualize"
 	@echo "        Visualizes bot logic"
-
+	@echo "    evaluate"
+	@echo "        evaluate the sanity of trained models."
+	
 
 train-online:
 	python3 train_online.py
@@ -37,3 +39,6 @@ run-action-server:
 
 visualize:
 	python3 -m rasa_core.visualize -s data/core/ -d actions_domain.yml -o story_graph.png
+
+evaluate:
+	python3 -m rasa_core.evaluate -s data/core/test.md -d models/dialogue -o matrix.pdf

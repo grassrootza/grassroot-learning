@@ -144,40 +144,9 @@
 * select{"contact_number": "011 111 1111"}
   - action_livewire_routine
   - slot{"contact_number": "011 111 1111"}
-  - utter_ask_add_media_files
-> check_for_media_file
-
-## user wants to add a media file
-> check_for_media_file
-* affirm
-  - utter_ask_media_file
-* select{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
-  - slot{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
-  - action_save_media_file_id
-  - utter_add_another_media_file
-> check_for_more_media_files
-
-## user would like to add another media file
-> check_for_more_media_files
-* affirm
-  - utter_ask_media_file
-* select{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
-  - slot{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
-  - action_save_media_file_id
-  - utter_add_another
-> check_for_more_media_files  
-
-## user is happy with currently added files, proceed to request confirmation
-> check_for_more_media_files
-* negate
-  - utter_livewire_status
-  - utter_confirm_request
-> check_livewire_correctness  
-
-## user is happy without any media files
-> check_for_media_file
-* negate
-  - utter_livewire_status
+  - utter_ask_media_files
+* select{"media_file_keys": []}
+  - action_save_media_file
   - utter_confirm_request
 > check_livewire_correctness
 

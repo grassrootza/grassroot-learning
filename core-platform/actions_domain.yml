@@ -34,7 +34,7 @@ entities:
  - latitude
  - longitude
  - task_uid
- - media_file_keys
+ - media_file_id
  - destination_uid
  - contact_name
  - contact_number
@@ -65,8 +65,6 @@ slots:
     type: text
   description:
     type: text
-  reminderMinutes:
-    type: text
   response_tag:
     type: text
   group_name:
@@ -81,7 +79,7 @@ slots:
     type: text
   livewire_type:
     type: text
-  media_file_keys:
+  media_file_id:
     type: text
   destination_uid:
     type: text
@@ -138,20 +136,21 @@ templates:
     - "Cool, I've recieved your vote option '{temp}'"
   utter_vote_status:
     - "You have chosen {subject} as your subject of your vote. You have described this vote as {description}\
-       You want this to happen %{datetime}. You have chosen {group_uid} as your group."
-  utter_ask_reminder_minutes:
-    - "Reminder minutes set to {reminderMinutes}"
+       You want this to happen {datetime}. You have chosen {group_uid} as your group."
+  utter_livewire_status:
+    - ""
   utter_ask_contact_name:
     - "Please provide your name or alias."
   utter_ask_contact_number:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_ask_livewire_content:
     - "Please enter the main content of your livewire."
-  utter_ask_media_files:
-    - "Would you like to add any images? Add them below and enter 'Done' when finished."
+  utter_ask_add_media_files:
+    - "Would you like to add any images?"
+  utter_ask_media_file:
+    - "Please paste/send your image below"
   utter_confirm_request:
     - "Is this correct?"
-
 
 actions:
   - utter_ask_subject
@@ -173,11 +172,12 @@ actions:
   - utter_ask_livewire_content
   - utter_ask_contact_name
   - utter_ask_contact_number
-  - utter_ask_media_files
+  - utter_ask_add_media_files
+  - utter_ask_media_file
+  - utter_livewire_status
   - utter_actions_initialiser
   - utter_actions_menu
   - utter_confirm_request
-  - action_utter_save_selected_group
   - action_get_vote_option
   - action_create_meeting_complete
   - action_create_vote_complete
@@ -197,6 +197,6 @@ actions:
   - action_todo_action_routine
   - action_get_group
   - action_livewire_routine
-  - action_save_media_file
   - action_default_vote_options
   - action_add_to_vote_options
+  - action_save_media_file_id

@@ -98,10 +98,11 @@ def get_token(sender_id):
         logging.debug("request token successfully converted to %s" % type(request_token))
     if isinstance(request_token, dict):
         if request_token['status'] == 403:
+            request_token['file_path'] = os.path.realpath(__file__)
             message = MIMEMultipart()
             message['From'] = os.getenv('ALERT_EMAIL', 'grassrootnlu@gmail.com')
             message['To'] = os.getenv('DEVELOPER', '')
-            message['Subject'] = "Test Email"
+            message['Subject'] = "Token Trouble"
             body = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
                     \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
             message.attach(MIMEText(

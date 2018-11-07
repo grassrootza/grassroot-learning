@@ -504,15 +504,6 @@ class ActionLivewireRoutine(FormAction):
         return 'action_livewire_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        responses = [
-                     "You have chosen %s as the title." % tracker.get_slot("subject"),
-                     "You have entered '%s' as the content." % tracker.get_slot("description"),
-                     "You have identified yourself as %s" % tracker.get_slot("contact_name"),
-                     "and provided %s as your contact detail." % tracker.get_slot("contact_number"),
-                     # "you have also included %s media file." % traker.get_slot("session_media_keys"),
-                     "You would like this to appear within the group %s." % get_group_name(tracker.get_slot("group_uid"))
-                    ]
-        dispatcher.utter_message(' '.join(responses))
         return []
 
 

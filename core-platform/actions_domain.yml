@@ -24,7 +24,7 @@ entities:
  - datetime
  - location
  - subject
- - vote_option
+ - vote_options
  - information_required
  - response_tag
  - description
@@ -34,7 +34,7 @@ entities:
  - latitude
  - longitude
  - task_uid
- - media_file_id
+ - media_file_ids
  - destination_uid
  - contact_name
  - contact_number
@@ -58,7 +58,7 @@ slots:
   temp:
     type: text
   vote_options:
-    type: text
+    type: list
   information_required:
     type: text
   params:
@@ -79,8 +79,8 @@ slots:
     type: text
   livewire_type:
     type: text
-  media_file_id:
-    type: text
+  media_file_ids:
+    type: list
   destination_uid:
     type: text
   contact_name:
@@ -134,9 +134,6 @@ templates:
     - "Would you like to add another?"
   utter_vote_option:
     - "Cool, I've recieved your vote option '{temp}'"
-  utter_vote_status:
-    - "You have chosen {subject} as your subject of your vote. You have described this vote as {description}\
-       You want this to happen {datetime}. You have chosen {group_uid} as your group."
   utter_livewire_status:
     - ""
   utter_ask_contact_name:
@@ -166,7 +163,6 @@ actions:
   - utter_ask_options_type
   - utter_ask_vote_option
   - utter_vote_option
-  - utter_vote_status
   - utter_add_another
   - utter_ask_reminder_minutes
   - utter_ask_livewire_content
@@ -200,3 +196,4 @@ actions:
   - action_default_vote_options
   - action_add_to_vote_options
   - action_save_media_file_id
+  - action_utter_vote_status

@@ -16,6 +16,7 @@ import logging
 import json
 import uuid
 import os
+import ast
 import smtplib
 
 
@@ -182,6 +183,30 @@ class ActionCreateMeetingRoutine(FormAction):
         return []
 
 
+class CreateMeetingComplete(Action):
+
+    def name(self):
+        return 'action_create_meeting_complete'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        meeting_path = '/task/create/meeting/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + meeting_path
+        logging.info('Constructed url for create meeting: %s' % url)
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'location': tracker.get_slot("location"),
+                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'subject': tracker.get_slot("subject"),
+                                         'description': tracker.get_slot("description")
+                                         })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Constructed url for create meeting: %s' % response.url)
+        logging.info('Dispatched to platform, response: %s' % response)
+        clean_session(tracker.sender_id)
+        return []
+
+
 class ActionCreateVoteRoutine(FormAction):
 
     RANDOMIZE = False
@@ -199,6 +224,79 @@ class ActionCreateVoteRoutine(FormAction):
         return 'action_create_vote_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        return []
+
+
+class ActionSetDefaultVoteOptions(Action):
+
+    def name(self):
+        return 'action_default_vote_options'
+
+    def run(self, dispatcher, tracker, domain):
+        return [SlotSet("vote_options", ["Yes", "No"])]
+
+
+class ActionAddToVoteOptions(Action):
+    
+    def name(self):
+        return 'action_add_to_vote_options'
+
+    def run(self, dispatcher, tracker, domain):
+        vote_option = (tracker.latest_message)['text']
+        logging.debug("Found vote option: %s" % vote_option)
+        current_options = tracker.get_slot("vote_options")
+        logging.debug("Found pre-existing options: %s" % current_options)
+        if current_options == None:
+            current_options = []
+        current_options.append(vote_option)
+        logging.debug("New vote options: %s" % current_options)
+        return [SlotSet("vote_options", current_options)]        
+
+
+class ActionUtterVoteStatus(Action):
+
+    def name(self):
+        return 'action_utter_vote_status'
+
+    def run(self, dispatcher, tracker, domain):
+        vote_options_list = tracker.get_slot("vote_options")
+        vote_options = ''
+        for i in range(len(vote_options_list)):
+            if i != len(vote_options_list) - 1:
+                vote_options = vote_options + str(vote_options_list[i]) + ', '
+            else:
+                vote_options = vote_options + 'and ' + str(vote_options_list[i])
+        template = ["You have chosen %s as your subject of your vote.",
+                      "You have described this vote as %s",
+                      "and want members of %s to vote between %s",
+                      "by %s."]
+        vote_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
+                                           get_group_name(tracker.get_slot("group_uid")),
+                                           vote_options, tracker.get_slot("datetime"))
+        dispatcher.utter_message(vote_status)
+        return []
+
+
+class CreateVoteComplete(Action):
+
+    def name(self):
+        return 'action_create_vote_complete'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        vote_path = '/task/create/vote/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + vote_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'title': tracker.get_slot("subject"),
+                                         'time': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'voteOptions': json.dumps(tracker.get_slot("vote_options")),
+                                         'description': tracker.get_slot("description")
+                                        })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Contructed url for create vote: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
+        clean_session(tracker.sender_id)
         return []
 
 
@@ -230,6 +328,27 @@ class ActionTodoInfoRoutine(FormAction):
         return []
 
 
+class CreateInfoTodoComplete(Action):
+
+    def name(self):
+        return 'action_create_info_todo_complete'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        todo_path = '/v2/api/task/create/todo/information/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'responseTag': tracker.get_slot("response_tag")
+                                        })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Contructed url for create information todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
+        return []        
+
+
 class ActionTodoVolunteerRoutine(FormAction):
 
     RANDOMIZE = False
@@ -253,6 +372,26 @@ class ActionTodoVolunteerRoutine(FormAction):
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                     ]
         dispatcher.utter_message(' '.join(responses))
+        return []
+
+
+class CreateVolunteerTodoComplete(Action):
+
+    def name(self):
+        return 'action_create_volunteer_todo_complete'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
+                                        })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Contructed url for create volunteer todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         return []
 
 
@@ -282,6 +421,26 @@ class ActionTodoValidationRoutine(FormAction):
         return []
 
 
+class CreateValidationTodoComplete(Action):
+
+    def name(self):
+        return 'create_validation_todo_complete'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
+                                        })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Contructed url for create validation todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
+        return []
+
+
 class ActionTodoActionRoutine(FormAction):
 
     RANDOMIZE = False
@@ -305,6 +464,26 @@ class ActionTodoActionRoutine(FormAction):
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                    ]
         dispatcher.utter_message(' '.join(responses))
+        return []
+
+
+class CreateActionTodoComplete(Action):
+
+    def name(self):
+        return 'action_create_todo_action_complete'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        todo_path = '/v2/api/task/create/todo/action/%s/%s' % (parentType, groupUid)
+        url = BASE_URL + todo_path
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                 params={
+                                         'subject': tracker.get_slot("subject"),
+                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
+                                         })
+        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        logging.info('Contructed url for create action todo: %s' % response.url)
+        logging.info('Received response from platform: %s' % response)
         return []
 
 
@@ -337,159 +516,48 @@ class ActionLivewireRoutine(FormAction):
         return []
 
 
-class ActionSetDefaultVoteOptions(Action):
+class ActionSaveMediaFile(Action):
 
     def name(self):
-        return 'action_default_vote_options'
+        return 'action_save_media_file_id'
 
     def run(self, dispatcher, tracker, domain):
-        return [SlotSet(["Yes", "No"], "vote_options")]
+        media_file = (tracker.latest_message)['text']
+        logging.debug("Recieved media file: %s" % media_file)
+        current_media_files = tracker.get_slot("media_file_ids")
+        logging.debug("Current media files are: %s" % current_media_files)
+        if current_media_files == None:
+            current_media_files = []
+        current_media_files.append(media_file)
+        logging.debug("Media files now look like: %s" % tracker.get_slot("media_file_ids"))
+        return [SlotSet("media_file_ids", current_media_files)]
 
 
-class ActionAddToVoteOptions(Action):
-    
+class ActionUtterLivewireStatus(Action):
+
     def name(self):
-        return 'action_add_to_vote_options'
+        return 'action_utter_livewire_status'
 
     def run(self, dispatcher, tracker, domain):
-        vote_option = tracker.get_slot("temp")
-        logging.debug("Found vote option: %s" % tracker.get_slot("temp"))
-        current_options = tracker.get_slot("vote_options")
-        logging.debug("Found pre-existing options: %s" % current_options)
-        if current_options == None:
-            current_options = {'vote_options': []}
+        template = [
+                     "You have chosen %s as the title.",
+                     "You have entered '%s' as the content.",
+                     "You have identified yourself as %s",
+                     "and provided %s as your contact detail.",
+                     "",
+                     "You would like this to appear within the group %s."
+                    ]
+        media_files = tracker.get_slot("media_file_ids")
+        if len(media_files) > 1:
+        	template[4] = "You have also included %s media files." % len(media_files)
+        elif len(media_files) == 1:
+        	template[4] = "You have also included an image to this livewire."
         else:
-            current_options = json.loads(current_options)
-        current_options['vote_options'].append(vote_option)
-        logging.debug("New vote options: %s" % current_options)
-        return [SlotSet(json.dumps(current_options), "vote_options")]        
-
-
-class CreateMeetingComplete(Action):
-
-    def name(self):
-        return 'action_create_meeting_complete'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        meeting_path = '/task/create/meeting/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + meeting_path
-        logging.info('Constructed url for create meeting: %s' % url)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
-                                 params={
-                                         'location': tracker.get_slot("location"),
-                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
-                                         'subject': tracker.get_slot("subject"),
-                                         'description': tracker.get_slot("description")
-                                         })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        logging.info('Constructed url for create meeting: %s' % response.url)
-        logging.info('Dispatched to platform, response: %s' % response)
-        clean_session(tracker.sender_id)
-        return []
-
-
-class CreateVoteComplete(Action):
-
-    def name(self):
-        return 'action_create_vote_complete'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        vote_path = '/task/create/vote/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + vote_path
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
-                                 params={
-                                         'title': tracker.get_slot("subject"),
-                                         'time': epoch(formalize(tracker.get_slot("datetime"))),
-                                         'voteOptions': get_session_data(tracker.sender_id, session_vote_options),
-                                         'description': tracker.get_slot("description")
-                                        })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        logging.info('Contructed url for create vote: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
-        clean_session(tracker.sender_id)
-        return []
-
-
-class CreateVolunteerTodoComplete(Action):
-
-    def name(self):
-        return 'action_create_volunteer_todo_complete'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                        })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        logging.info('Contructed url for create volunteer todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
-        return []
-
-
-class CreateValidationTodoComplete(Action):
-
-    def name(self):
-        return 'create_validation_todo_complete'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                        })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        logging.info('Contructed url for create validation todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
-        return []
-
-
-class CreateInfoTodoComplete(Action):
-
-    def name(self):
-        return 'action_create_info_todo_complete'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/information/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
-                                         'responseTag': tracker.get_slot("response_tag")
-                                        })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        logging.info('Contructed url for create information todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
-        return []
-
-
-class CreateActionTodoComplete(Action):
-
-    def name(self):
-        return 'action_create_todo_action_complete'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/action/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                         })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        logging.info('Contructed url for create action todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        	template.pop(4)
+        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
+                                                tracker.get_slot("contact_name"), tracker.get_slot("contact_number"),
+                                                get_group_name(tracker.get_slot("group_uid")))
+        dispatcher.utter_message(livewire_status)
         return []
 
 
@@ -535,23 +603,6 @@ class CreateLivewireComplete(Action):
         return []
 
 
-class ActionSaveMediaFile(Action):
-
-    def name(self):
-        return 'action_save_media_file'
-
-    def run(self, dispatcher, tracker, domain):
-        media_file = tracker.get_slot("media_file_id")
-        if media_file != None:
-            if tracker.sender_id in list(session_media_files):
-                session_media_files[tracker.sender_id].append(media_file)
-                return [SlotSet('media_file_keys', session_media_files[tracker.sender_id])]
-            else:
-                session_media_files[tracker.sender_id] = [media_file]
-                return [SlotSet('media_file_keys', session_media_files[tracker.sender_id])]
-        return []
-
-
 def formalize(datetime_str):
     response = requests.get('%s/datetime?date_string=%s' % (DATETIME_URL, datetime_str)).content.decode('ascii')
     logging.debug('datetime engine returned: %s' % response)
@@ -581,9 +632,3 @@ def clean_session(sender_id):
         if sender_id in list(session_data):
             session_data.pop(sender_id)
     return
-
-
-# def intent(input):
-
-
-# def restart_on_intent(intent):

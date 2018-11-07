@@ -70,8 +70,8 @@
 > check_default_or_custom
 * negate
   - action_default_vote_options
-  - slot{"vote_options": ["vote", "options"]}
-  - utter_vote_status
+  - slot{"vote_options": "['vote', 'options']"}
+  - action_utter_vote_status
   - utter_confirm_request
 > check_vote_correctness
 
@@ -82,7 +82,7 @@
 * select{"temp": "vote option"}
   - slot{"temp": "vote option"}
   - action_add_to_vote_options
-  - slot{"vote_options": ["vote", "options"]}
+  - slot{"vote_options": "['vote', 'options']"}
   - utter_vote_option
   - utter_add_another
 > check_for_more
@@ -102,7 +102,7 @@
 ## user is done adding vote options
 > check_for_more
 * negate
-  - utter_vote_status
+  - action_utter_vote_status
   - utter_confirm_request
 > check_vote_correctness
 
@@ -154,7 +154,7 @@
 * select{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
   - slot{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
   - action_save_media_file_id
-  - utter_add_another_media_file
+  - utter_add_another
 > check_for_more_media_files
 
 ## user would like to add another media file

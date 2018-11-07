@@ -5,7 +5,11 @@ TEST_PATH=./
 help:
 	@echo "    run-action-server"
 	@echo "        Activates the action server"
-	@echo "    train-nlu-core"
+	@echo "    train-nlu"
+	@echo "        Trains nlu model"
+	@echo "    train-core"
+	@echo "        Train rasa core"
+	@echo "    train-core-nlu"
 	@echo "        Train dialogue and nlu models"
 	@echo "    run-core-nlu"
 	@echo "        Launch a core-nlu instance"
@@ -26,6 +30,10 @@ train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
 
 train-core:
+	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10
+
+train-core-nlu:
+	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
 	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10
 
 run-core-nlu:

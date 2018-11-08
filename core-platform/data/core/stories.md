@@ -83,7 +83,6 @@
   - slot{"temp": "vote option"}
   - action_add_to_vote_options
   - slot{"vote_options": "['vote', 'options']"}
-  - utter_vote_option
   - utter_add_another
 > check_for_more
 
@@ -95,7 +94,6 @@
   - slot{"temp": "vote option"}
   - action_add_to_vote_options
   - slot{"vote_options": ["vote", "options"]}
-  - utter_vote_option
   - utter_add_another
 > check_for_more
 
@@ -151,8 +149,8 @@
 > check_for_media_file
 * affirm
   - utter_ask_media_file
-* select{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
-  - slot{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
+* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 > check_for_more_media_files
@@ -161,8 +159,8 @@
 > check_for_more_media_files
 * affirm
   - utter_ask_media_file
-* select{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
-  - slot{"media_file_id": "762aef58-4865-407a-b793-af6114ab3444"}
+* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 > check_for_more_media_files  
@@ -170,14 +168,14 @@
 ## user is happy with currently added files, proceed to request confirmation
 > check_for_more_media_files
 * negate
-  - utter_livewire_status
+  - action_utter_livewire_status
   - utter_confirm_request
 > check_livewire_correctness  
 
 ## user is happy without any media files
 > check_for_media_file
 * negate
-  - utter_livewire_status
+  - action_utter_livewire_status
   - utter_confirm_request
 > check_livewire_correctness
 

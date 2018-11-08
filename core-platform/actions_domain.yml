@@ -132,10 +132,6 @@ templates:
     - "Enter a vote option."
   utter_add_another:
     - "Would you like to add another?"
-  utter_vote_option:
-    - "Cool, I've recieved your vote option '{temp}'"
-  utter_livewire_status:
-    - ""
   utter_ask_contact_name:
     - "Please provide your name or alias."
   utter_ask_contact_number:
@@ -170,7 +166,6 @@ actions:
   - utter_ask_contact_number
   - utter_ask_add_media_files
   - utter_ask_media_file
-  - utter_livewire_status
   - utter_actions_initialiser
   - utter_actions_menu
   - utter_confirm_request
@@ -197,3 +192,4 @@ actions:
   - action_add_to_vote_options
   - action_save_media_file_id
   - action_utter_vote_status
+  - action_utter_livewire_status

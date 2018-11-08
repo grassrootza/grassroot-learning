@@ -114,8 +114,10 @@ def get_token(sender_id):
             server.starttls()
             server.login(
                          message['From'],
-                         os.getenv('ALERT_PWD', '')
-                        )
+                         os.getenv(
+                                   'ALERT_PWD',
+                                       ''
+                         ))
             text = message.as_string()
             server.sendmail(
                             message['From'],
@@ -131,28 +133,6 @@ def get_group_name(groupUid):
     response = requests.get(BASE_URL + GROUP_NAME_PATH)
     logging.debug('Got this back from group name retrieval: %s' % response)
     return groupUid
-
-
-class ActionEvaluateIntent(Action):
-
-    def name(self):
-        return 'action_evaluate_intent'
-
-    def run(self, tracker, dispatcher, domain):
-        user_input = tracker.get_slot("group_uid")
-        dispatcher.utter_message("Users entered %s" % user_input)
-
-        if user_input == 'load_more':
-            pageNumber = tracker.get_slot("page")
-            if pageNumber == None:
-                pageNumber = 0
-            next_page = pageNumber + 1
-            SlotSet("page", next_page)
-            SlotSet("group_uid", None)
-            dispatcher.utter_message("loading more groups")
-            group_extractor = ActionGetGroup()
-            return group_extractor.run(dispatcher, tracker, domain)
-        return []
 
 
 class ActionCreateMeetingRoutine(FormAction):
@@ -176,7 +156,7 @@ class ActionCreateMeetingRoutine(FormAction):
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
                      "You have described this meeting as %s." % tracker.get_slot("description"),
-                     "You want this to happen %s." % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*." % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -244,6 +224,7 @@ class ActionAddToVoteOptions(Action):
     def run(self, dispatcher, tracker, domain):
         vote_option = (tracker.latest_message)['text']
         logging.debug("Found vote option: %s" % vote_option)
+        dispatcher.utter_message("Vote option '%s' recieved." % vote_option)
         current_options = tracker.get_slot("vote_options")
         logging.debug("Found pre-existing options: %s" % current_options)
         if current_options == None:
@@ -266,13 +247,15 @@ class ActionUtterVoteStatus(Action):
                 vote_options = vote_options + str(vote_options_list[i]) + ', '
             else:
                 vote_options = vote_options + 'and ' + str(vote_options_list[i])
-        template = ["You have chosen %s as your subject of your vote.",
-                      "You have described this vote as %s",
-                      "and want members of %s to vote between %s",
-                      "by %s."]
+        template = [
+                    "You have chosen %s as your subject of your vote.",
+                    "You have described this vote as %s",
+                    "and want members of %s to vote between %s",
+                    "by *%s*."
+                   ]
         vote_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
-                                           get_group_name(tracker.get_slot("group_uid")),
-                                           vote_options, tracker.get_slot("datetime"))
+                                            get_group_name(tracker.get_slot("group_uid")),
+                                            vote_options, tracker.get_slot("datetime"))
         dispatcher.utter_message(vote_status)
         return []
 
@@ -321,7 +304,7 @@ class ActionTodoInfoRoutine(FormAction):
                      "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
                      "You have described this todo as %s" % tracker.get_slot("description"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
-                     "Participants may respond until %s" % tracker.get_slot("datetime"),
+                     "Participants may respond until *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -368,7 +351,7 @@ class ActionTodoVolunteerRoutine(FormAction):
         responses = [
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
                      "You have described this volunteer task as %s" % tracker.get_slot("description"),
-                     "You want this to happen %s" % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -414,7 +397,7 @@ class ActionTodoValidationRoutine(FormAction):
         responses = [
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
                      "You have described this validation as %s." % tracker.get_slot("description"),
-                     "You want everyone to have responded by %s." % tracker.get_slot("datetime"),
+                     "You want everyone to have responded by *%s*." % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -460,7 +443,7 @@ class ActionTodoActionRoutine(FormAction):
         responses = [
                     "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
                     "You have described this action as %s" % tracker.get_slot("description"),
-                    "You want this to happen %s" % tracker.get_slot("datetime"),
+                    "You want this to happen *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                    ]
         dispatcher.utter_message(' '.join(responses))
@@ -574,7 +557,7 @@ class CreateLivewireComplete(Action):
         url = BASE_URL + livewire_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
-                                         'headline': tracker.get_slot("subject"),
+                                         'headline': headline,
                                          'description': description,
                                          'contactName': contactName,
                                          'contactNumber': contactNumber,

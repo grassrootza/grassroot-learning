@@ -181,7 +181,6 @@ class CreateMeetingComplete(Action):
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Constructed url for create meeting: %s' % response.url)
         logging.info('Dispatched to platform, response: %s' % response)
-        clean_session(tracker.sender_id)
         return []
 
 
@@ -277,7 +276,6 @@ class CreateVoteComplete(Action):
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create vote: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
-        clean_session(tracker.sender_id)
         return []
 
 
@@ -571,7 +569,6 @@ class CreateLivewireComplete(Action):
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed livewire url: %s' % response.url)
         logging.info('Received response from platform: %s' % response)
-        clean_session(tracker.sender_id)
         return []
 
 

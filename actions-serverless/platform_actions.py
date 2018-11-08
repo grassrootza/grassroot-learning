@@ -32,8 +32,6 @@ GROUP_PATH = '/group/fetch/minimal/filtered'
 GROUP_NAME_PATH = '/v2/api/group/fetch/minimal/filtered'
 
 parentType = 'GROUP'
-session_vote_options = {'user_id': []}
-session_media_files = {'user_id': []}
 
 permissionsMap = {
     'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS',
@@ -548,7 +546,7 @@ class CreateLivewireComplete(Action):
         taskUid = tracker.get_slot("task_uid")
         livewire_type = 'INSTANT'
         addLocation = False
-        mediaFileKeys = get_session_data(tracker.sender_id, session_media_files)
+        mediaFileKeys = tracker.get_slot("media_file_ids")
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
         destUid = tracker.get_slot("destination_uid")
@@ -591,18 +589,3 @@ def epoch(formalized_datetime):
         logging.debug(e)
         utc_time = datetime.strptime(formalized_datetime, '%d-%m-%YT%H:%M')
         return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
-
-
-def get_session_data(sender_id, data):
-    if sender_id in list(data):
-        return data[sender_id]
-    else:
-        return None
-
-
-def clean_session(sender_id):
-    data = [session_media_files, session_vote_options]
-    for session_data in data:
-        if sender_id in list(session_data):
-            session_data.pop(sender_id)
-    return

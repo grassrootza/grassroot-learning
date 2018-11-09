@@ -49,27 +49,25 @@ slots:
   inform:
     type: text
   datetime:
-    type: text
+    type: unfeaturized
   location:
-    type: text
+    type: unfeaturized
   subject:
-    type: text
+    type: unfeaturized
   temp:
     type: text
   vote_options:
     type: list
   information_required:
-    type: text
+    type: unfeaturized
   params:
     type: text
   description:
-    type: text
+    type: unfeaturized
   response_tag:
-    type: text
-  group_name:
-    type: text
+    type: unfeaturized
   group_uid:
-    type: text
+    type: unfeaturized
   latitude:
     type: float
   longitude:
@@ -77,15 +75,15 @@ slots:
   task_uid:
     type: text
   livewire_type:
-    type: text
+    type: unfeaturized
   media_file_ids:
-    type: list
+    type: unfeaturized
   destination_uid:
     type: text
   contact_name:
-    type: text
+    type: unfeaturized
   contact_number:
-    type: text
+    type: unfeaturized
 
 templates:
   utter_actions_intitialiser:

@@ -28,7 +28,7 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
 
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
-GROUP_NAME_PATH = '/v2/api/group/fetch/minimal/specified/'
+GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
 
 parentType = 'GROUP'
 
@@ -129,8 +129,13 @@ def get_token(sender_id):
 def get_group_name(groupUid, sender_id):
     response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
                             headers={'Authorization': 'Bearer ' + get_token(sender_id)})
-    logging.debug('Got this back from group name retrieval: %s' % response)
-    return groupUid
+    logging.debug('Got this back from group name retrieval: %s' % response.content)
+    if response.ok:
+        data = json.loads(response.text)
+        group_name = data['name']
+        member_count = data['memberCount']
+        return group_name, member_count
+    return None, None
 
 
 class ActionIncrementPage(Action):
@@ -164,12 +169,13 @@ class ActionCreateMeetingRoutine(FormAction):
         return 'action_create_meeting_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
                      "You have described this meeting as %s." % tracker.get_slot("description"),
                      "You want this to happen *%s*." % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -251,6 +257,7 @@ class ActionUtterVoteStatus(Action):
         return 'action_utter_vote_status'
 
     def run(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         vote_options_list = tracker.get_slot("vote_options")
         vote_options = ''
         for i in range(len(vote_options_list)):
@@ -261,11 +268,11 @@ class ActionUtterVoteStatus(Action):
         template = [
                     "You have chosen %s as your subject of your vote.",
                     "You have described this vote as %s",
-                    "and want members of %s to vote between %s",
+                    "and want the %s member(s) of %s to vote between %s",
                     "by *%s*."
                    ]
         vote_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
-                                            get_group_name(tracker.get_slot("group_uid"), tracker.sender_id),
+                                            member_count, group_name,
                                             vote_options, tracker.get_slot("datetime"))
         dispatcher.utter_message(vote_status)
         return []
@@ -310,12 +317,13 @@ class ActionTodoInfoRoutine(FormAction):
         return 'action_todo_info_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
                      "You have described this todo as %s" % tracker.get_slot("description"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
                      "Participants may respond until *%s*" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -358,11 +366,12 @@ class ActionTodoVolunteerRoutine(FormAction):
         return 'action_todo_volunteer_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
                      "You have described this volunteer task as %s" % tracker.get_slot("description"),
                      "You want this to happen *%s*" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -404,11 +413,12 @@ class ActionTodoValidationRoutine(FormAction):
         return 'action_todo_validation_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
                      "You have described this validation as %s." % tracker.get_slot("description"),
                      "You want everyone to have responded by *%s*." % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -450,11 +460,12 @@ class ActionTodoActionRoutine(FormAction):
         return 'action_todo_action_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
                      "You have described this action as %s" % tracker.get_slot("description"),
                      "You want this to happen *%s*" % tracker.get_slot("datetime"),
-                     "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
                    ]
         dispatcher.utter_message(' '.join(responses))
         return []
@@ -523,13 +534,14 @@ class ActionUtterLivewireStatus(Action):
         return 'action_utter_livewire_status'
 
     def run(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         template = [
                      "You have chosen %s as the title.",
                      "You have entered '%s' as the content.",
                      "You have identified yourself as %s",
                      "and provided %s as your contact detail.",
                      "",
-                     "You would like this to appear within the group %s."
+                     "You would like this to appear within the group %s which has %s member."
                     ]
         media_files = tracker.get_slot("media_file_ids")
         if len(media_files) > 1:
@@ -540,7 +552,7 @@ class ActionUtterLivewireStatus(Action):
         	template.pop(4)
         livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
                                                 tracker.get_slot("contact_name"), tracker.get_slot("contact_number"),
-                                                get_group_name(tracker.get_slot("group_uid"), tracker.sender_id))
+                                                group_name, member_count)
         dispatcher.utter_message(livewire_status)
         return []
 

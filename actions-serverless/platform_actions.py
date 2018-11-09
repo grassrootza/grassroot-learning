@@ -80,7 +80,7 @@ def get_group_menu_items(sender_id, page,required_permission = permissionsMap['d
         if raw_json['last'] == False:
             menu_items.append({
                                'title': 'Load more groups',
-                               'payload': 'next_page'
+                               'payload': '/next_page'
                               })
     except KeyError as e:
         logging.error('Error: platform_actions.py: get_group_menu_items(): %s' % str(e))
@@ -131,6 +131,20 @@ def get_group_name(groupUid):
     response = requests.get(BASE_URL + GROUP_NAME_PATH)
     logging.debug('Got this back from group name retrieval: %s' % response)
     return groupUid
+
+
+class ActionIncrementPage(Action):
+
+    def name(self):
+        return 'action_increment_page'
+
+    def run(self, dispatcher, tracker, domain):
+        current_page = tracker.get_slot("page")
+        if current_page == None:
+            current_page = 0
+        current_page += 1
+        logging.debug("Now loading group page: %s" % current_page)
+        return [SlotSet("page", current_page)]    
 
 
 class ActionCreateMeetingRoutine(FormAction):
@@ -437,9 +451,9 @@ class ActionTodoActionRoutine(FormAction):
 
     def submit(self, dispatcher, tracker, domain):
         responses = [
-                    "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
-                    "You have described this action as %s" % tracker.get_slot("description"),
-                    "You want this to happen *%s*" % tracker.get_slot("datetime"),
+                     "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
+                     "You have described this action as %s" % tracker.get_slot("description"),
+                     "You want this to happen *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group." % get_group_name(tracker.get_slot("group_uid"))
                    ]
         dispatcher.utter_message(' '.join(responses))

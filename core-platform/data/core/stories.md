@@ -9,6 +9,17 @@
 * call_meeting
   - slot{"action": "call_meeting"}
   - action_get_group
+> check_for_more_meeting_groups
+
+## user wants more groups
+> check_for_more_meeting_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_meeting_groups
+
+## user has selected desired group, continue meeting flow
+> check_for_more_meeting_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_create_meeting_routine
@@ -48,6 +59,17 @@
 * call_vote
   - slot{"action": "call_vote"}
   - action_get_group
+> check_for_more_vote_groups
+
+## user wants more groups
+> check_for_more_vote_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_vote_groups
+
+## user has selected desired group, continue vote flow
+> check_for_more_vote_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_create_vote_routine
@@ -120,6 +142,17 @@
 > check_what_user_wants
 * create_livewire
   - action_get_group
+> check_for_more_livewire_groups
+
+## user wants more groups
+> check_for_more_livewire_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_livewire_groups
+
+## user has selected desired group, continue livewire flow
+> check_for_more_livewire_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_livewire_routine
@@ -195,6 +228,17 @@
 > check_what_user_wants
 * create_volunteer_todo
   - action_get_group
+> check_for_more_volunteer_groups
+
+## user wants more groups
+> check_for_more_volunteer_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_volunteer_groups
+
+## user has selected desired group, continue volunteer flow
+> check_for_more_volunteer_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_todo_volunteer_routine
@@ -230,6 +274,17 @@
 > check_what_user_wants
 * create_info_todo
   - action_get_group
+> check_for_more_info_groups
+
+## user wants more groups
+> check_for_more_info_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_info_groups
+
+## user has selected desired group, continue info-todo flow
+> check_for_more_info_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_todo_info_routine
@@ -269,6 +324,17 @@
 > check_what_user_wants
 * create_action_todo
   - action_get_group
+> check_for_more_action_groups
+
+## user wants more groups
+> check_for_more_action_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_action_groups
+
+## user has selected desired group, continue action flow
+> check_for_more_action_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_todo_action_routine
@@ -304,6 +370,17 @@
 > check_what_user_wants
 * create_validation_todo
   - action_get_group
+> check_for_more_validation_groups
+
+## user wants more groups
+> check_for_more_validation_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_validation_groups
+
+## user has selected desired group, continue validation flow
+> check_for_more_validation_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - action_todo_validation_routine
@@ -323,13 +400,13 @@
 > check_validation_correctness
 
 ## request is correct, send to server
-> check_validation_carrectness
+> check_validation_corectness
 * affirm
   - create_validation_todo_complete
   - action_restart
 
 ## request is wrong
-> check_validation_carrectness
+> check_validation_correctness
 * negate
   - utter_negation
   - action_restart

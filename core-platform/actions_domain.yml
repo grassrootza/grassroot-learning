@@ -18,7 +18,6 @@ intents:
   - out_of_scope
 
 entities:
- - temp
  - page
  - action
  - datetime
@@ -144,6 +143,8 @@ templates:
     - "Please paste/send your image below"
   utter_confirm_request:
     - "Is this correct?"
+  utter_default:
+    - "Sorry. I have much to learn. I'm certain I'll understand everything you say one day."
 
 actions:
   - utter_ask_subject
@@ -193,3 +194,4 @@ actions:
   - action_save_media_file_id
   - action_utter_vote_status
   - action_utter_livewire_status
+  - action_increment_page

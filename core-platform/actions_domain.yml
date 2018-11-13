@@ -37,7 +37,7 @@ entities:
  - destination_uid
  - contact_name
  - contact_number
-
+ - media_record_id
 
 slots:
   requested_slot:
@@ -75,6 +75,8 @@ slots:
   task_uid:
     type: text
   livewire_type:
+    type: unfeaturized
+  media_record_id:
     type: unfeaturized
   media_file_ids:
     type: unfeaturized
@@ -143,6 +145,20 @@ templates:
     - "Is this correct?"
   utter_default:
     - "Sorry. I have much to learn. I'm certain I'll understand everything you say one day."
+  utter_confirm_meeting_intent:
+    - "Okay, lets call a meeting."
+  utter_confirm_vote_intent:
+    - "Okay, lets call a vote"
+  utter_confirm_livewire_intent:
+    - "Okay, lets create a livewire post."
+  utter_confirm_info_intent:
+    - "Okay lets create an info action"
+  utter_confirm_volunteer_intent:
+    - "Okay, lets find volunteers."
+  utter_confirm_action_intent:
+    - "Okay, lets call for action."
+  utter_confirm_validation_intent:
+    - "Okay, lets create a validation task."
 
 actions:
   - utter_ask_subject
@@ -168,6 +184,13 @@ actions:
   - utter_actions_initialiser
   - utter_actions_menu
   - utter_confirm_request
+  - utter_confirm_meeting_intent
+  - utter_confirm_vote_intent
+  - utter_confirm_livewire_intent
+  - utter_confirm_info_intent
+  - utter_confirm_volunteer_intent
+  - utter_confirm_action_intent
+  - utter_confirm_validation_intent
   - action_get_vote_option
   - action_create_meeting_complete
   - action_create_vote_complete

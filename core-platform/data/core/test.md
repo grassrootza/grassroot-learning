@@ -38,6 +38,7 @@
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
+  - action_create_vote_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "world domination"}
   - action_create_vote_routine
@@ -81,6 +82,7 @@
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
+  - action_livewire_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "New Clinic Open"}
   - action_livewire_routine
@@ -157,6 +159,7 @@
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
+  - action_todo_info_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
   - action_todo_info_routine
@@ -216,8 +219,6 @@
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
-* select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
   - action_todo_validation_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}

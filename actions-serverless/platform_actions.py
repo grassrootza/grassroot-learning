@@ -135,7 +135,7 @@ def get_group_name(groupUid, sender_id):
         group_name = data['name']
         member_count = data['memberCount']
         return group_name, member_count
-    return None, None
+    return '', ''
 
 
 class ActionIncrementPage(Action):
@@ -152,7 +152,7 @@ class ActionIncrementPage(Action):
         return [SlotSet("page", current_page)]    
 
 
-class ActionCreateMeetingRoutine(FormAction):
+class ActionAcquireMeetingDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -181,7 +181,7 @@ class ActionCreateMeetingRoutine(FormAction):
         return []
 
 
-class CreateMeetingComplete(Action):
+class ActionSendMeetingToServer(Action):
 
     def name(self):
         return 'action_create_meeting_complete'
@@ -200,11 +200,11 @@ class CreateMeetingComplete(Action):
                                          })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Constructed url for create meeting: %s' % response.url)
-        logging.info('Dispatched to platform, response: %s' % response)
+        logging.info('Dispatched to platform, response: %s' % response.text)
         return []
 
 
-class ActionCreateVoteRoutine(FormAction):
+class ActionAcquireVoteDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -278,7 +278,7 @@ class ActionUtterVoteStatus(Action):
         return []
 
 
-class CreateVoteComplete(Action):
+class SendVoteToServer(Action):
 
     def name(self):
         return 'action_create_vote_complete'
@@ -296,11 +296,11 @@ class CreateVoteComplete(Action):
                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create vote: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        logging.info('Received response from platform: %s' % response.text)
         return []
 
 
-class ActionTodoInfoRoutine(FormAction):
+class ActionAcquireInfoTodoDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -329,7 +329,7 @@ class ActionTodoInfoRoutine(FormAction):
         return []
 
 
-class CreateInfoTodoComplete(Action):
+class SendInfoTodoToServer(Action):
 
     def name(self):
         return 'action_create_info_todo_complete'
@@ -346,11 +346,11 @@ class CreateInfoTodoComplete(Action):
                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create information todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        logging.info('Received response from platform: %s' % response.text)
         return []        
 
 
-class ActionTodoVolunteerRoutine(FormAction):
+class ActionAcquireVolunteerDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -377,7 +377,7 @@ class ActionTodoVolunteerRoutine(FormAction):
         return []
 
 
-class CreateVolunteerTodoComplete(Action):
+class ActionSendVolunteerTodoToServer(Action):
 
     def name(self):
         return 'action_create_volunteer_todo_complete'
@@ -393,11 +393,11 @@ class CreateVolunteerTodoComplete(Action):
                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create volunteer todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        logging.info('Received response from platform: %s' % response.text)
         return []
 
 
-class ActionTodoValidationRoutine(FormAction):
+class ActionAcquireValidationDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -424,7 +424,7 @@ class ActionTodoValidationRoutine(FormAction):
         return []
 
 
-class CreateValidationTodoComplete(Action):
+class ActionSendValidationToServer(Action):
 
     def name(self):
         return 'create_validation_todo_complete'
@@ -440,11 +440,11 @@ class CreateValidationTodoComplete(Action):
                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create validation todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        logging.info('Received response from platform: %s' % response.text)
         return []
 
 
-class ActionTodoActionRoutine(FormAction):
+class ActionAcquireActionTodoDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -471,7 +471,7 @@ class ActionTodoActionRoutine(FormAction):
         return []
 
 
-class CreateActionTodoComplete(Action):
+class ActionSendActionTodoToServer(Action):
 
     def name(self):
         return 'action_create_todo_action_complete'
@@ -487,11 +487,11 @@ class CreateActionTodoComplete(Action):
                                          })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create action todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        logging.info('Received response from platform: %s' % response.text)
         return []
 
 
-class ActionLivewireRoutine(FormAction):
+class ActionAcquireLivewireDetails(FormAction):
 
     RANDOMIZE = False
 
@@ -517,7 +517,8 @@ class ActionSaveMediaFile(Action):
         return 'action_save_media_file_id'
 
     def run(self, dispatcher, tracker, domain):
-        media_file = (tracker.latest_message)['text']
+        # media_file = (tracker.latest_message)['text']
+        media_file = tracker.get_slot("media_record_id")
         logging.debug("Recieved media file: %s" % media_file)
         current_media_files = tracker.get_slot("media_file_ids")
         logging.debug("Current media files are: %s" % current_media_files)
@@ -541,7 +542,7 @@ class ActionUtterLivewireStatus(Action):
                      "You have identified yourself as %s",
                      "and provided %s as your contact detail.",
                      "",
-                     "You would like this to appear within the group %s which has %s member."
+                     "You would like this to appear within the group %s which has %s members."
                     ]
         media_files = tracker.get_slot("media_file_ids")
         if len(media_files) > 1:
@@ -557,7 +558,7 @@ class ActionUtterLivewireStatus(Action):
         return []
 
 
-class CreateLivewireComplete(Action):
+class ActionSendLivewireToServer(Action):
 
     def name(self):
         return 'action_create_livewire_complete'
@@ -594,7 +595,7 @@ class CreateLivewireComplete(Action):
                                          })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed livewire url: %s' % response.url)
-        logging.info('Received response from platform: %s' % response)
+        logging.info('Received response from platform: %s' % response.text)
         return []
 
 

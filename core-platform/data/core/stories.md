@@ -7,6 +7,7 @@
 ## user wants a meeting
 > check_what_user_wants
 * call_meeting
+  - utter_confirm_meeting_intent
   - slot{"action": "call_meeting"}
   - action_get_group
 > check_for_more_meeting_groups
@@ -57,6 +58,7 @@
 ## user wants to vote
 > check_what_user_wants
 * call_vote
+  - utter_confirm_vote_intent
   - slot{"action": "call_vote"}
   - action_get_group
 > check_for_more_vote_groups
@@ -141,6 +143,7 @@
 ## user wants to post a livewire
 > check_what_user_wants
 * create_livewire
+  - utter_confirm_livewire_intent
   - action_get_group
 > check_for_more_livewire_groups
 
@@ -227,6 +230,7 @@
 ## user wants volunteers
 > check_what_user_wants
 * create_volunteer_todo
+  - utter_confirm_volunteer_intent
   - action_get_group
 > check_for_more_volunteer_groups
 
@@ -273,6 +277,7 @@
 ## user wants group member information
 > check_what_user_wants
 * create_info_todo
+  - utter_confirm_info_intent
   - action_get_group
 > check_for_more_info_groups
 
@@ -323,6 +328,7 @@
 ## user wants to call for action
 > check_what_user_wants
 * create_action_todo
+  - utter_confirm_action_intent
   - action_get_group
 > check_for_more_action_groups
 
@@ -369,6 +375,7 @@
 ## user seeks validation
 > check_what_user_wants
 * create_validation_todo
+  - utter_confirm_validation_intent
   - action_get_group
 > check_for_more_validation_groups
 
@@ -400,7 +407,7 @@
 > check_validation_correctness
 
 ## request is correct, send to server
-> check_validation_corectness
+> check_validation_correctness
 * affirm
   - create_validation_todo_complete
   - action_restart

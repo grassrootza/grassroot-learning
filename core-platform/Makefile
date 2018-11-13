@@ -30,11 +30,11 @@ train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
 
 train-core:
-	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10 --nlu_threshold 0.4 --core_threshold 0.4 --fallback_action action_default_fallback
+	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 15 --nlu_threshold 0.0 --core_threshold 0.0 --fallback_action action_default_fallback
 
 train-core-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
-	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10 --nlu_threshold 0.4 --core_threshold 0.4 --fallback_action action_default_fallback
+	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10 --nlu_threshold 0.0 --core_threshold 0.0 --fallback_action action_default_fallback
 
 run-core-nlu:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/nlu --endpoints endpoints.yml --verbose

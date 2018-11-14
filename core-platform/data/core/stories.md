@@ -7,10 +7,22 @@
 ## user wants a meeting
 > check_what_user_wants
 * call_meeting
+  - utter_confirm_meeting_intent
   - slot{"action": "call_meeting"}
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_meeting_groups
+
+## user wants more groups
+> check_for_more_meeting_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_meeting_groups
+
+## user has selected desired group, continue meeting flow
+> check_for_more_meeting_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_create_meeting_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "world domination"}
@@ -46,10 +58,22 @@
 ## user wants to vote
 > check_what_user_wants
 * call_vote
+  - utter_confirm_vote_intent
   - slot{"action": "call_vote"}
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_vote_groups
+
+## user wants more groups
+> check_for_more_vote_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_vote_groups
+
+## user has selected desired group, continue vote flow
+> check_for_more_vote_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_create_vote_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "world domination"}
@@ -63,9 +87,44 @@
 * select{"datetime": "later"}
   - action_create_vote_routine
   - slot{"datetime": "later"}
-  - utter_vote_options_initialiser
-* select{"vote_option": "yes"}
-  - action_save_vote_option
+  - utter_ask_options_type
+> check_default_or_custom
+
+## user is okay with default yes/no options
+> check_default_or_custom
+* negate
+  - action_default_vote_options
+  - slot{"vote_options": "['vote', 'options']"}
+  - action_utter_vote_status
+  - utter_confirm_request
+> check_vote_correctness
+
+## user would like custom vote options
+> check_default_or_custom
+* affirm
+  - utter_ask_vote_option
+* select{"temp": "vote option"}
+  - slot{"temp": "vote option"}
+  - action_add_to_vote_options
+  - slot{"vote_options": "['vote', 'options']"}
+  - utter_add_another
+> check_for_more
+
+## user would like to add another vote option
+> check_for_more
+* affirm
+  - utter_ask_vote_option
+* select{"temp": "vote option"}
+  - slot{"temp": "vote option"}
+  - action_add_to_vote_options
+  - slot{"vote_options": ["vote", "options"]}
+  - utter_add_another
+> check_for_more
+
+## user is done adding vote options
+> check_for_more
+* negate
+  - action_utter_vote_status
   - utter_confirm_request
 > check_vote_correctness
 
@@ -84,9 +143,21 @@
 ## user wants to post a livewire
 > check_what_user_wants
 * create_livewire
+  - utter_confirm_livewire_intent
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_livewire_groups
+
+## user wants more groups
+> check_for_more_livewire_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_livewire_groups
+
+## user has selected desired group, continue livewire flow
+> check_for_more_livewire_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_livewire_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "New Clinic Open"}
@@ -107,9 +178,40 @@
 * select{"contact_number": "011 111 1111"}
   - action_livewire_routine
   - slot{"contact_number": "011 111 1111"}
-  - utter_ask_media_files
-* select{"media_file_keys": []}
-  - action_save_media_file
+  - utter_ask_add_media_files
+> check_for_media_file
+
+## user wants to add a media file
+> check_for_media_file
+* affirm
+  - utter_ask_media_file
+* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - action_save_media_file_id
+  - utter_add_another
+> check_for_more_media_files
+
+## user would like to add another media file
+> check_for_more_media_files
+* affirm
+  - utter_ask_media_file
+* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - action_save_media_file_id
+  - utter_add_another
+> check_for_more_media_files  
+
+## user is happy with currently added files, proceed to request confirmation
+> check_for_more_media_files
+* negate
+  - action_utter_livewire_status
+  - utter_confirm_request
+> check_livewire_correctness  
+
+## user is happy without any media files
+> check_for_media_file
+* negate
+  - action_utter_livewire_status
   - utter_confirm_request
 > check_livewire_correctness
 
@@ -128,9 +230,21 @@
 ## user wants volunteers
 > check_what_user_wants
 * create_volunteer_todo
+  - utter_confirm_volunteer_intent
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_volunteer_groups
+
+## user wants more groups
+> check_for_more_volunteer_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_volunteer_groups
+
+## user has selected desired group, continue volunteer flow
+> check_for_more_volunteer_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_volunteer_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -163,9 +277,21 @@
 ## user wants group member information
 > check_what_user_wants
 * create_info_todo
+  - utter_confirm_info_intent
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_info_groups
+
+## user wants more groups
+> check_for_more_info_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_info_groups
+
+## user has selected desired group, continue info-todo flow
+> check_for_more_info_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_info_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -202,9 +328,21 @@
 ## user wants to call for action
 > check_what_user_wants
 * create_action_todo
+  - utter_confirm_action_intent
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_action_groups
+
+## user wants more groups
+> check_for_more_action_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_action_groups
+
+## user has selected desired group, continue action flow
+> check_for_more_action_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_action_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -237,9 +375,21 @@
 ## user seeks validation
 > check_what_user_wants
 * create_validation_todo
+  - utter_confirm_validation_intent
   - action_get_group
-* select{"group": "Veritas"}
-  - slot{"group": "Veritas"}
+> check_for_more_validation_groups
+
+## user wants more groups
+> check_for_more_validation_groups
+* next_page
+  - action_increment_page
+  - action_get_group
+> check_for_more_validation_groups
+
+## user has selected desired group, continue validation flow
+> check_for_more_validation_groups
+* select{"group_uid": "Veritas"}
+  - slot{"group_uid": "Veritas"}
   - action_todo_validation_routine
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
@@ -257,13 +407,13 @@
 > check_validation_correctness
 
 ## request is correct, send to server
-> check_validation_carrectness
+> check_validation_correctness
 * affirm
   - create_validation_todo_complete
   - action_restart
 
 ## request is wrong
-> check_validation_carrectness
+> check_validation_correctness
 * negate
   - utter_negation
   - action_restart

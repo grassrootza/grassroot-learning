@@ -23,10 +23,8 @@ entities:
  - datetime
  - location
  - subject
- - vote_option
+ - vote_options
  - information_required
- - group
- - group_name
  - response_tag
  - description
  - reminderMinutes
@@ -35,11 +33,11 @@ entities:
  - latitude
  - longitude
  - task_uid
- - media_file_keys
+ - media_file_ids
  - destination_uid
  - contact_name
  - contact_number
-
+ - media_record_id
 
 slots:
   requested_slot:
@@ -51,29 +49,25 @@ slots:
   inform:
     type: text
   datetime:
-    type: text
+    type: unfeaturized
   location:
-    type: text
+    type: unfeaturized
   subject:
+    type: unfeaturized
+  temp:
     type: text
-  vote_option:
-    type: text
+  vote_options:
+    type: list
   information_required:
-    type: text
-  group:
-    type: text
+    type: unfeaturized
   params:
     type: text
   description:
-    type: text
-  reminderMinutes:
-    type: text
+    type: unfeaturized
   response_tag:
-    type: text
-  group_name:
-    type: text
+    type: unfeaturized
   group_uid:
-    type: text
+    type: unfeaturized
   latitude:
     type: float
   longitude:
@@ -81,15 +75,17 @@ slots:
   task_uid:
     type: text
   livewire_type:
-    type: text
-  media_file_keys:
-    type: text
+    type: unfeaturized
+  media_record_id:
+    type: unfeaturized
+  media_file_ids:
+    type: unfeaturized
   destination_uid:
     type: text
   contact_name:
-    type: text
+    type: unfeaturized
   contact_number:
-    type: text
+    type: unfeaturized
 
 templates:
   utter_actions_intitialiser:
@@ -109,10 +105,8 @@ templates:
     - "When would you like this to happen?"
   utter_datetime:
     - "You want to do this by {datetime}"
-  utter_ask_group:
+  utter_ask_group_uid:
     - "Which group of people would you like to this with?"
-  utter_group:
-    - "You have chosen {group} for this action."
   utter_ask_response_tag:
     - "How would like incoming responses to be tagged? eg. 'id:', 'addr:', etc"
   utter_response_tag:
@@ -121,10 +115,6 @@ templates:
     - "Where would you like this to happen?"
   utter_location:
     - "You want this to happen at {location}."
-  utter_ask_group_name:
-    - "What would you like to call your new group?"
-  utter_group_name:
-    - "You have chosen {group_name} as the name of your new group."
   utter_ask_todo_info:
     - "What type of information would you like participants to give you?"
   utter_todo_info:
@@ -135,28 +125,45 @@ templates:
 #    - "We are making it happen for you. Thank you for using our service."
   utter_ask_description:
     - "How would you describe it?"
-  utter_vote_options_initialiser:
-    - "Please enter your vote options one by one and enter \"I'm done\" when finished."
-  utter_vote_option:
-    - "Cool, I've recieved your vote option '{vote_option}'"
-  utter_ask_reminder_minutes:
-    - "Reminder minutes set to {reminderMinutes}"
+  utter_ask_options_type:
+    - "Would you like to add vote options?"
+  utter_ask_vote_option:
+    - "Enter a vote option."
+  utter_add_another:
+    - "Would you like to add another?"
   utter_ask_contact_name:
     - "Please provide your name or alias."
   utter_ask_contact_number:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_ask_livewire_content:
     - "Please enter the main content of your livewire."
-  utter_ask_media_files:
-    - "Would you like to add any images? Add them below and enter 'Done' when finished."
+  utter_ask_add_media_files:
+    - "Would you like to add any images?"
+  utter_ask_media_file:
+    - "Please paste/send your image below"
   utter_confirm_request:
     - "Is this correct?"
-
+  utter_default:
+    - "Sorry. I have much to learn. I'm certain I'll understand everything you say one day."
+  utter_confirm_meeting_intent:
+    - "Okay, lets call a meeting."
+  utter_confirm_vote_intent:
+    - "Okay, lets call a vote"
+  utter_confirm_livewire_intent:
+    - "Okay, lets create a livewire post."
+  utter_confirm_info_intent:
+    - "Okay lets create an info action"
+  utter_confirm_volunteer_intent:
+    - "Okay, lets find volunteers."
+  utter_confirm_action_intent:
+    - "Okay, lets call for action."
+  utter_confirm_validation_intent:
+    - "Okay, lets create a validation task."
 
 actions:
   - utter_ask_subject
   - utter_ask_datetime
-  - utter_ask_group
+  - utter_ask_group_uid
   - utter_ask_location
   - utter_ask_group_name
   - utter_ask_response_tag
@@ -164,14 +171,26 @@ actions:
   - utter_negation
   - utter_affirmation
   - utter_ask_description
-  - utter_vote_options_initialiser
+  - utter_ask_options_type
+  - utter_ask_vote_option
   - utter_vote_option
+  - utter_add_another
   - utter_ask_reminder_minutes
   - utter_ask_livewire_content
   - utter_ask_contact_name
   - utter_ask_contact_number
-  - utter_ask_media_files
-  - action_utter_save_selected_group
+  - utter_ask_add_media_files
+  - utter_ask_media_file
+  - utter_actions_initialiser
+  - utter_actions_menu
+  - utter_confirm_request
+  - utter_confirm_meeting_intent
+  - utter_confirm_vote_intent
+  - utter_confirm_livewire_intent
+  - utter_confirm_info_intent
+  - utter_confirm_volunteer_intent
+  - utter_confirm_action_intent
+  - utter_confirm_validation_intent
   - action_get_vote_option
   - action_create_meeting_complete
   - action_create_vote_complete
@@ -191,7 +210,9 @@ actions:
   - action_todo_action_routine
   - action_get_group
   - action_livewire_routine
-  - action_save_media_file
-  - utter_actions_initialiser
-  - utter_actions_menu
-  - utter_confirm_request
+  - action_default_vote_options
+  - action_add_to_vote_options
+  - action_save_media_file_id
+  - action_utter_vote_status
+  - action_utter_livewire_status
+  - action_increment_page

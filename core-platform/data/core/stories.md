@@ -28,10 +28,6 @@
 * select{"subject": "world domination"}
   - action_create_meeting_routine
   - slot{"subject": "world domination"}
-  - slot{"requested_slot": "description"}
-* select{"description": "none"}
-  - action_create_meeting_routine
-  - slot{"description": "none"}
   - slot{"requested_slot": "location"}
 * select{"location": "Nowhere"}
   - action_create_meeting_routine
@@ -79,10 +75,6 @@
 * select{"subject": "world domination"}
   - action_create_vote_routine
   - slot{"subject": "world domination"}
-  - slot{"requested_slot": "description"}
-* select{"description": "None"}
-  - action_create_vote_routine
-  - slot{"description": "world domination"}
   - slot{"requested_slot": "datetime"}
 * select{"datetime": "later"}
   - action_create_vote_routine
@@ -163,11 +155,10 @@
 * select{"subject": "New Clinic Open"}
   - action_livewire_routine
   - slot{"subject": "New Clinic Open"}
-  - utter_ask_livewire_content
-  - slot{"requested_slot": "description"}
-*  select{"description": "A new clinic has open within our community"}
+  - slot{"requested_slot": "livewire_content"}
+*  select{"livewire_content": "A new clinic has open within our community"}
   - action_livewire_routine
-  - slot{"description": "A new clinic has opened within our comminity"}
+  - slot{"livewire_content": "A new clinic has opened within our comminity"}
   - utter_ask_contact_name
   - slot{"requested_slot": "contact_name"}
 * select{"contact_name": "Jack Ryan"}
@@ -250,10 +241,6 @@
 * select{"subject": "protest"}
   - action_todo_volunteer_routine
   - slot{"subject": "protest"}
-  - slot{"requested_slot": "description"}
-* select{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - action_todo_volunteer_routine
-  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
   - slot{"requested_slot": "datetime"}
 * select{"datetime": "later"}
   - action_todo_volunteer_routine
@@ -348,10 +335,6 @@
 * select{"subject": "protest"}
   - action_todo_action_routine
   - slot{"subject": "protest"}
-  - slot{"requested_slot": "description"}
-* select{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - action_todo_action_routine
-  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
   - slot{"requested_slot": "datetime"}
 * select{"datetime": "later"}
   - action_todo_action_routine
@@ -395,10 +378,6 @@
 * select{"subject": "protest"}
   - action_todo_validation_routine
   - slot{"subject": "protest"}
-  - slot{"requested_slot": "description"}
-* select{"description": "Volunteer gathering to clean up our neighbourhood."}
-  - action_todo_validation_routine
-  - slot{"description": "Volunteer gathering to clean up our neighbourhood."}
   - slot{"requested_slot": "datetime"}
 * select{"datetime": "later"}
   - action_todo_validation_routine

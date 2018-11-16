@@ -161,7 +161,6 @@ class ActionAcquireMeetingDetails(FormAction):
         return [
             FreeTextFormField("location"),
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
             FreeTextFormField("datetime")
         ]
 
@@ -173,7 +172,6 @@ class ActionAcquireMeetingDetails(FormAction):
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You have described this meeting as %s." % tracker.get_slot("description"),
                      "You want this to happen *%s*." % tracker.get_slot("datetime"),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
@@ -196,7 +194,6 @@ class ActionSendMeetingToServer(Action):
                                          'location': tracker.get_slot("location"),
                                          'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
                                          'subject': tracker.get_slot("subject"),
-                                         'description': tracker.get_slot("description")
                                          })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Constructed url for create meeting: %s' % response.url)
@@ -212,7 +209,6 @@ class ActionAcquireVoteDetails(FormAction):
     def required_fields():
         return [
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
             FreeTextFormField("datetime")
         ]
         # voteOptions are acquired through a different Action
@@ -266,12 +262,11 @@ class ActionUtterVoteStatus(Action):
             else:
                 vote_options = vote_options + 'and ' + str(vote_options_list[i])
         template = [
-                    "You have chosen %s as your subject of your vote.",
-                    "You have described this vote as %s",
+                    "You have chosen %s as your subject of your vote",
                     "and want the %s member(s) of %s to vote between %s",
                     "by *%s*."
                    ]
-        vote_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
+        vote_status = ' '.join(template) % (tracker.get_slot("subject"),
                                             member_count, group_name,
                                             vote_options, tracker.get_slot("datetime"))
         dispatcher.utter_message(vote_status)
@@ -292,7 +287,6 @@ class SendVoteToServer(Action):
                                          'title': tracker.get_slot("subject"),
                                          'time': epoch(formalize(tracker.get_slot("datetime"))),
                                          'voteOptions': json.dumps(tracker.get_slot("vote_options")),
-                                         'description': tracker.get_slot("description")
                                         })
         dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create vote: %s' % response.url)
@@ -308,7 +302,6 @@ class ActionAcquireInfoTodoDetails(FormAction):
     def required_fields():
         return [
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
             FreeTextFormField("response_tag"),
             FreeTextFormField("datetime")
         ]
@@ -320,7 +313,6 @@ class ActionAcquireInfoTodoDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
-                     "You have described this todo as %s" % tracker.get_slot("description"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
                      "Participants may respond until *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
@@ -358,7 +350,6 @@ class ActionAcquireVolunteerDetails(FormAction):
     def required_fields():
         return [
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
             FreeTextFormField("datetime")
         ]
 
@@ -369,7 +360,6 @@ class ActionAcquireVolunteerDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
-                     "You have described this volunteer task as %s" % tracker.get_slot("description"),
                      "You want this to happen *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
@@ -405,7 +395,6 @@ class ActionAcquireValidationDetails(FormAction):
     def required_fields():
         return [
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
             FreeTextFormField("datetime")
         ]
 
@@ -416,7 +405,6 @@ class ActionAcquireValidationDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
-                     "You have described this validation as %s." % tracker.get_slot("description"),
                      "You want everyone to have responded by *%s*." % tracker.get_slot("datetime"),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
@@ -452,7 +440,6 @@ class ActionAcquireActionTodoDetails(FormAction):
     def required_fields():
         return [
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
             FreeTextFormField("datetime")
         ]
 
@@ -463,7 +450,6 @@ class ActionAcquireActionTodoDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
-                     "You have described this action as %s" % tracker.get_slot("description"),
                      "You want this to happen *%s*" % tracker.get_slot("datetime"),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                    ]
@@ -499,7 +485,7 @@ class ActionAcquireLivewireDetails(FormAction):
     def required_fields():
         return [
             FreeTextFormField("subject"),
-            FreeTextFormField("description"),
+            FreeTextFormField("livewire_content"),
             FreeTextFormField("contact_name"),
             FreeTextFormField("contact_number")
         ]
@@ -517,7 +503,6 @@ class ActionSaveMediaFile(Action):
         return 'action_save_media_file_id'
 
     def run(self, dispatcher, tracker, domain):
-        # media_file = (tracker.latest_message)['text']
         media_file = tracker.get_slot("media_record_id")
         logging.debug("Recieved media file: %s" % media_file)
         current_media_files = tracker.get_slot("media_file_ids")
@@ -542,16 +527,17 @@ class ActionUtterLivewireStatus(Action):
                      "You have identified yourself as %s",
                      "and provided %s as your contact detail.",
                      "",
-                     "You would like this to appear within the group %s which has %s members."
+                     "You would like this to appear within the group %s which has %s member(s)."
                     ]
         media_files = tracker.get_slot("media_file_ids")
-        if len(media_files) > 1:
-        	template[4] = "You have also included %s media files." % len(media_files)
-        elif len(media_files) == 1:
-        	template[4] = "You have also included an image to this livewire."
+        if media_files != None:
+            if len(media_files) > 1:
+        	    template[4] = "You have also included %s media files." % len(media_files)
+            elif len(media_files) == 1:
+               template[4] = "You have also included an image to this livewire."
         else:
         	template.pop(4)
-        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("description"),
+        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("livewire_content"),
                                                 tracker.get_slot("contact_name"), tracker.get_slot("contact_number"),
                                                 group_name, member_count)
         dispatcher.utter_message(livewire_status)
@@ -565,7 +551,7 @@ class ActionSendLivewireToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         headline = tracker.get_slot("subject")
-        description = tracker.get_slot("description")
+        content = tracker.get_slot("livewire_content")
         contactName = tracker.get_slot("contact_name")
         contactNumber =  tracker.get_slot("contact_number")
         taskUid = tracker.get_slot("task_uid")
@@ -581,7 +567,7 @@ class ActionSendLivewireToServer(Action):
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'headline': headline,
-                                         'description': description,
+                                         'description': content,
                                          'contactName': contactName,
                                          'contactNumber': contactNumber,
                                          'groupUid': groupUid,

@@ -26,7 +26,6 @@ entities:
  - vote_options
  - information_required
  - response_tag
- - description
  - reminderMinutes
  - requested_slot
  - group_uid
@@ -38,6 +37,7 @@ entities:
  - contact_name
  - contact_number
  - media_record_id
+ - livewire_content
 
 slots:
   requested_slot:
@@ -75,6 +75,8 @@ slots:
   task_uid:
     type: text
   livewire_type:
+    type: unfeaturized
+  livewire_content:
     type: unfeaturized
   media_record_id:
     type: unfeaturized
@@ -123,8 +125,6 @@ templates:
     - "We have nuked your request. Thank you for using our service."
 #  utter_affirmation:
 #    - "We are making it happen for you. Thank you for using our service."
-  utter_ask_description:
-    - "How would you describe it?"
   utter_ask_options_type:
     - "Would you like to add vote options?"
   utter_ask_vote_option:
@@ -170,7 +170,6 @@ actions:
   - utter_ask_todo_info
   - utter_negation
   - utter_affirmation
-  - utter_ask_description
   - utter_ask_options_type
   - utter_ask_vote_option
   - utter_vote_option

@@ -503,7 +503,6 @@ class ActionSaveMediaFile(Action):
         return 'action_save_media_file_id'
 
     def run(self, dispatcher, tracker, domain):
-        # media_file = (tracker.latest_message)['text']
         media_file = tracker.get_slot("media_record_id")
         logging.debug("Recieved media file: %s" % media_file)
         current_media_files = tracker.get_slot("media_file_ids")
@@ -531,10 +530,11 @@ class ActionUtterLivewireStatus(Action):
                      "You would like this to appear within the group %s which has %s member(s)."
                     ]
         media_files = tracker.get_slot("media_file_ids")
-        if len(media_files) > 1:
-        	template[4] = "You have also included %s media files." % len(media_files)
-        elif len(media_files) == 1:
-        	template[4] = "You have also included an image to this livewire."
+        if media_files != None:
+            if len(media_files) > 1:
+        	    template[4] = "You have also included %s media files." % len(media_files)
+            elif len(media_files) == 1:
+               template[4] = "You have also included an image to this livewire."
         else:
         	template.pop(4)
         livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("livewire_content"),

@@ -19,7 +19,7 @@ train-nlu:
 train-core:
 	cd ./core-services; python3 train_services_core.py --aug 10 --epochs 50 --batch 128 --memdepth 0 # note that too high an aug factor seems to create over-fitting
 	cd ./core-knowledge; python3 train_knowledge_core.py
-	cd ./core-platform; python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10
+	cd ./core-platform; python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 15 --nlu_threshold 0.0 --core_threshold 0.0 --fallback_action action_default_fallback
 
 run-flask:
 	python3 app.py

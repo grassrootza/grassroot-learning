@@ -23,11 +23,11 @@ logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(leve
 application = Flask(__name__)
 
 # Now load up the various interpreters and agents
-opening_nlu = RasaNLUInterpreter('./nlu-opening/models/current/opening_nlu')
-service_nlu = RasaNLUInterpreter('./core-services/models/current/services_nlu')
+opening_nlu = '' #RasaNLUInterpreter('./nlu-opening/models/current/opening_nlu')
+service_nlu = '' #RasaNLUInterpreter('./core-services/models/current/services_nlu')
 platform_nlu = RasaNLUInterpreter('./core-platform/models/current/platform_nlu')
 
-services_actions_endpoint = os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
+services_actions_endpoint = '' #os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 platform_actions_endpoint = os.getenv('PLATFORM_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 
 intent_domain_map = {
@@ -45,8 +45,8 @@ intent_domain_map = {
 }
 
 domain_agents = {
-    "service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
-    "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
+    #"service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
+    #"knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
     "action" : Agent.load('core-platform/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
 }
 

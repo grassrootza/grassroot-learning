@@ -24,7 +24,7 @@ logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(leve
 auth_token = os.getenv('TOKEN_X')
 
 BASE_URL = os.getenv('PLATFORM_BASE_URL', 'https://staging.grassroot.org.za/v2/api')
-DATETIME_URL = os.getenv('DATE_TIME_URL', 'http://learning.grassroot.cloud')
+DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-west-1.amazonaws.com/production')
 
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
@@ -211,7 +211,6 @@ class ActionAcquireVoteDetails(FormAction):
             FreeTextFormField("subject"),
             FreeTextFormField("datetime")
         ]
-        # voteOptions are acquired through a different Action
 
     def name(self):
         return 'action_create_vote_routine'
@@ -533,8 +532,9 @@ class ActionUtterLivewireStatus(Action):
         if media_files != None:
             if len(media_files) > 1:
         	    template[4] = "You have also included %s media files." % len(media_files)
-            elif len(media_files) == 1:
-               template[4] = "You have also included an image to this livewire."
+            else: 
+                if len(media_files) == 1:
+                    template[4] = "You have also included an image to this livewire."
         else:
         	template.pop(4)
         livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("livewire_content"),
@@ -586,16 +586,14 @@ class ActionSendLivewireToServer(Action):
 
 
 def formalize(datetime_str):
-    response = requests.get('%s/datetime?date_string=%s' % (DATETIME_URL, datetime_str)).content.decode('ascii')
-    logging.debug('datetime engine returned: %s' % response)
-    return response
+    response = requests.get(DATETIME_URL, params={
+                                                  'date_string': datetime_str
+                                                 })
+    logging.info('constructed datetime url: %s' % response.url)
+    logging.debug('datetime engine returned: %s' % response.content)
+    return response.content.decode('ascii')
 
 
 def epoch(formalized_datetime):
-    try:
-        utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
-        return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
-    except ValueError as e:
-        logging.debug(e)
-        utc_time = datetime.strptime(formalized_datetime, '%d-%m-%YT%H:%M')
-        return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+    utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+    return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)

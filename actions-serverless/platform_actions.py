@@ -195,9 +195,12 @@ class ActionSendMeetingToServer(Action):
                                          'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
                                          'subject': tracker.get_slot("subject"),
                                          })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Constructed url for create meeting: %s' % response.url)
         logging.info('Dispatched to platform, response: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
 
@@ -287,9 +290,12 @@ class SendVoteToServer(Action):
                                          'time': epoch(formalize(tracker.get_slot("datetime"))),
                                          'voteOptions': json.dumps(tracker.get_slot("vote_options")),
                                         })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create vote: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
 
@@ -327,7 +333,7 @@ class SendInfoTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/information/%s/%s' % (parentType, groupUid)
+        todo_path = '/task/create/todo/information/%s/%s' % (parentType, groupUid)
         url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
@@ -335,9 +341,12 @@ class SendInfoTodoToServer(Action):
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
                                          'responseTag': tracker.get_slot("response_tag")
                                         })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create information todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []        
 
 
@@ -373,16 +382,19 @@ class ActionSendVolunteerTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
+        todo_path = '/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
         url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
                                         })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create volunteer todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
 
@@ -418,16 +430,19 @@ class ActionSendValidationToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
+        todo_path = '/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
         url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
                                         })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create validation todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
 
@@ -463,16 +478,19 @@ class ActionSendActionTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/v2/api/task/create/todo/action/%s/%s' % (parentType, groupUid)
+        todo_path = '/task/create/todo/action/%s/%s' % (parentType, groupUid)
         url = BASE_URL + todo_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
                                          })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed url for create action todo: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
 
@@ -562,7 +580,7 @@ class ActionSendLivewireToServer(Action):
         longitude = tracker.get_slot("longitude")
         destUid = tracker.get_slot("destination_uid")
         groupUid = tracker.get_slot("group_uid")
-        livewire_path = '/v2/api/livewire/create/%s' % tracker.sender_id
+        livewire_path = '/livewire/create/%s' % tracker.sender_id
         url = BASE_URL + livewire_path
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
@@ -579,9 +597,12 @@ class ActionSendLivewireToServer(Action):
                                          'longitude': longitude,
                                          'destUid': destUid
                                          })
-        dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
         logging.info('Contructed livewire url: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
 

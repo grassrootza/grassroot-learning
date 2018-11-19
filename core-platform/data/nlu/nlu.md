@@ -86,3 +86,15 @@
 - Don't you understand?
 - What's wrong
 - Makes no sense
+
+## intent:next_page
+- load more groups
+- more groups
+- next page
+- please load more groups
+- next page please
+- show me more groups
+- show more groups
+- are there any more groups
+- make more groups appear
+- are these the only groups

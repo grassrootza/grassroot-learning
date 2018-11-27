@@ -605,7 +605,7 @@ class ActionSendLivewireToServer(Action):
             dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
-
+"""
 class ActionCustomFallback(Action):
 
     def name(self):
@@ -630,7 +630,7 @@ class ActionCustomFallback(Action):
             logging.error('Evaluation failed. Got this back: %s' % new_intent)
             dispatcher.utter_template('utter_default', tracker)
         return []
-
+"""
 
 def formalize(datetime_str):
     response = requests.get(DATETIME_URL, params={

@@ -174,8 +174,8 @@
 > check_for_media_file
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 > check_for_more_media_files
@@ -184,8 +184,8 @@
 > check_for_more_media_files
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 > check_for_more_media_files  
@@ -394,3 +394,8 @@
 * negate
   - utter_negation
   - action_restart
+
+## fallback story
+* out_of_scope
+  - action_restart
+  - action_custom_fallback

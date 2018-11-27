@@ -606,6 +606,32 @@ class ActionSendLivewireToServer(Action):
         return []
 
 
+class ActionCustomFallback(Action):
+
+    def name(self):
+        return 'action_custom_fallback'
+
+    def run(self, dispatcher, tracker, domain):
+        disputed_message = (tracker.latest_message)['text']
+        new_intent = requests.get('http://0.0.0.0:5000/evaluate', params={'message': disputed_message})
+        if new_intent.status_code == 200:
+            logging.info('Successfuly got this back from intent evaluation: %s' % new_intent.content)
+            new_domain = json.loads(new_intent.content)['intent']
+            logging.info('Rerouting message to new domain: %s' % new_domain)
+            response = requests.get('http://0.0.0.0:5000/%s/parse' % new_domain,
+                                    params={
+                                            'message': disputed_message,
+                                            'user_id': tracker.sender_id
+                                           }) 
+            logging.debug('Rerouted to url: %s' % response.url)
+            if response.status_code == 200:
+                dispatcher.utter_message(json.loads(response.content.decode('ascii'))['responses'])    
+        else:
+            logging.error('Evaluation failed. Got this back: %s' % new_intent)
+            dispatcher.utter_template('utter_default', tracker)
+        return []
+
+
 def formalize(datetime_str):
     response = requests.get(DATETIME_URL, params={
                                                   'date_string': datetime_str

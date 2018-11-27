@@ -188,3 +188,8 @@
     - action_retrieve_and_send_services
     - utter_goodbye
     - action_restart
+
+## fallback story
+* out_of_scope
+  - action_restart
+  - action_custom_fallback

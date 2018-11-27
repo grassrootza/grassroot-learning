@@ -32,11 +32,11 @@ entities:
  - latitude
  - longitude
  - task_uid
- - media_file_ids
  - destination_uid
  - contact_name
  - contact_number
  - media_record_id
+ - media_record_ids
  - livewire_content
 
 slots:
@@ -80,7 +80,7 @@ slots:
     type: unfeaturized
   media_record_id:
     type: unfeaturized
-  media_file_ids:
+  media_record_ids:
     type: unfeaturized
   destination_uid:
     type: text
@@ -93,7 +93,7 @@ templates:
   utter_actions_intitialiser:
     - "Welcome to Grassroot Actions. What would you like to do?"
   utter_actions_menu:
-    - "Welcome to Grassroot Actions. Here you can set meeting, call votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
+    - "Welcome to Grassroot Actions. Here you can call meetings and votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
   action_get_group:
     - text: "Choose a group"
       buttons:
@@ -215,3 +215,4 @@ actions:
   - action_utter_vote_status
   - action_utter_livewire_status
   - action_increment_page
+  - action_custom_fallback

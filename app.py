@@ -35,13 +35,12 @@ intent_domain_map = {
     'request_knowledge': 'knowledge',
     'call_meeting': 'action',
     'call_vote': 'action',
-    'create_group': 'action',
     'create_action_todo': 'action',
     'create_info_todo': 'action',
     'create_volunteer_todo': 'action',
     'create_validation_todo': 'action',
-    'update': 'action',
-    'create_group': 'action'
+    'create_livewire': 'action',
+    'take_action': 'action'
 }
 
 domain_agents = {
@@ -149,6 +148,20 @@ def parse_user_province():
     resp = jsonify(reshape_nlu_result('service', nlu_result))
     resp.status_code = 200
     return resp
+
+
+"""
+@application.route('/evaluate', methods=['GET'])
+def evaluate():
+    user_message = request.args.get('message')
+    nlu_result = error_catching_nlu_parse(user_message, opening_nlu)
+    NLU_THRESHOLD = 0.1
+    if nlu_result['intent']['confidence'] > NLU_THRESHOLD:
+        intent = nlu_result['intent']['name']
+        return json.dumps({'intent': intent})
+    else:
+        return json.dumps({'intent': None})
+"""
 
 
 @application.route('/opening/parse', methods=['GET'])

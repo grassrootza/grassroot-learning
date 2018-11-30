@@ -16,6 +16,7 @@ intents:
   - create_livewire
   - inform
   - out_of_scope
+  - action_failed
 
 entities:
  - page
@@ -69,9 +70,9 @@ slots:
   group_uid:
     type: unfeaturized
   latitude:
-    type: float
+    type: unfeaturized
   longitude:
-    type: float
+    type: unfeaturized
   task_uid:
     type: text
   livewire_type:
@@ -132,7 +133,7 @@ templates:
   utter_add_another:
     - "Would you like to add another?"
   utter_ask_contact_name:
-    - "Please provide your name or alias."
+    - "Please provide your name or alias (or enter 'me' to use your account name)."
   utter_ask_contact_number:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_ask_livewire_content:
@@ -159,6 +160,20 @@ templates:
     - "Okay, lets call for action."
   utter_confirm_validation_intent:
     - "Okay, lets create a validation task."
+  utter_restart_meeting:
+    - "Would you like to make another attemot at calling a meeting?"
+  utter_restart_livewire:
+    - "Would like to make another attempt at creating a livewire?"
+  utter_restarting:
+    - "Alright, lets run through the process again."
+  utter_location_or_not:
+    - "Would you like to add a location to your Livewire?"
+  utter_ask_livewire_location:
+    - "Please paste your livewire location below."
+  utter_location_received:
+    - "I have recieved your location."
+  utter_location_skipped:
+    - "Okay. Moving on with no Livewire location."
 
 actions:
   - utter_ask_subject
@@ -190,6 +205,13 @@ actions:
   - utter_confirm_volunteer_intent
   - utter_confirm_action_intent
   - utter_confirm_validation_intent
+  - utter_restart_livewire
+  - utter_restart_meeting
+  - utter_restarting
+  - utter_location_or_not
+  - utter_ask_livewire_location
+  - utter_location_received
+  - utter_location_skipped
   - action_get_vote_option
   - action_create_meeting_complete
   - action_create_vote_complete

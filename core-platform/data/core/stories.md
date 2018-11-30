@@ -48,6 +48,18 @@
 ## request is wrong
 > check_meeting_correctness
 * negate
+  - utter_restart_meeting
+> restart_meeting_creation
+
+> restart_meeting_creation
+* affirm
+  - utter_restarting
+  - utter_actions_initialiser
+  - utter_actions_menu
+> check_what_user_wants
+
+> restart_meeting_creation
+* negate
   - utter_negation
   - action_restart
 
@@ -193,13 +205,31 @@
 ## user is happy with currently added files, proceed to request confirmation
 > check_for_more_media_files
 * negate
-  - action_utter_livewire_status
-  - utter_confirm_request
-> check_livewire_correctness  
+  - utter_location_or_not
+> check_for_location
 
 ## user is happy without any media files
 > check_for_media_file
 * negate
+  - utter_location_or_not
+> check_for_location
+
+## user would like to add livewire location
+> check_for_location
+* affirm
+  - utter_ask_livewire_location
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+  - slot{"latitude": -26.1947954}
+  - slot{"longitude": 28.036162200000035}
+  - utter_location_received
+  - action_utter_livewire_status
+  - utter_confirm_request
+> check_livewire_correctness
+
+## user is easy to please and is happy without livewire location
+> check_for_location
+* negate
+  - utter_location_skipped
   - action_utter_livewire_status
   - utter_confirm_request
 > check_livewire_correctness
@@ -212,6 +242,20 @@
 
 ## request is wrong
 > check_livewire_correctness
+* negate
+  - utter_restart_livewire
+> restart_livewire_creation
+
+# user would like to make a redo
+> restart_livewire_creation
+* affirm
+  - utter_restarting
+  - utter_actions_initialiser
+  - utter_actions_menu
+> check_what_user_want
+
+# user doesnt have it in them to try again
+> restart_livewire_creation
 * negate
   - utter_negation
   - action_restart

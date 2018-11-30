@@ -172,7 +172,7 @@ class ActionAcquireMeetingDetails(FormAction):
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*." % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -270,7 +270,7 @@ class ActionUtterVoteStatus(Action):
                    ]
         vote_status = ' '.join(template) % (tracker.get_slot("subject"),
                                             member_count, group_name,
-                                            vote_options, tracker.get_slot("datetime"))
+                                            vote_options, human_readable_time(formalize(tracker.get_slot("datetime")))
         dispatcher.utter_message(vote_status)
         return []
 
@@ -319,7 +319,7 @@ class ActionAcquireInfoTodoDetails(FormAction):
         responses = [
                      "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
-                     "Participants may respond until *%s*" % tracker.get_slot("datetime"),
+                     "Participants may respond until *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -368,7 +368,7 @@ class ActionAcquireVolunteerDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*" % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -416,7 +416,7 @@ class ActionAcquireValidationDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
-                     "You want everyone to have responded by *%s*." % tracker.get_slot("datetime"),
+                     "You want everyone to have responded by *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -464,7 +464,7 @@ class ActionAcquireActionTodoDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*" % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                    ]
         dispatcher.utter_message(' '.join(responses))
@@ -644,3 +644,12 @@ def formalize(datetime_str):
 def epoch(formalized_datetime):
     utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
     return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+
+def human_readable_time(formalized_datetime):
+    try:
+        datetime_obj = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+        human_readable_time = datetime.strftime(datetime_obj, '%b %d, %Y at %H:%M')
+        return human_readable_time
+    except Exception as e:
+        logging.error('platform_actions: human_readable_time: %s ' % e)
+        return formalized_datetime

@@ -95,11 +95,6 @@ templates:
     - "Welcome to Grassroot Actions. What would you like to do?"
   utter_actions_menu:
     - "Welcome to Grassroot Actions. Here you can call meetings and votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
-  action_get_group:
-    - text: "Choose a group"
-      buttons:
-      - title: "group"
-        payload: '/select{"group": "group_uid"}'
   utter_ask_subject:
     - "What is this about?"
   utter_subject:
@@ -160,10 +155,6 @@ templates:
     - "Okay, lets call for action."
   utter_confirm_validation_intent:
     - "Okay, lets create a validation task."
-  utter_restart_meeting:
-    - "Would you like to make another attemot at calling a meeting?"
-  utter_restart_livewire:
-    - "Would like to make another attempt at creating a livewire?"
   utter_restarting:
     - "Alright, lets run through the process again."
   utter_location_or_not:
@@ -174,6 +165,8 @@ templates:
     - "I have recieved your location."
   utter_location_skipped:
     - "Okay. Moving on with no Livewire location."
+  utter_restart_action:
+    - "Would you like to try again?"
 
 actions:
   - utter_ask_subject
@@ -212,6 +205,7 @@ actions:
   - utter_ask_livewire_location
   - utter_location_received
   - utter_location_skipped
+  - utter_restart_action
   - action_get_vote_option
   - action_create_meeting_complete
   - action_create_vote_complete
@@ -238,3 +232,4 @@ actions:
   - action_utter_livewire_status
   - action_increment_page
   - action_custom_fallback
+  - action_reroute_to_new_domain

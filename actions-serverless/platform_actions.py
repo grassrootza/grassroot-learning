@@ -12,6 +12,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import requests
+import inspect
 import logging
 import json
 import uuid
@@ -94,36 +95,51 @@ def get_token(sender_id):
     if request_token.startswith('{'):
         request_token = json.loads(request_token)
         logging.debug("request token successfully converted to %s" % type(request_token))
-    if isinstance(request_token, dict):
-        if request_token['status'] == 403:
-            request_token['file_path'] = os.path.realpath(__file__)
-            message = MIMEMultipart()
-            message['From'] = os.getenv('ALERT_EMAIL', 'grassrootnlu@gmail.com')
-            message['To'] = os.getenv('DEVELOPER', '')
-            message['Subject'] = "Token Trouble"
-            body = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
-                    \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
-            message.attach(MIMEText(
-                                    body,
-                                    'plain'
-                                   ))
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(
-                         message['From'],
-                         os.getenv(
-                                   'ALERT_PWD',
-                                       ''
-                         ))
-            text = message.as_string()
-            server.sendmail(
-                            message['From'],
-                            message['To'], text
-                           )
-            server.quit()
-            logging.debug('developer notified.')
-            return ''
-    return request_token
+        if isinstance(request_token, dict):
+            if request_token['status'] == 403:
+                request_token['file_path'] = os.path.realpath(__file__)
+                error_message = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
+                        \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
+                error_alert(error_message, inspect.stack()[0][3])
+    else:
+        return request_token
+
+            
+def error_alert(error_message, function):
+    try:
+        message = MIMEMultipart()
+        message['From'] = os.getenv('ALERT_EMAIL', 'grassrootnlu@gmail.com')
+        message['To'] = os.getenv('DEVELOPER', '')
+        message['Subject'] = "Token Trouble"
+        message.attach(MIMEText(
+                                error_message,
+                                'plain'
+                               ))
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(
+                     message['From'],
+                     os.getenv(
+                               'ALERT_PWD',
+                                   ''
+                     ))
+        text = message.as_string()
+        server.sendmail(
+                        message['From'],
+                        message['To'], text
+                       )
+        server.quit()
+        logging.debug('developer notified.')
+        return ''
+    except Exception as e:
+        logging.error("platform_actions: error_alert:" 
+                      " failed to notify developer about function %s() failure."
+                      " Details %s" % (
+                                       function,
+                                       e
+                                      ))
+        return ''
+
 
 
 def get_group_name(groupUid, sender_id):
@@ -270,7 +286,7 @@ class ActionUtterVoteStatus(Action):
                    ]
         vote_status = ' '.join(template) % (tracker.get_slot("subject"),
                                             member_count, group_name,
-                                            vote_options, human_readable_time(formalize(tracker.get_slot("datetime")))
+                                            vote_options, human_readable_time(formalize(tracker.get_slot("datetime"))))
         dispatcher.utter_message(vote_status)
         return []
 
@@ -555,7 +571,7 @@ class ActionUtterLivewireStatus(Action):
                     template[4] = "You have also included an image to this livewire."
         else:
         	template.pop(4)
-        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("livewire_content"),
+        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), snip(tracker.get_slot("livewire_content")),
                                                 tracker.get_slot("contact_name"), tracker.get_slot("contact_number"),
                                                 group_name, member_count)
         dispatcher.utter_message(livewire_status)
@@ -632,18 +648,37 @@ class ActionCustomFallback(Action):
         return []
 """
 
+class ActionRerouteMessage(Action):
+
+    def name(self):
+        return 'action_reroute_to_new_domain'
+
+    def run(self, dispatcher, tracker, domain):
+        message = (tracker.latest_message)['text']
+        user_id = tracker.sender_id
+        # send message and user id to app.py opening nlu along with SOS key
+        dispatcher.utter_message('Under construction.')
+        return []
+
+
 def formalize(datetime_str):
-    response = requests.get(DATETIME_URL, params={
-                                                  'date_string': datetime_str
-                                                 })
-    logging.info('constructed datetime url: %s' % response.url)
-    logging.debug('datetime engine returned: %s' % response.content)
-    return response.content.decode('ascii')
+    try:
+        response = requests.get(DATETIME_URL, params={
+                                                      'date_string': datetime_str
+                                                     })
+        logging.info('constructed datetime url: %s' % response.url)
+        logging.debug('datetime engine returned: %s' % response.content)
+        return response.content.decode('ascii')
+    except Exception as e:
+        logging.error('platform_actions: formalize: %s' % e)
+        error_alert(e, inspect.stack()[0][3])
+        return datetime_str
 
 
 def epoch(formalized_datetime):
     utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
     return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+
 
 def human_readable_time(formalized_datetime):
     try:
@@ -653,3 +688,14 @@ def human_readable_time(formalized_datetime):
     except Exception as e:
         logging.error('platform_actions: human_readable_time: %s ' % e)
         return formalized_datetime
+
+
+def snip(text):
+    """This function shortens large text data and adds ellipsis if 
+       text exceeds 20 characters. Typcially used for previewing livewire content.
+    """
+
+    if len(text) > 20:
+        return text[:20] + "..."
+    else:
+        return text

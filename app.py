@@ -92,7 +92,7 @@ def reshape_core_result(domain, core_results):
 
     for core_result in core_results:
         if 'text' in core_result and core_result['text'] == 'DUM_SPIRO_SPERO':
-            logging.warning('Found distress signal from domain. Initialising domain rerouting.')
+            logging.warning('Found distress signal from %s domain. Initialising domain rerouting.' % domain)
             return False
         if 'text' in core_result and len(core_result['text']) > 0:
             response_texts.append(core_result['text'])

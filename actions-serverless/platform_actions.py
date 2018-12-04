@@ -141,7 +141,6 @@ def error_alert(error_message, function):
         return ''
 
 
-
 def get_group_name(groupUid, sender_id):
     response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
                             headers={'Authorization': 'Bearer ' + get_token(sender_id)})
@@ -621,32 +620,6 @@ class ActionSendLivewireToServer(Action):
             dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
 
-"""
-class ActionCustomFallback(Action):
-
-    def name(self):
-        return 'action_custom_fallback'
-
-    def run(self, dispatcher, tracker, domain):
-        disputed_message = (tracker.latest_message)['text']
-        new_intent = requests.get('http://0.0.0.0:5000/evaluate', params={'message': disputed_message})
-        if new_intent.status_code == 200:
-            logging.info('Successfuly got this back from intent evaluation: %s' % new_intent.content)
-            new_domain = json.loads(new_intent.content)['intent']
-            logging.info('Rerouting message to new domain: %s' % new_domain)
-            response = requests.get('http://0.0.0.0:5000/%s/parse' % new_domain,
-                                    params={
-                                            'message': disputed_message,
-                                            'user_id': tracker.sender_id
-                                           }) 
-            logging.debug('Rerouted to url: %s' % response.url)
-            if response.status_code == 200:
-                dispatcher.utter_message(json.loads(response.content.decode('ascii'))['responses'])    
-        else:
-            logging.error('Evaluation failed. Got this back: %s' % new_intent)
-            dispatcher.utter_template('utter_default', tracker)
-        return []
-"""
 
 class ActionRerouteMessage(Action):
 
@@ -656,8 +629,7 @@ class ActionRerouteMessage(Action):
     def run(self, dispatcher, tracker, domain):
         message = (tracker.latest_message)['text']
         user_id = tracker.sender_id
-        # send message and user id to app.py opening nlu along with SOS key
-        dispatcher.utter_message('Under construction.')
+        dispatcher.utter_message('DUM_SPIRO_SPERO')
         return []
 
 

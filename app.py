@@ -91,6 +91,9 @@ def reshape_core_result(domain, core_results):
     response_menu = []
 
     for core_result in core_results:
+        if 'text' in core_result and core_result['text'] == 'DUM_SPIRO_SPERO':
+            logging.warning('Found distress signal from domain. Initialising domain rerouting.')
+            return False
         if 'text' in core_result and len(core_result['text']) > 0:
             response_texts.append(core_result['text'])
         if 'buttons' in core_result:
@@ -165,7 +168,7 @@ def evaluate():
 
 
 @application.route('/opening/parse', methods=['GET'])
-def parse_unknown_domain():
+def parse_unknown_domain(*rerouted_message):
     """Parser when nothing is known about the message, i.e., at the start of a conversation (or at restart)
 
     Query params:
@@ -174,7 +177,10 @@ def parse_unknown_domain():
     Returns:
         The best-guess intent, ranked intents, and any guessed entities, except for high-confidence results, in which case, domain parse result
     """
-    user_message = request.args.get('message')
+    if rerouted_message:
+        user_message = rerouted_message[0]
+    else:
+        user_message = request.args.get('message')
     nlu_result = error_catching_nlu_parse(user_message, opening_nlu)
     
     primary_result = nlu_result['intent']
@@ -225,6 +231,8 @@ def parse_knowledge_domain(domain):
     to_send = responses_to_user if (responses_to_user and len(responses_to_user) > 0) else {}
     reshaped_response = reshape_core_result(domain, to_send)
     logging.info('Newly reshaped response: {}'.format(reshaped_response))
+    if not reshaped_response:
+        parse_unknown_domain(*[user_message])
     
     resp = jsonify(reshaped_response)
     resp.status_code = 200

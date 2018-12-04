@@ -30,6 +30,13 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-wes
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
 GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
+LIVEWIRE_PATH = '/livewire/create/'
+ACTION_TODO_PATH = '/task/create/todo/action/'
+VOLUNTEER_TODO_PATH = '/task/create/todo/volunteer/'
+VALIDATION_TODO_PATH = '/task/create/todo/confirmation/'
+INFO_TODO_PATH = '/task/create/todo/information/'
+MEETING_PATH = '/task/create/meeting/'
+VOTE_PATH = '/task/create/vote/'
 
 parentType = 'GROUP'
 
@@ -201,8 +208,7 @@ class ActionSendMeetingToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        meeting_path = '/task/create/meeting/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + meeting_path
+        url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
         logging.info('Constructed url for create meeting: %s' % url)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
@@ -297,8 +303,7 @@ class SendVoteToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        vote_path = '/task/create/vote/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + vote_path
+        url = BASE_URL + VOTE_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'title': tracker.get_slot("subject"),
@@ -348,8 +353,7 @@ class SendInfoTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/information/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + INFO_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -397,8 +401,7 @@ class ActionSendVolunteerTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + VOLUNTEER_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -445,8 +448,7 @@ class ActionSendValidationToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + VALIDATION_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -493,8 +495,7 @@ class ActionSendActionTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/action/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + ACTION_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -507,6 +508,7 @@ class ActionSendActionTodoToServer(Action):
         else:
             dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
+
 
 
 class ActionAcquireLivewireDetails(FormAction):
@@ -595,8 +597,7 @@ class ActionSendLivewireToServer(Action):
         longitude = tracker.get_slot("longitude")
         destUid = tracker.get_slot("destination_uid")
         groupUid = tracker.get_slot("group_uid")
-        livewire_path = '/livewire/create/%s' % tracker.sender_id
-        url = BASE_URL + livewire_path
+        url = BASE_URL + LIVEWIRE_PATH + tracker.sender_id
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'headline': headline,
@@ -627,16 +628,20 @@ class ActionRerouteMessage(Action):
         return 'action_reroute_to_new_domain'
 
     def run(self, dispatcher, tracker, domain):
-        message = (tracker.latest_message)['text']
-        user_id = tracker.sender_id
         dispatcher.utter_message('DUM_SPIRO_SPERO')
         return []
 
 
-def formalize(datetime_str):
+def formalize(datetime_string):
+    """This function converts arbitrary date-strings to a standard format.
+
+        params:
+            date_string: arbitrary date string (e.g., 'tomorrow at 3', 'next year on the first monday of May at 4pm')
+    """
+
     try:
         response = requests.get(DATETIME_URL, params={
-                                                      'date_string': datetime_str
+                                                      'date_string': datetime_string
                                                      })
         logging.info('constructed datetime url: %s' % response.url)
         logging.debug('datetime engine returned: %s' % response.content)
@@ -644,15 +649,28 @@ def formalize(datetime_str):
     except Exception as e:
         logging.error('platform_actions: formalize: %s' % e)
         error_alert(e, inspect.stack()[0][3])
-        return datetime_str
+        return datetime_string
 
 
 def epoch(formalized_datetime):
+    """This function converts the output of formalize() to epoch milisecond.
+
+        params:
+            formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
+    """
+
     utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
     return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
 
 
 def human_readable_time(formalized_datetime):
+    """This function translates the output of formalize() to a more humanly
+       explicit format.
+
+        params:
+            formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
+    """
+
     try:
         datetime_obj = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
         human_readable_time = datetime.strftime(datetime_obj, '%b %d, %Y at %H:%M')
@@ -665,6 +683,9 @@ def human_readable_time(formalized_datetime):
 def snip(text):
     """This function shortens large text data and adds ellipsis if 
        text exceeds 20 characters. Typcially used for previewing livewire content.
+
+        params:
+             text: type -> string;
     """
 
     if len(text) > 20:

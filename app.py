@@ -230,10 +230,10 @@ def parse_knowledge_domain(domain):
 
     to_send = responses_to_user if (responses_to_user and len(responses_to_user) > 0) else {}
     reshaped_response = reshape_core_result(domain, to_send)
-    logging.info('Newly reshaped response: {}'.format(reshaped_response))
     if not reshaped_response:
         parse_unknown_domain(*[user_message])
-    
+
+    logging.info('Newly reshaped response: {}'.format(reshaped_response)) 
     resp = jsonify(reshaped_response)
     resp.status_code = 200
     return resp

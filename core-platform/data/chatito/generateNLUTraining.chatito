@@ -3,13 +3,9 @@
 
 %[create_livewire]('training': '5')
     ~[livewire] ~[about?] @[subject?]
-    ~[livewire] ~[media_file_id?]
-
-%[create_action_todo]('training': '100', 'testing': '1')
-    ~[action_todo] @[datetime] @[subject]
-    ~[action_todo] @[datetime?] @[subject?]
-    ~[action_todo] @[datetime] @[subject?]
-    ~[please?] ~['action_todo] @[datetime?] @[subject]
+    ~[livewire] @[media_record_id?]
+    ~[livewire] @[livewire_content]
+    ~[livewire] @[coordinates?]
 
 %[create_info_todo]('training': '100', 'testing': '1')
     ~[info_todo] @[datetime] @[subject] @[response_tag]
@@ -27,54 +23,62 @@
     ~[validation_todo] @[subject?] @[datetime?]
     ~[please?] ~[validation_todo] @[subject] @[datetime]
 
-%[create_group]('training': '28', 'testing': '1')
-    ~[group] ~[group_name] @[group]
-    ~[group] ~[group_name?] @[group?]
-    ~[group] @[group?]
-    ~[group] @[group]
-    ~[group] ~[please?]
-    ~[please?] ~[group]
+%[create_group_uid]('training': '28', 'testing': '1')
+    ~[group_uid] ~[group_name] @[group_uid]
+    ~[group_uid] ~[group_name?] @[group_uid?]
+    ~[group_uid] @[group_uid?]
+    ~[group_uid] @[group_uid]
+    ~[group_uid] ~[please?]
+    ~[please?] ~[group_uid]
 
 %[call_meeting]('training': '1000', 'testing': '50')
-    ~[meeting] ~[please?] @[location] @[datetime] @[subject] @[group]
-    ~[meeting] @[location?] @[datetime?] @[subject?] @[group?] ~[please?]
+    ~[meeting] ~[please?] @[location] @[datetime] @[subject] @[group_uid]
+    ~[meeting] @[location?] @[datetime?] @[subject?] @[group_uid?] ~[please?]
     ~[please?] ~[meeting] @[location] @[datetime]
     ~[meeting] @[location?] @[datetime?]
-    ~[meeting] @[subject] @[group]
-    ~[meeting] @[subject?] @[group?]
+    ~[meeting] @[subject] @[group_uid]
+    ~[meeting] @[subject?] @[group_uid?]
     ~[meeting] @[subject]
-    ~[meeting] @[group]
+    ~[meeting] @[group_uid]
     ~[meeting] @[datetime]
     ~[meeting] @[location]
     ~[meeting] ~[please?]
 
 %[call_vote]('training': '250', 'testing': '10')
-    ~[please?] ~[vote] @[datetime] @[subject] ~[between] @[vote_option] ~[and] @[vote_option]
-    ~[vote] @[datetime?] @[subject?] ~[between] @[vote_option] ~[comma] @[vote_option] ~[and] @[vote_option] ~[please?]
-    ~[vote] @[datetime?] @[subject?] ~[between] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option]
+    ~[please?] ~[vote] @[datetime] @[subject] ~[between] @[vote_options] ~[and] @[vote_options]
+    ~[vote] @[datetime?] @[subject?] ~[between] @[vote_options] ~[comma] @[vote_options] ~[and] @[vote_options] ~[please?]
+    ~[vote] @[datetime?] @[subject?] ~[between] @[vote_options] ~[comma] @[vote_options] ~[comma] @[vote_options]
     ~[vote] @[datetime] @[subject]
     ~[vote] @[datetime]
-    ~[vote] ~[between] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option] ~[comma] @[vote_option] ~[comma?] ~[and] @[vote_option]
+    ~[vote] ~[between] @[vote_options] ~[comma] @[vote_options] ~[comma] @[vote_options] ~[comma] @[vote_options] ~[comma?] ~[and] @[vote_options]
     ~[vote] ~[please?]
+
+%[add_member]('training': '100', 'testing': '5')
+    ~[new_member]
+    ~[new_member] ~[to] @[group_uid]
+    ~[please?] ~[new_member] @[contact] ~[to] @[group_uid]
 
 %[next_page]('training': '3')
     ~[load_more]
 
-%[select]('training': '52', 'testing': '1')
+%[select]('training': '67', 'testing': '1')
     @[location]
-    @[group]
+    @[group_uid]
     @[datetime]
     @[subject]
-    @[response_tag]
     @[description]
-    @[vote_option]
-    @[reminderMinutes]    
+    @[vote_options]
+    @[livewire_content]
+    @[media_record_id]
 
-%[affirm]('training': '10', 'testing': '1')
+%[affirm]('training': '8', 'testing': '1')
     ~[yes]
 
 %[negate]('training': '10', 'testing': '1')
     ~[no]
+
+%[out_of_scope]('training': '78', 'testing': '1')
+    ~[other_domains]
 
 ~[comma]
     ,
@@ -83,6 +87,9 @@
 ~[and]
     and
     or
+
+~[to]
+    to
 
 ~[please]
     please
@@ -99,12 +106,12 @@
     I would like
 
 ~[action]
-    an action
-    action
-    I'd like to act
-    action please
-    take action
     act now
+    I would like to act
+    actions please
+    take action
+    Action please
+    Act
 
 ~[livewire]
     create a livewire alert
@@ -142,6 +149,8 @@
     make a meeting happen
     create a meeting
     lets have a meeting
+    mtng
+    meeting
 
 ~[vote]
     call a vote
@@ -159,14 +168,8 @@
     thats right
     exactly
     good
-    ja
-    E
-    Ee
     yeah
-    sho
-    done
     correct
-    complete
 
 ~[no]
     nay
@@ -181,16 +184,125 @@
     ca
     hayi
     noooooo
-
-~[media_file_id]
-    f66cfc83-6c11-4775-98c1-44fe774a81a5
-    249dcb06-4864-499e-8707-bfdcdb666417
-    2b9cb035-14b9-4ed9-b664-1de11188541f
+    holy balls
 
 ~[load_more]
     load more
     load_more
     more
+
+~[new_member]
+    I would like to add members
+    Lets add memebers to this group
+    Add members
+    New members
+    Add new members
+
+~[other_domains]
+    where
+    ubu
+    kuphi
+    ikuphi
+    kai
+    whr
+    where are
+    where is
+    find
+    ngifuna
+    ndifuna
+    thola
+    fumana
+    service
+    services
+    isevisis
+    help
+    help me
+    sizo
+    hlp
+    usizo
+    Hlp
+    Help!
+    helpe
+    thusa
+    Izwi Lami
+    Izwe Lami
+    izwe lami
+    izwi lami
+    health e
+    izwe-lami
+    health-e
+    pain
+    hurt
+    rape
+    raped
+    ho betoa
+    rapist
+    raping
+    assault
+    asault
+    asslt 
+    violence
+    violent
+    violense
+    shelter
+    Shelter
+    shelters
+    Shelters
+    homeless shelter
+    victim shelter
+    shlters
+    ster
+    a shelter
+    one shelter
+    close shelter
+    TCC
+    thuthuzela
+    Thuthuzela
+    rape centre
+    rape center
+    rape care
+    tcc
+    the thuthuzela
+    tutuzela
+    the tutuzela
+    tutzela
+    thuthzela
+    clinic
+    clinics
+    24hr clinic
+    clnic
+    clnc
+    near clinic
+    closest clinic
+    a clinic
+    the clinic
+    Clinic
+    Clinics
+
+@[coordinates]
+    select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+    {"longitude": 28.036162200000035, "latitude": -26.1947954}
+    /select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+
+@[contact]
+    0738889999
+    073 888 9999
+    +27 73 888 9999
+    +27738889999
+    73 888 9999
+    738889999
+    Nqobile, 072 222 2222
+    Qondile, 083 333 3333
+
+@[media_record_id]
+    f66cfc83-6c11-4775-98c1-44fe774a81a5
+    249dcb06-4864-499e-8707-bfdcdb666417
+    f66cfc83-6c11-4775-98c1-44fe774a81a5
+
+@[media_record_ids]
+    [f66cfc83-6c11-4775-98c1-44fe774a81a5]
+    [249dcb06-4864-499e-8707-bfdcdb666417, 249dcb06-4864-499e-8707-bfdcdb666417]
+    [2b9cb035-14b9-4ed9-b664-1de11188541f, 249dcb06-4864-499e-8707-bfdcdb666417, 249dcb06-4864-499e-8707-bfdcdb666417]
 
 @[description]
     This group is dedicated to tracking the upcoming elections
@@ -200,6 +312,11 @@
     A meeting to address sanitation in our community
     A group created to empower the youth in our community
     A Group created for the parents in our community to keep them all connected to social dynamics
+
+@[livewire_content]
+    A new clinic has been open in our community and will offer free services to the public as of today
+    A group of young activists have resolved to crack down on corruption and its working
+    Violence erupts as someone decides to say Lord Voldemort name in public, putting Hogwarts on DEFCON 1
 
 @[location]
     Germiston
@@ -238,6 +355,9 @@
     next monday
     next thursday
     this monday
+    friday 5am
+    tomorrow 6pm
+    next week thursday 3pm
 
 @[subject]
     protest action
@@ -251,27 +371,17 @@
     Violence
     Corruption
 
-@[group]
+@[group_uid]
     Mnandini Community Group
     Dooms Day Union
     The Social Activists
     The Social Watch
     Union of Natural Born Killers
 
-@[vote_option]
-    Yes
-    No
-    Maybe
-    Darth Vader
-    Voldermort
-    Luke Skywalker
-    Bernie Sanders
-    Violence
-    Peace
-    Action
-    Patience
-    Duality
-    Quantum World
+@[vote_options]
+    {'vote_options': ['no']}
+    {'vote_options': ['yes', 'no']}
+    {'vote_options': ['darth vader', 'sky walker', 'chewbacca']}
 
 @[response_tag]
     id:
@@ -281,11 +391,3 @@
     phone-number:
     phone-no
     no
-
-@[reminderMinutes]
-    24 minutes
-    34
-    10
-    5
-    6 days
-    3 days

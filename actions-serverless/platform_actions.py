@@ -12,6 +12,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import requests
+import inspect
 import logging
 import json
 import uuid
@@ -29,6 +30,13 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-wes
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
 GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
+LIVEWIRE_PATH = '/livewire/create/'
+ACTION_TODO_PATH = '/task/create/todo/action/'
+VOLUNTEER_TODO_PATH = '/task/create/todo/volunteer/'
+VALIDATION_TODO_PATH = '/task/create/todo/confirmation/'
+INFO_TODO_PATH = '/task/create/todo/information/'
+MEETING_PATH = '/task/create/meeting/'
+VOTE_PATH = '/task/create/vote/'
 
 parentType = 'GROUP'
 
@@ -94,36 +102,50 @@ def get_token(sender_id):
     if request_token.startswith('{'):
         request_token = json.loads(request_token)
         logging.debug("request token successfully converted to %s" % type(request_token))
-    if isinstance(request_token, dict):
-        if request_token['status'] == 403:
-            request_token['file_path'] = os.path.realpath(__file__)
-            message = MIMEMultipart()
-            message['From'] = os.getenv('ALERT_EMAIL', 'grassrootnlu@gmail.com')
-            message['To'] = os.getenv('DEVELOPER', '')
-            message['Subject'] = "Token Trouble"
-            body = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
-                    \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
-            message.attach(MIMEText(
-                                    body,
-                                    'plain'
-                                   ))
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(
-                         message['From'],
-                         os.getenv(
-                                   'ALERT_PWD',
-                                       ''
-                         ))
-            text = message.as_string()
-            server.sendmail(
-                            message['From'],
-                            message['To'], text
-                           )
-            server.quit()
-            logging.debug('developer notified.')
-            return ''
-    return request_token
+        if isinstance(request_token, dict):
+            if request_token['status'] == 403:
+                request_token['file_path'] = os.path.realpath(__file__)
+                error_message = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
+                        \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
+                error_alert(error_message, inspect.stack()[0][3])
+    else:
+        return request_token
+
+            
+def error_alert(error_message, function):
+    try:
+        message = MIMEMultipart()
+        message['From'] = os.getenv('ALERT_EMAIL', 'grassrootnlu@gmail.com')
+        message['To'] = os.getenv('DEVELOPER', '')
+        message['Subject'] = "Token Trouble"
+        message.attach(MIMEText(
+                                error_message,
+                                'plain'
+                               ))
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(
+                     message['From'],
+                     os.getenv(
+                               'ALERT_PWD',
+                                   ''
+                     ))
+        text = message.as_string()
+        server.sendmail(
+                        message['From'],
+                        message['To'], text
+                       )
+        server.quit()
+        logging.debug('developer notified.')
+        return ''
+    except Exception as e:
+        logging.error("platform_actions: error_alert:" 
+                      " failed to notify developer about function %s() failure."
+                      " Details %s" % (
+                                       function,
+                                       e
+                                      ))
+        return ''
 
 
 def get_group_name(groupUid, sender_id):
@@ -172,7 +194,7 @@ class ActionAcquireMeetingDetails(FormAction):
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*." % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -186,8 +208,7 @@ class ActionSendMeetingToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        meeting_path = '/task/create/meeting/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + meeting_path
+        url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
         logging.info('Constructed url for create meeting: %s' % url)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
@@ -270,7 +291,7 @@ class ActionUtterVoteStatus(Action):
                    ]
         vote_status = ' '.join(template) % (tracker.get_slot("subject"),
                                             member_count, group_name,
-                                            vote_options, tracker.get_slot("datetime"))
+                                            vote_options, human_readable_time(formalize(tracker.get_slot("datetime"))))
         dispatcher.utter_message(vote_status)
         return []
 
@@ -282,8 +303,7 @@ class SendVoteToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        vote_path = '/task/create/vote/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + vote_path
+        url = BASE_URL + VOTE_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'title': tracker.get_slot("subject"),
@@ -319,7 +339,7 @@ class ActionAcquireInfoTodoDetails(FormAction):
         responses = [
                      "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
-                     "Participants may respond until *%s*" % tracker.get_slot("datetime"),
+                     "Participants may respond until *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -333,8 +353,7 @@ class SendInfoTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/information/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + INFO_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -368,7 +387,7 @@ class ActionAcquireVolunteerDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*" % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -382,8 +401,7 @@ class ActionSendVolunteerTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/volunteer/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + VOLUNTEER_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -416,7 +434,7 @@ class ActionAcquireValidationDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
-                     "You want everyone to have responded by *%s*." % tracker.get_slot("datetime"),
+                     "You want everyone to have responded by *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -430,8 +448,7 @@ class ActionSendValidationToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/confirmation/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + VALIDATION_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -464,7 +481,7 @@ class ActionAcquireActionTodoDetails(FormAction):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*" % tracker.get_slot("datetime"),
+                     "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                    ]
         dispatcher.utter_message(' '.join(responses))
@@ -478,8 +495,7 @@ class ActionSendActionTodoToServer(Action):
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
-        todo_path = '/task/create/todo/action/%s/%s' % (parentType, groupUid)
-        url = BASE_URL + todo_path
+        url = BASE_URL + ACTION_TODO_PATH + '%s/%s' % (parentType, groupUid)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'subject': tracker.get_slot("subject"),
@@ -492,6 +508,7 @@ class ActionSendActionTodoToServer(Action):
         else:
             dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
+
 
 
 class ActionAcquireLivewireDetails(FormAction):
@@ -555,7 +572,7 @@ class ActionUtterLivewireStatus(Action):
                     template[4] = "You have also included an image to this livewire."
         else:
         	template.pop(4)
-        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), tracker.get_slot("livewire_content"),
+        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), snip(tracker.get_slot("livewire_content")),
                                                 tracker.get_slot("contact_name"), tracker.get_slot("contact_number"),
                                                 group_name, member_count)
         dispatcher.utter_message(livewire_status)
@@ -580,8 +597,7 @@ class ActionSendLivewireToServer(Action):
         longitude = tracker.get_slot("longitude")
         destUid = tracker.get_slot("destination_uid")
         groupUid = tracker.get_slot("group_uid")
-        livewire_path = '/livewire/create/%s' % tracker.sender_id
-        url = BASE_URL + livewire_path
+        url = BASE_URL + LIVEWIRE_PATH + tracker.sender_id
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
                                  params={
                                          'headline': headline,
@@ -606,15 +622,73 @@ class ActionSendLivewireToServer(Action):
         return []
 
 
-def formalize(datetime_str):
-    response = requests.get(DATETIME_URL, params={
-                                                  'date_string': datetime_str
-                                                 })
-    logging.info('constructed datetime url: %s' % response.url)
-    logging.debug('datetime engine returned: %s' % response.content)
-    return response.content.decode('ascii')
+class ActionRerouteMessage(Action):
+
+    def name(self):
+        return 'action_reroute_to_new_domain'
+
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message('DUM_SPIRO_SPERO')
+        return []
+
+
+def formalize(datetime_string):
+    """This function converts arbitrary date-strings to a standard format.
+
+        params:
+            date_string: arbitrary date string (e.g., 'tomorrow at 3', 'next year on the first monday of May at 4pm')
+    """
+
+    try:
+        response = requests.get(DATETIME_URL, params={
+                                                      'date_string': datetime_string
+                                                     })
+        logging.info('constructed datetime url: %s' % response.url)
+        logging.debug('datetime engine returned: %s' % response.content)
+        return response.content.decode('ascii')
+    except Exception as e:
+        logging.error('platform_actions: formalize: %s' % e)
+        error_alert(e, inspect.stack()[0][3])
+        return datetime_string
 
 
 def epoch(formalized_datetime):
+    """This function converts the output of formalize() to epoch milisecond.
+
+        params:
+            formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
+    """
+
     utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
     return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+
+
+def human_readable_time(formalized_datetime):
+    """This function translates the output of formalize() to a more humanly
+       explicit format.
+
+        params:
+            formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
+    """
+
+    try:
+        datetime_obj = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+        human_readable_time = datetime.strftime(datetime_obj, '%b %d, %Y at %H:%M')
+        return human_readable_time
+    except Exception as e:
+        logging.error('platform_actions: human_readable_time: %s ' % e)
+        return formalized_datetime
+
+
+def snip(text):
+    """This function shortens large text data and adds ellipsis if 
+       text exceeds 20 characters. Typcially used for previewing livewire content.
+
+        params:
+             text: type -> string;
+    """
+
+    if len(text) > 20:
+        return text[:20] + "..."
+    else:
+        return text

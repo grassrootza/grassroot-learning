@@ -93,17 +93,24 @@
   - utter_ask_add_media_files
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 * negate
+  - utter_location_or_not
+* affirm
+  - utter_ask_livewire_location
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+  - slot{"latitude": -26.1947954}
+  - slot{"longitude": 28.036162200000035}
+  - utter_location_received
   - action_utter_livewire_status
   - utter_confirm_request
 * affirm

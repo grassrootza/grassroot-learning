@@ -48,6 +48,18 @@
 ## request is wrong
 > check_meeting_correctness
 * negate
+  - utter_restart_action
+> restart_meeting_creation
+
+> restart_meeting_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+> restart_meeting_creation
+* negate
   - utter_negation
   - action_restart
 
@@ -129,6 +141,20 @@
 ## request is wrong
 > check_vote_correctness
 * negate
+  - utter_restart_action
+> restart_vote_creation
+
+# user would like to make a redo
+> restart_vote_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+# user doesnt have it in them to try again
+> restart_vote_creation
+* negate
   - utter_negation
   - action_restart
 
@@ -174,8 +200,8 @@
 > check_for_media_file
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 > check_for_more_media_files
@@ -184,22 +210,40 @@
 > check_for_more_media_files
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 > check_for_more_media_files  
 
-## user is happy with currently added files, proceed to request confirmation
+## user is happy with currently added files, now check for location
 > check_for_more_media_files
 * negate
-  - action_utter_livewire_status
-  - utter_confirm_request
-> check_livewire_correctness  
+  - utter_location_or_not
+> check_for_location
 
-## user is happy without any media files
+## alternatively, user is happy without any media files, check for location
 > check_for_media_file
 * negate
+  - utter_location_or_not
+> check_for_location
+
+## user would like to add livewire location
+> check_for_location
+* affirm
+  - utter_ask_livewire_location
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+  - slot{"latitude": -26.1947954}
+  - slot{"longitude": 28.036162200000035}
+  - utter_location_received
+  - action_utter_livewire_status
+  - utter_confirm_request
+> check_livewire_correctness
+
+## user is easy to please and is happy without livewire location
+> check_for_location
+* negate
+  - utter_location_skipped
   - action_utter_livewire_status
   - utter_confirm_request
 > check_livewire_correctness
@@ -212,6 +256,20 @@
 
 ## request is wrong
 > check_livewire_correctness
+* negate
+  - utter_restart_action
+> restart_livewire_creation
+
+# user would like to make a redo
+> restart_livewire_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+# user doesnt have it in them to try again
+> restart_livewire_creation
 * negate
   - utter_negation
   - action_restart
@@ -255,6 +313,20 @@
 
 ## request is wrong
 > check_volunteer_action_correctness
+* negate
+  - utter_restart_action
+> restart_volunteer_creation
+
+# user would like to make a redo
+> restart_volunteer_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+# user doesnt have it in them to try again
+> restart_volunteer_creation
 * negate
   - utter_negation
   - action_restart
@@ -307,6 +379,20 @@
 ## request is wrong
 > check_info_action_correctness
 * negate
+  - utter_restart_action
+> restart_info_todo_creation
+
+# user would like to make a redo
+> restart_info_todo_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+# user doesnt have it in them to try again
+> restart_info_todo_creation
+* negate
   - utter_negation
   - action_restart
 
@@ -350,6 +436,20 @@
 ## request is wrong
 > check_action_correctness
 * negate
+  - utter_restart_action
+> restart_action_todo_creation
+
+# user would like to make a redo
+> restart_action_todo_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+# user doesnt have it in them to try again
+> restart_action_todo_creation
+* negate
   - utter_negation
   - action_restart
 
@@ -392,5 +492,24 @@
 ## request is wrong
 > check_validation_correctness
 * negate
+  - utter_restart_action
+> restart_validation_creation
+
+# user would like to make a redo
+> restart_validation_creation
+* affirm
+  - utter_restarting
+  - utter_actions_menu
+  - action_restart
+> check_what_user_wants
+
+# user doesnt have it in them to try again
+> restart_validation_creation
+* negate
   - utter_negation
+  - action_restart
+
+## fallback story
+* out_of_scope
+  - action_reroute_to_new_domain
   - action_restart

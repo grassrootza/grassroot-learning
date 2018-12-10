@@ -3,9 +3,15 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from typing import Dict, Text, Any, List, Union
+
+from rasa_core_sdk import ActionExecutionRejection
+from rasa_core_sdk import Tracker
+from rasa_core_sdk.executor import CollectingDispatcher
+from rasa_core_sdk.forms import FormAction, REQUESTED_SLOT
 from rasa_core_sdk import Action
-from rasa_core_sdk.forms import FreeTextFormField, FormAction
 from rasa_core_sdk.events import SlotSet
+
 from datetime import datetime
 from difflib import SequenceMatcher
 from email.mime.multipart import MIMEMultipart
@@ -176,15 +182,15 @@ class ActionIncrementPage(Action):
 
 class ActionAcquireMeetingDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("location"),
-            FreeTextFormField("subject"),
-            FreeTextFormField("datetime")
-        ]
+                "location",
+                "subject",
+                "datetime"
+               ]
 
     def name(self):
         return 'action_create_meeting_routine'
@@ -227,14 +233,14 @@ class ActionSendMeetingToServer(Action):
 
 class ActionAcquireVoteDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("subject"),
-            FreeTextFormField("datetime")
-        ]
+                "subject",
+                "datetime"
+               ]
 
     def name(self):
         return 'action_create_vote_routine'
@@ -321,15 +327,15 @@ class SendVoteToServer(Action):
 
 class ActionAcquireInfoTodoDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("subject"),
-            FreeTextFormField("response_tag"),
-            FreeTextFormField("datetime")
-        ]
+                "subject",
+                "datetime",
+                "response_tag"
+               ]
 
     def name(self):
         return 'action_todo_info_routine'
@@ -371,14 +377,14 @@ class SendInfoTodoToServer(Action):
 
 class ActionAcquireVolunteerDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("subject"),
-            FreeTextFormField("datetime")
-        ]
+                "subject",
+                "datetime"
+               ]
 
     def name(self):
         return 'action_todo_volunteer_routine'
@@ -418,14 +424,14 @@ class ActionSendVolunteerTodoToServer(Action):
 
 class ActionAcquireValidationDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("subject"),
-            FreeTextFormField("datetime")
-        ]
+                "subject",
+                "datetime"
+               ]
 
     def name(self):
         return 'action_todo_validation_routine'
@@ -465,14 +471,14 @@ class ActionSendValidationToServer(Action):
 
 class ActionAcquireActionTodoDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("subject"),
-            FreeTextFormField("datetime")
-        ]
+                "subject",
+                "datetime"
+               ]
 
     def name(self):
         return 'action_todo_action_routine'
@@ -513,16 +519,16 @@ class ActionSendActionTodoToServer(Action):
 
 class ActionAcquireLivewireDetails(FormAction):
 
-    RANDOMIZE = False
-
     @staticmethod
-    def required_fields():
+    def required_slots(tracker: Tracker) -> List[Text]:
+        """A list of required slots that the form has to fill"""
+
         return [
-            FreeTextFormField("subject"),
-            FreeTextFormField("livewire_content"),
-            FreeTextFormField("contact_name"),
-            FreeTextFormField("contact_number")
-        ]
+                "subject",
+                "livewire_content",
+                "contact_name",
+                "contact_number"
+               ]
 
     def name(self):
         return 'action_livewire_routine'

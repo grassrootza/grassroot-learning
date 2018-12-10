@@ -15,7 +15,6 @@ def train_agent():
     return train.train_dialogue_model(domain_file="actions_domain.yml",
                                       stories_file="data/core/stories.md",
                                       output_path="models/dialogue",
-                                      nlu_model_path='models/intent',
                                       max_history=2,
                                       kwargs={"batch_size": 64,
                                               "epochs": 50,

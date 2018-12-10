@@ -23,19 +23,24 @@
 > check_for_more_meeting_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
-  - action_create_meeting_routine
+  - form{"name": "action_create_meeting_routine"}
   - slot{"requested_slot": "subject"}
 * select{"subject": "world domination"}
-  - action_create_meeting_routine
   - slot{"subject": "world domination"}
+  - form: action_create_meeting_routine
+  - slot{"subject": "world domination"}
+  - form{"name": "action_create_meeting_routine"}
   - slot{"requested_slot": "location"}
-* select{"location": "Nowhere"}
-  - action_create_meeting_routine
-  - slot{"location": "Nowhere"}
+* select{"location": "Somewhere on Earth"}
+  - slot{"location": "Somewhere on Earth"}
+  - form: action_create_meeting_routine
+  - slot{"location": "Somewhere on Earth"}
+  - form{"name": "action_create_meeting_routine"}
   - slot{"requested_slot": "datetime"}
-* select{"datetime": "soon"}
-  - action_create_meeting_routine
-  - slot{"datetime": "soon"}
+* select{"datetime": "this vernal equinox"}
+  - slot{"datetime": "this vernal equinox"}
+  - form: action_create_meeting_routine
+  - slot{"datetime": "this vernal equinox"}
   - utter_confirm_request
 > check_meeting_correctness
 
@@ -82,15 +87,18 @@
 > check_for_more_vote_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
-  - action_create_vote_routine
+  - form{"name": "action_create_vote_routine"}
   - slot{"requested_slot": "subject"}
-* select{"subject": "world domination"}
-  - action_create_vote_routine
-  - slot{"subject": "world domination"}
+* select{"subject": "A new ward counselor"}
+  - slot{"subject": "A mew ward counselor"}
+  - form: action_create_vote_routine
+  - slot{"subject": "A new ward counselor"}
+  - form{"name": "action_create_vote_routine"}
   - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_create_vote_routine
-  - slot{"datetime": "later"}
+* select{"datetime": "at first sight of the next full moon"}
+  - slot{"datetime": "at first sight of the next full moon"}
+  - form: action_create_vote_routine
+  - slot{"datetime": "at first sight of the next full moon"}
   - utter_ask_options_type
 > check_default_or_custom
 

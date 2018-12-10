@@ -216,13 +216,6 @@ actions:
   - action_create_info_todo_complete
   - action_create_livewire_complete
   - action_save_vote_option
-  - action_create_meeting_routine
-  - action_create_group_routine
-  - action_create_vote_routine
-  - action_todo_info_routine
-  - action_todo_volunteer_routine
-  - action_todo_validation_routine
-  - action_todo_action_routine
   - action_get_group
   - action_livewire_routine
   - action_default_vote_options
@@ -233,3 +226,12 @@ actions:
   - action_increment_page
   - action_custom_fallback
   - action_reroute_to_new_domain
+
+forms:
+  - action_create_meeting_routine
+  - action_create_group_routine
+  - action_create_vote_routine
+  - action_todo_info_routine
+  - action_todo_volunteer_routine
+  - action_todo_validation_routine
+  - action_todo_action_routine

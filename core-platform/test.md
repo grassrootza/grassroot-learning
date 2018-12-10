@@ -3,6 +3,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * call_meeting
+  - utter_confirm_meeting_intent
   - slot{"action": "call_meeting"}
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -30,7 +31,8 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * call_vote
-  - slot{"action": "call_meeting"}
+  - utter_confirm_vote_intent
+  - slot{"action": "call_vote"}
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -70,7 +72,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_livewire
-  - slot{"action": "call_meeting"}
+  - utter_confirm_livewire_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -122,7 +124,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_volunteer_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_volunteer_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -146,7 +148,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_info_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_info_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -178,7 +180,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_action_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_action_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -202,7 +204,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_validation_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_validation_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}

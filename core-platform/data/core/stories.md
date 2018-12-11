@@ -438,13 +438,13 @@
 > check_for_more_action_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
-  - slot{"name": "action_todo_action_routine"}
+  - form{"name": "action_todo_action_routine"}
   - slot{"requested_slot": "subject"}
 * select{"subject": "protest"}
   - slot{"subject": "protest"}
   - form: action_todo_action_routine
   - slot{"subject": "protest"}
-  - slot{"name": "action_todo_action_routine"}
+  - form{"name": "action_todo_action_routine"}
   - slot{"requested_slot": "datetime"}
 * select{"datetime": "later"}
   - slot{"datetime": "later"}

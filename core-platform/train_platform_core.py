@@ -4,6 +4,8 @@ from rasa_core import utils
 from rasa_core.agent import Agent
 from rasa_core.policies.keras_policy import KerasPolicy
 from rasa_core.policies.memoization import MemoizationPolicy
+from rasa_core.policies.form_policy import FormPolicy
+from rasa_core.policies.embedding_policy import EmbeddingPolicy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', help='The number of epochs to train', type=int, default=50)
@@ -21,16 +23,17 @@ if __name__ == '__main__':
 
     print('Training core model with args: {}'.format(args))
 
+    # training_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'])
+    training_policy = EmbeddingPolicy()
+
     agent = Agent("actions_domain.yml",
-                  policies=[MemoizationPolicy(max_history=args['memdepth']), KerasPolicy()])
+                  policies=[MemoizationPolicy(max_history=args['memdepth']), FormPolicy(), training_policy])
 
     training_data = agent.load_data(training_data_folder)
 
     agent.train(
             training_data,
             augmentation_factor=args['aug'],
-            epochs=args['epochs'],
-            batch_size=args['batch'],
             validation_split=0.2
     )
 

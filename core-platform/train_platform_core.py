@@ -1,4 +1,5 @@
 import argparse, sys
+from log import *
 
 from rasa_core import utils
 from rasa_core.agent import Agent
@@ -23,8 +24,8 @@ if __name__ == '__main__':
 
     print('Training core model with args: {}'.format(args))
 
-    # training_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'])
-    training_policy = EmbeddingPolicy()
+    training_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'])
+    # training_policy = EmbeddingPolicy()
 
     agent = Agent("actions_domain.yml",
                   policies=[MemoizationPolicy(max_history=args['memdepth']), FormPolicy(), training_policy])

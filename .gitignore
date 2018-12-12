@@ -23,6 +23,7 @@ core-platform/models/
 core-platform/rasa_core.log
 core-platform/__pycache__/
 core-platform/story_graph.png
+core-platform/core.log
 
 # Some config files
 *_credentials.yml

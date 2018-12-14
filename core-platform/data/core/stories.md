@@ -1,26 +1,14 @@
-## a new beginning
+## full flow of meeting
 * take_action
   - utter_actions_initialiser
   - utter_actions_menu
-> check_what_user_wants
-
-## user wants a meeting
-> check_what_user_wants
 * call_meeting
   - utter_confirm_meeting_intent
   - slot{"action": "call_meeting"}
   - action_get_group
-> check_for_more_meeting_groups
-
-## user wants more groups
-> check_for_more_meeting_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_meeting_groups
-
-## user has selected desired group, continue meeting flow
-> check_for_more_meeting_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_create_meeting_routine"}
@@ -61,30 +49,20 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 > restart_meeting_creation
 * negate
   - utter_negation
   - action_restart
 
-## user wants to vote
-> check_what_user_wants
+## user calls a vote, full flow
 * call_vote
   - utter_confirm_vote_intent
   - slot{"action": "call_vote"}
   - action_get_group
-> check_for_more_vote_groups
-
-## user wants more groups
-> check_for_more_vote_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_vote_groups
-
-## user has selected desired group, continue vote flow
-> check_for_more_vote_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_create_vote_routine"}
@@ -111,7 +89,7 @@
   - utter_confirm_request
 > check_vote_correctness
 
-## user would like custom vote options
+## user would like custom vote options, with slight vote
 > check_default_or_custom
 * affirm
   - utter_ask_vote_option
@@ -120,10 +98,6 @@
   - action_add_to_vote_options
   - slot{"vote_options": "['vote', 'options']"}
   - utter_add_another
-> check_for_more
-
-## user would like to add another vote option
-> check_for_more
 * affirm
   - utter_ask_vote_option
 * select{"temp": "vote option"}
@@ -131,10 +105,13 @@
   - action_add_to_vote_options
   - slot{"vote_options": ["vote", "options"]}
   - utter_add_another
-> check_for_more
-
-## user is done adding vote options
-> check_for_more
+* affirm
+  - utter_ask_vote_option
+* select{"temp": "vote option"}
+  - slot{"temp": "vote option"}
+  - action_add_to_vote_options
+  - slot{"vote_options": ["vote", "options 2"]}
+  - utter_add_another
 * negate
   - action_utter_vote_status
   - utter_confirm_request
@@ -158,7 +135,6 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 # user doesnt have it in them to try again
 > restart_vote_creation
@@ -167,21 +143,12 @@
   - action_restart
 
 ## user wants to post a livewire
-> check_what_user_wants
 * create_livewire
   - utter_confirm_livewire_intent
   - action_get_group
-> check_for_more_livewire_groups
-
-## user wants more groups
-> check_for_more_livewire_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_livewire_groups
-
-## user has selected desired group, continue livewire flow
-> check_for_more_livewire_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_livewire_routine"}
@@ -219,20 +186,12 @@
   - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
-> check_for_more_media_files
-
-## user would like to add another media file
-> check_for_more_media_files
 * affirm
   - utter_ask_media_file
 * select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
-> check_for_more_media_files  
-
-## user is happy with currently added files, now check for location
-> check_for_more_media_files
 * negate
   - utter_location_or_not
 > check_for_location
@@ -281,7 +240,6 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 # user doesnt have it in them to try again
 > restart_livewire_creation
@@ -290,21 +248,12 @@
   - action_restart
 
 ## user wants volunteers
-> check_what_user_wants
 * create_volunteer_todo
   - utter_confirm_volunteer_intent
   - action_get_group
-> check_for_more_volunteer_groups
-
-## user wants more groups
-> check_for_more_volunteer_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_volunteer_groups
-
-## user has selected desired group, continue volunteer flow
-> check_for_more_volunteer_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_todo_volunteer_routine"}
@@ -341,7 +290,6 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 # user doesnt have it in them to try again
 > restart_volunteer_creation
@@ -350,21 +298,12 @@
   - action_restart
 
 ## user wants group member information
-> check_what_user_wants
 * create_info_todo
   - utter_confirm_info_intent
   - action_get_group
-> check_for_more_info_groups
-
-## user wants more groups
-> check_for_more_info_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_info_groups
-
-## user has selected desired group, continue info-todo flow
-> check_for_more_info_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_todo_info_routine"}
@@ -412,7 +351,6 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 # user doesnt have it in them to try again
 > restart_info_todo_creation
@@ -421,21 +359,12 @@
   - action_restart
 
 ## user wants to call for action
-> check_what_user_wants
 * create_action_todo
   - utter_confirm_action_intent
   - action_get_group
-> check_for_more_action_groups
-
-## user wants more groups
-> check_for_more_action_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_action_groups
-
-## user has selected desired group, continue action flow
-> check_for_more_action_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_todo_action_routine"}
@@ -472,7 +401,6 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 # user doesnt have it in them to try again
 > restart_action_todo_creation
@@ -481,21 +409,12 @@
   - action_restart
 
 ## user seeks validation
-> check_what_user_wants
 * create_validation_todo
   - utter_confirm_validation_intent
   - action_get_group
-> check_for_more_validation_groups
-
-## user wants more groups
-> check_for_more_validation_groups
 * next_page
   - action_increment_page
   - action_get_group
-> check_for_more_validation_groups
-
-## user has selected desired group, continue validation flow
-> check_for_more_validation_groups
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
   - form{"name": "action_todo_validation_routine"}
@@ -531,7 +450,6 @@
   - utter_restarting
   - utter_actions_menu
   - action_restart
-> check_what_user_wants
 
 # user doesnt have it in them to try again
 > restart_validation_creation

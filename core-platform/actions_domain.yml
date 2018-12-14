@@ -39,6 +39,7 @@ entities:
  - media_record_id
  - media_record_ids
  - livewire_content
+ - temp
 
 slots:
   requested_slot:
@@ -217,7 +218,6 @@ actions:
   - action_create_livewire_complete
   - action_save_vote_option
   - action_get_group
-  - action_livewire_routine
   - action_default_vote_options
   - action_add_to_vote_options
   - action_save_media_file_id
@@ -235,3 +235,4 @@ forms:
   - action_todo_volunteer_routine
   - action_todo_validation_routine
   - action_todo_action_routine
+  - action_livewire_routine

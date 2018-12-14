@@ -1,4 +1,7 @@
 import argparse, sys
+from log import *
+
+import logging
 
 from rasa_core import utils
 from rasa_core.agent import Agent
@@ -11,7 +14,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', help='The number of epochs to train', type=int, default=50)
 parser.add_argument('--aug', help='How much to augment the data', type=int, default=50)
 parser.add_argument('--batch', help='Mini batch size to use', type=int, default=10)
-parser.add_argument('--memdepth', help='Depth to apply in memorization', type=int, default=8)
+parser.add_argument('--max_history', help='Max history to pass to policy', type=int, default=5)
+parser.add_argument('--memo', help='Whether to use memoization', type=bool, default=False)
+parser.add_argument('--embedding', help='Whether to use embedding', type=bool, default=False)
 
 if __name__ == '__main__':
     utils.configure_colored_logging(loglevel="INFO")
@@ -21,15 +26,19 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    print('Training core model with args: {}'.format(args))
+    logging.info('Training core model with args: {}'.format(args))
 
-    # training_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'])
-    training_policy = EmbeddingPolicy()
+    memoization_policy = MemoizationPolicy(max_history=args['max_history'])
 
-    agent = Agent("actions_domain.yml",
-                  policies=[MemoizationPolicy(max_history=args['memdepth']), FormPolicy(), training_policy])
+    lstm_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'], max_history=args['max_history'])
+    embedding_policy = EmbeddingPolicy(epoch=args['epochs'])
+    training_policy = embedding_policy if args['embedding'] else lstm_policy
 
-    training_data = agent.load_data(training_data_folder)
+    policy_ensemble = [FormPolicy(), memoization_policy, training_policy] if args['memo'] else [FormPolicy(), training_policy]
+    logging.info("Policy ensemble has {} members".format(len(policy_ensemble)))
+    agent = Agent("actions_domain.yml", policies=policy_ensemble)
+
+    training_data = agent.load_data(training_data_folder, augmentation_factor=args['aug'])
 
     agent.train(
             training_data,

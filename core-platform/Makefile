@@ -48,4 +48,4 @@ visualize:
 	python3 -m rasa_core.visualize -s data/core/ -d actions_domain.yml -o story_graph.png
 
 evaluate:
-	python3 -m rasa_core.evaluate -s test.md -d models/dialogue -o matrix.pdf
+	python3 -m rasa_core.evaluate --stories test.md --core models/dialogue -o results

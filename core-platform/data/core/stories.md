@@ -11,24 +11,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
+  - action_create_meeting_routine
   - form{"name": "action_create_meeting_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "world domination"}
-  - slot{"subject": "world domination"}
-  - form: action_create_meeting_routine
-  - slot{"subject": "world domination"}
-  - form{"name": "action_create_meeting_routine"}
-  - slot{"requested_slot": "location"}
-* select{"location": "Somewhere on Earth"}
-  - slot{"location": "Somewhere on Earth"}
-  - form: action_create_meeting_routine
-  - slot{"location": "Somewhere on Earth"}
-  - form{"name": "action_create_meeting_routine"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "this vernal equinox"}
-  - slot{"datetime": "this vernal equinox"}
-  - form: action_create_meeting_routine
-  - slot{"datetime": "this vernal equinox"}
+  - form{"name": null}
   - utter_confirm_request
 > check_meeting_correctness
 
@@ -65,18 +50,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
+  - action_create_vote_routine
   - form{"name": "action_create_vote_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "A new ward counselor"}
-  - slot{"subject": "A mew ward counselor"}
-  - form: action_create_vote_routine
-  - slot{"subject": "A new ward counselor"}
-  - form{"name": "action_create_vote_routine"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "at first sight of the next full moon"}
-  - slot{"datetime": "at first sight of the next full moon"}
-  - form: action_create_vote_routine
-  - slot{"datetime": "at first sight of the next full moon"}
+  - form{"name": null}
   - utter_ask_options_type
 > check_default_or_custom
 
@@ -151,30 +127,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
+  - action_livewire_routine
   - form{"name": "action_livewire_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "New Clinic Open"}
-  - slot{"subject": "New Clinic Open"}
-  - form: action_livewire_routine
-  - slot{"subject": "New Clinic Open"}
-  - form{"name": "action_livewire_routine"}
-  - slot{"requested_slot": "livewire_content"}
-*  select{"livewire_content": "A new clinic has open within our community"}
-  - slot{"livewire_content": "A new clinic has opened within our comminity"}
-  - form: action_livewire_routine
-  - slot{"livewire_content": "A new clinic has opened within our comminity"}
-  - form{"name": "action_livewire_routine"}
-  - slot{"requested_slot": "contact_name"}
-* select{"contact_name": "Jack Ryan"}
-  - slot{"contact_name": "Jack Ryan"}
-  - form: action_livewire_routine
-  - slot{"contact_name": "Jack Ryan"}
-  - form{"name": "action_livewire_routine"}
-  - slot{"requested_slot": "contact_number"}
-* select{"contact_number": "011 111 1111"}
-  - slot{"contact_number": "011 111 1111"}
-  - form: action_livewire_routine
-  - slot{"contact_number": "011 111 1111"}
+  - form{"name": null}
   - utter_ask_add_media_files
 > check_for_media_file
 
@@ -256,19 +211,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
-  - form{"name": "action_todo_volunteer_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - slot{"subject": "protest"}
-  - form: action_todo_volunteer_routine
-  - slot{"subject": "protest"}
-  - form{"name": "action_todo_volunteer_routine"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - slot{"datetime": "later"}
-  - form: action_todo_volunteer_routine
-  - slot{"datetime": "later"}
   - action_todo_volunteer_routine
+  - form{"name": "action_todo_volunteer_routine"}
+  - form{"name": null}
   - utter_confirm_request
 > check_volunteer_action_correctness
 
@@ -306,30 +251,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
+  - action_todo_info_routine
   - form{"name": "action_todo_info_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - slot{"subject": "protest"}
-  - form: action_todo_info_routine
-  - slot{"subject": "protest"}
-  - form{"name": "action_todo_info_routine"}
-  - slot{"requested_slot": "information_required"}
-* select{"information_required": "id numbers"}
-  - slot{"information_required": "id numbers"}
-  - form: action_todo_info_routine
-  - slot{"information_required": "id numbers"}
-  - form{"name": "action_todo_info_routine"}
-  - slot{"requested_slot": "response_tag"}
-* select{"response_tag": "id: "}
-  - slot{"response_tag": "id: "}
-  - form: action_todo_info_routine
-  - slot{"response_tag": "id: "}
-  - form{"name": "action_todo_info_routine"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - slot{"datetime": "later"}
-  - form: action_todo_info_routine
-  - slot{"datetime": "later"}
+  - form{"name": null}
   - utter_confirm_request
 > check_info_action_correctness
 
@@ -367,19 +291,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
-  - form{"name": "action_todo_action_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - slot{"subject": "protest"}
-  - form: action_todo_action_routine
-  - slot{"subject": "protest"}
-  - form{"name": "action_todo_action_routine"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - slot{"datetime": "later"}
-  - form: action_todo_action_routine
-  - slot{"datetime": "later"}
   - action_todo_action_routine
+  - form{"name": "action_todo_action_routine"}
+  - form{"name": null}
   - utter_confirm_request
 > check_action_correctness
 
@@ -417,18 +331,9 @@
   - action_get_group
 * select{"group_uid": "Veritas"}
   - slot{"group_uid": "Veritas"}
+  - action_todo_validation_routine
   - form{"name": "action_todo_validation_routine"}
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - slot{"subject": "protest"}
-  - form: action_todo_validation_routine
-  - slot{"subject": "protest"}
-  - form{"name": "action_todo_validation_routine"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - slot{"datetime": "later"}
-  - form: action_todo_validation_routine
-  - slot{"datetime": "later"}
+  - form{"name": null}
   - utter_confirm_request
 > check_validation_correctness
 

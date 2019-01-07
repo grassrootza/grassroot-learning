@@ -22,6 +22,8 @@ grassroot-nlu/logs/nlu.log
 core-platform/models/
 core-platform/rasa_core.log
 core-platform/__pycache__/
+core-platform/story_graph.html
+core-platform/story_graph.dot
 core-platform/story_graph.png
 core-platform/core.log
 
@@ -40,3 +42,6 @@ core-platform/core.log
 **/failed_stories.md
 **/story_confmat.pdf
 *.log
+
+# quick start bash file
+.start.sh

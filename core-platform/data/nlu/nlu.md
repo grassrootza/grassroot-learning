@@ -98,3 +98,61 @@
 - are there any more groups
 - make more groups appear
 - are these the only groups
+
+## intent:select
+- [A new Leader](subject)
+- [Housing permits](subject)
+- [Informal settlements](subject)
+- [FNB Stadium](location)
+- [City Hall](location)
+- [Charter House](location)
+- [Uncle Sam's place](location)
+- [Braamfontein](location)
+- [Khutso House](location)
+- [tomorrow](datetime)
+- [this friday at 3pm](datetime)
+- [next tuesday at two in the afternoon](datetime)
+- [tomorrow](datetime)
+- [this friday at 3pm](datetime)
+- [next tuesday at two in the afternoon](datetime)
+- [tomorrow](datetime)
+- [this friday at 3pm](datetime)
+- [next tuesday at two in the afternoon](datetime)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [James Comey](contact_name)
+- [Alison Hendrix](contact_name)
+- [Jabu Kunene](contact_name)
+- [Golem](contact_name)
+- [065 000 0000](contact_number)
+- [062 345 4534](contact_number)
+- [089939584](contact_number)
+
+## intent:call_meeting
+- call a meeting
+- meeting
+- set a meeting
+- lets call a meeting
+- organise me a meeting
+- create a meeting
+- schedule a meeting
+- meeting
+- mtng
+- lets meet
+- lets do a meeting
+
+## intent:create_livewire
+- livewire
+- post a livewire
+- create a livewire
+- post livewire
+- livewire post
+- livewire
+- lets post a livewire please
+- help me make a livewire

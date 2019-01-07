@@ -92,8 +92,6 @@ slots:
     type: unfeaturized
 
 templates:
-  utter_actions_intitialiser:
-    - "Welcome to Grassroot Actions. What would you like to do?"
   utter_actions_menu:
     - "Welcome to Grassroot Actions. Here you can call meetings and votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
   utter_ask_subject:
@@ -223,16 +221,15 @@ actions:
   - action_save_media_file_id
   - action_utter_vote_status
   - action_utter_livewire_status
+  - action_utter_meeting_status
   - action_increment_page
   - action_custom_fallback
   - action_reroute_to_new_domain
-
-forms:
-  - action_create_meeting_routine
-  - action_create_group_routine
-  - action_create_vote_routine
-  - action_todo_info_routine
-  - action_todo_volunteer_routine
-  - action_todo_validation_routine
-  - action_todo_action_routine
-  - action_livewire_routine
+  - extract_and_validate_entity
+  - request_subject
+  - request_location
+  - request_datetime
+  - request_livewire_content
+  - request_contact_name
+  - request_contact_number
+  

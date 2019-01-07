@@ -12,6 +12,8 @@ from rasa_core_sdk.forms import FormAction, REQUESTED_SLOT
 from rasa_core_sdk import Action
 from rasa_core_sdk.events import SlotSet
 
+from platform_utils import *
+
 from datetime import datetime
 from difflib import SequenceMatcher
 from email.mime.multipart import MIMEMultipart
@@ -177,7 +179,20 @@ class ActionIncrementPage(Action):
             current_page = 0
         current_page += 1
         logging.debug("Now loading group page: %s" % current_page)
-        return [SlotSet("page", current_page)]    
+        return [SlotSet("page", current_page)] 
+
+
+class ExtractValidateEntity(Action):
+
+    def name(self):
+        return 'extract_and_validate_entity'
+
+    def run(self, dispatcher, tracker, domain):
+        expected_entity = tracker.get_slot('requested_slot')
+        expected_value = (tracker.latest_message)['text']
+        # run_evaluation() where need be.
+        logging.info("setting value '%s' for entity '%s'" % (expected_value, expected_entity))
+        return [SlotSet(expected_entity, expected_value), SlotSet("requested_slot", None)]
 
 
 class ActionAcquireMeetingDetails(FormAction):
@@ -196,6 +211,23 @@ class ActionAcquireMeetingDetails(FormAction):
         return 'action_create_meeting_routine'
 
     def submit(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        responses = [
+                     "You have chosen %s as your location." % tracker.get_slot("location"),
+                     "You have chosen %s as your subject." % tracker.get_slot("subject"),
+                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
+                    ]
+        dispatcher.utter_message(' '.join(responses))
+        return []
+
+
+class ActionUtterMeetingStatus(Action):
+
+    def name(self):
+        return 'action_utter_meeting_status'
+
+    def run(self, dispatcher, tracker, domain):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
@@ -694,7 +726,7 @@ def snip(text):
              text: type -> string;
     """
 
-    if len(text) > 20:
+    if text != None and len(text) > 20:
         return text[:20] + "..."
     else:
         return text

@@ -31,6 +31,7 @@ import smtplib
 logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s", level=logging.DEBUG)
 
 auth_token = os.getenv('TOKEN_X')
+logging.info('Setting auth token: %s' % auth_token)
 
 BASE_URL = os.getenv('PLATFORM_BASE_URL', 'https://staging.grassroot.org.za/v2/api')
 DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-west-1.amazonaws.com/production')
@@ -73,6 +74,7 @@ class ActionGetGroup(Action):
 
 def get_group_menu_items(sender_id, page,required_permission = permissionsMap['default']):
     full_url = BASE_URL + GROUP_PATH
+    logging.info('Getting group menu items, for sender ID : %s' % sender_id)
     request = requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)},
                                                   params={
                                                           'pageNumber': page,

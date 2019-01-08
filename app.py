@@ -45,7 +45,7 @@ intent_domain_map = {
 
 domain_agents = {
     "service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
-    "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
+    # "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
     "action" : Agent.load('core-platform/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
 }
 

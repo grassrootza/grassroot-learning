@@ -129,8 +129,8 @@
     - slot{"subject": "New School Opened"}
     - extract_and_validate_entity
     - slot{"subject": "New School Opened"}
-    - request_livewire_content
     - utter_ask_livewire_content
+    - request_livewire_content
     - slot{"requested_slot": "livewire_content"}
 * select{"livewire_content": "Lorem ipsum"}
     - slot{"livewire_content": "Lorem ipsum"}
@@ -157,16 +157,13 @@
 > check_for_media_file
 * affirm
     - utter_ask_media_file
-* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-    - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
+    - slot{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
     - action_save_media_file_id
     - utter_add_another
-* affirm
-    - utter_ask_media_file
-* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-    - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-    - action_save_media_file_id
-    - utter_add_another
+> check_for_media_file
+
+> check_for_media_file
 * negate
     - utter_location_or_not
 > check_for_location

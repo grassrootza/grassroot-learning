@@ -206,14 +206,13 @@ actions:
   - utter_location_skipped
   - utter_restart_action
   - action_get_vote_option
-  - action_create_meeting_complete
-  - action_create_vote_complete
-  - action_create_group_complete
-  - action_create_volunteer_todo_complete
-  - create_validation_todo_complete
-  - action_create_todo_action_complete
-  - action_create_info_todo_complete
-  - action_create_livewire_complete
+  - action_send_meeting_to_server
+  - action_send_vote_to_server
+  - action_send_volunteer_todo_to_server
+  - create_send_validation_todo_to_server
+  - action_send_todo_action_to_server
+  - action_send_info_todo_to_server
+  - action_send_livewire_to_server
   - action_save_vote_option
   - action_get_group
   - action_default_vote_options

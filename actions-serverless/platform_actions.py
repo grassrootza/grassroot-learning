@@ -242,7 +242,7 @@ class ActionUtterMeetingStatus(Action):
 class ActionSendMeetingToServer(Action):
 
     def name(self):
-        return 'action_create_meeting_complete'
+        return 'action_send_meeting_to_server'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
@@ -337,7 +337,7 @@ class ActionUtterVoteStatus(Action):
 class SendVoteToServer(Action):
 
     def name(self):
-        return 'action_create_vote_complete'
+        return 'action_send_vote_to_server'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
@@ -387,7 +387,7 @@ class ActionAcquireInfoTodoDetails(FormAction):
 class SendInfoTodoToServer(Action):
 
     def name(self):
-        return 'action_create_info_todo_complete'
+        return 'action_send_info_todo_to_server'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
@@ -435,7 +435,7 @@ class ActionAcquireVolunteerDetails(FormAction):
 class ActionSendVolunteerTodoToServer(Action):
 
     def name(self):
-        return 'action_create_volunteer_todo_complete'
+        return 'action_send_volunteer_todo_to_server'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
@@ -482,7 +482,7 @@ class ActionAcquireValidationDetails(FormAction):
 class ActionSendValidationToServer(Action):
 
     def name(self):
-        return 'create_validation_todo_complete'
+        return 'action_send_validation_todo_to_server'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
@@ -529,7 +529,7 @@ class ActionAcquireActionTodoDetails(FormAction):
 class ActionSendActionTodoToServer(Action):
 
     def name(self):
-        return 'action_create_todo_action_complete'
+        return 'action_send_action_todo_to_server'
 
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
@@ -620,7 +620,7 @@ class ActionUtterLivewireStatus(Action):
 class ActionSendLivewireToServer(Action):
 
     def name(self):
-        return 'action_create_livewire_complete'
+        return 'action_send_livewire_to_server'
 
     def run(self, dispatcher, tracker, domain):
         headline = tracker.get_slot("subject")

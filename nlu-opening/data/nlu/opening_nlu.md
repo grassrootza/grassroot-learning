@@ -59,3 +59,56 @@
 - abuse
 - violence
 - hit
+
+## intent:call_meeting
+- call a meeting
+- set a meeting
+- I'd like to have a meeting
+- I'm requesting a meeting
+- Kindly call a meeting
+- Kindly set a meeting
+- meeting
+- call meeting
+- set meeting
+- make a meeting happen
+- create a meeting
+- lets have a meeting
+
+## intent:call_vote
+- call a vote
+- vote
+- lets vote
+- create a vote
+- its time to vote
+- kindly create a vote
+
+## intent:create_livewire
+- create a livewire alert
+- form a livewire alert
+- send out a livewire
+- issue livewire
+- create an alert
+- livewire
+
+## intent:take_action
+- an action
+- action
+- I'd like to act
+- action please
+- take action
+- act now
+
+## intent:create_info_todo
+- I need member information
+- Get me information
+
+## intent:create_volunteer_todo
+- find me volunteers
+- volunteers 
+
+## intent:create_validation_todo
+- I need confirmation
+- Find me confirmation
+- I need validation
+- Validate
+- Confirm

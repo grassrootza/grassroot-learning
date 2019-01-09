@@ -3,6 +3,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * call_meeting
+  - utter_confirm_meeting_intent
   - slot{"action": "call_meeting"}
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -30,7 +31,8 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * call_vote
-  - slot{"action": "call_meeting"}
+  - utter_confirm_vote_intent
+  - slot{"action": "call_vote"}
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -70,7 +72,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_livewire
-  - slot{"action": "call_meeting"}
+  - utter_confirm_livewire_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -93,17 +95,24 @@
   - utter_ask_add_media_files
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 * affirm
   - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+* select{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
+  - slot{"media_record_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
   - action_save_media_file_id
   - utter_add_another
 * negate
+  - utter_location_or_not
+* affirm
+  - utter_ask_livewire_location
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+  - slot{"latitude": -26.1947954}
+  - slot{"longitude": 28.036162200000035}
+  - utter_location_received
   - action_utter_livewire_status
   - utter_confirm_request
 * affirm
@@ -115,7 +124,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_volunteer_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_volunteer_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -139,7 +148,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_info_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_info_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -171,7 +180,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_action_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_action_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
@@ -195,7 +204,7 @@
   - utter_actions_initialiser
   - utter_actions_menu
 * create_validation_todo
-  - slot{"action": "call_meeting"}
+  - utter_confirm_validation_intent
   - action_get_group
 * select{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}
   - slot{"group_uid": "0a56b88b-25f7-4365-aa3b-bbe9b903a143"}

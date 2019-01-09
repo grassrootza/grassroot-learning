@@ -87,3 +87,4 @@ actions:
   - utter_goodbye
   - action_retrieve_and_send_services
   - action_service_type_reset
+  - action_custom_fallback

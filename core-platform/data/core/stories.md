@@ -1,396 +1,325 @@
-## a new beginning
+## full flow of meeting
 * take_action
-  - utter_actions_initialiser
-  - utter_actions_menu
+    - utter_actions_menu
 > check_what_user_wants
+
+## meeting happy path 1
+* call_meeting
+    - utter_confirm_meeting_intent
+    - slot{"action": "call_meeting"}
+    - action_get_group
+* select{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
+    - slot{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
+    - request_subject
+    - slot{"requested_slot": "subject"}
+* select{"subject": "A new test"}
+    - slot{"subject": "A new test"}
+    - extract_and_validate_entity
+    - slot{"subject": "A new test"}
+    - slot{"requested_slot": null}
+    - request_location
+    - slot{"requested_slot": "location"}
+* select{"location": "City Hall"}
+    - slot{"location": "City Hall"}
+    - extract_and_validate_entity
+    - slot{"location": "City Hall"}
+    - slot{"requested_slot": null}
+    - request_datetime
+    - slot{"requested_slot": "datetime"}
+* select{"datetime": "tomorrow"}
+    - slot{"datetime": "tomorrow"}
+    - extract_and_validate_entity
+    - slot{"datetime": "tomorrow"}
+    - slot{"requested_slot": null}
+    - action_utter_meeting_status
+    - utter_confirm_request
+* affirm
+    - action_send_meeting_to_server
+    - action_restart
+
+## meeting happy path 2
+* take_action
+    - utter_actions_menu
+* call_meeting
+    - utter_confirm_meeting_intent
+    - action_get_group
+* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - utter_ask_subject
+    - request_subject
+    - slot{"requested_slot": "subject"}
+* select{"subject": "Housing Permits"}
+    - slot{"subject": "Housing Permits"}
+    - extract_and_validate_entity
+    - slot{"subject": "Housing Permits"}
+    - slot{"requested_slot": null}
+    - utter_ask_location
+    - request_location
+    - slot{"requested_slot": "location"}
+* select{"location": "Khutso House"}
+    - slot{"location": "Khutso House"}
+    - extract_and_validate_entity
+    - slot{"location": "Khutso House"}
+    - slot{"requested_slot": null}
+    - utter_ask_datetime
+    - request_datetime
+    - slot{"requested_slot": "datetime"}
+* select{"datetime": "tomorrow at 9am"}
+    - slot{"datetime": "tomorrow at 9am"}
+    - extract_and_validate_entity
+    - slot{"datetime": "tomorrow at 9am"}
+    - slot{"requested_slot": null}
+    - action_utter_meeting_status
+    - utter_confirm_request
+* affirm
+    - action_send_meeting_to_server
+    - action_restart
 
 ## user wants a meeting
 > check_what_user_wants
 * call_meeting
-  - utter_confirm_meeting_intent
-  - slot{"action": "call_meeting"}
-  - action_get_group
-> check_for_more_meeting_groups
+    - utter_confirm_meeting_intent
+    - slot{"action": "call_meeting"}
+    - action_get_group
+> check_for_more_groups
 
 ## user wants more groups
-> check_for_more_meeting_groups
+> check_for_more_groups
 * next_page
-  - action_increment_page
-  - action_get_group
-> check_for_more_meeting_groups
+    - action_increment_page
+    - action_get_group
+> check_for_more_groups
 
-## user has selected desired group, continue meeting flow
-> check_for_more_meeting_groups
+# user has chosen a group
+> check_for_more_groups
 * select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_create_meeting_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "world domination"}
-  - action_create_meeting_routine
-  - slot{"subject": "world domination"}
-  - slot{"requested_slot": "location"}
-* select{"location": "Nowhere"}
-  - action_create_meeting_routine
-  - slot{"location": "Nowhere"}
+    - slot{"group_uid": "Veritas"}
+    - utter_ask_subject
+    - request_subject
+    - slot{"requested_slot": "subject"}
+* select{"subject": "Something awesome"}
+    - slot{"subject": "A new test"}
+    - extract_and_validate_entity
+    - slot{"subject": "Something awesome"}
+    - utter_ask_location
+    - request_location
+    - slot{"requested_slot": "location"}
+* select{"location": "Secret Headquarters"}
+    - slot{"location": "Secret Headquarters"}
+    - extract_and_validate_entity
+    - slot{"location": "Secret Headquarters"}
+    - utter_ask_datetime
+    - request_datetime
   - slot{"requested_slot": "datetime"}
-* select{"datetime": "soon"}
-  - action_create_meeting_routine
-  - slot{"datetime": "soon"}
-  - utter_confirm_request
+* select{"datetime": "tomorrow"}
+    - slot{"datetime": "tomorrow"}
+    - extract_and_validate_entity
+    - slot{"datetime": "tomorrow"}
+    - slot{"requested_slot": null}
+    - action_utter_meeting_status
+    - utter_confirm_request
 > check_meeting_correctness
 
 ## request is correct, send request to server
 > check_meeting_correctness
 * affirm
-  - action_create_meeting_complete
-  - action_restart
+    - action_send_meeting_to_server
+    - action_restart
 
 ## request is wrong
 > check_meeting_correctness
 * negate
-  - utter_negation
-  - action_restart
+    - utter_restart_action
+> restart_meeting_creation
 
-## user wants to vote
+> restart_meeting_creation
+* affirm
+    - utter_restarting
+    - utter_actions_menu
+    - action_restart
+
+> restart_meeting_creation
+* negate
+    - utter_negation
+    - action_restart
+
+## livewire happy path 1
 > check_what_user_wants
-* call_vote
-  - utter_confirm_vote_intent
-  - slot{"action": "call_vote"}
-  - action_get_group
-> check_for_more_vote_groups
-
-## user wants more groups
-> check_for_more_vote_groups
-* next_page
-  - action_increment_page
-  - action_get_group
-> check_for_more_vote_groups
-
-## user has selected desired group, continue vote flow
-> check_for_more_vote_groups
-* select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_create_vote_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "world domination"}
-  - action_create_vote_routine
-  - slot{"subject": "world domination"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_create_vote_routine
-  - slot{"datetime": "later"}
-  - utter_ask_options_type
-> check_default_or_custom
-
-## user is okay with default yes/no options
-> check_default_or_custom
-* negate
-  - action_default_vote_options
-  - slot{"vote_options": "['vote', 'options']"}
-  - action_utter_vote_status
-  - utter_confirm_request
-> check_vote_correctness
-
-## user would like custom vote options
-> check_default_or_custom
+* create_livewire
+    - utter_confirm_livewire_intent
+    - action_get_group
+* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - utter_ask_subject
+    - request_subject
+    - slot{"requested_slot": "subject"}
+* select{"subject": "Climate Change"}
+    - slot{"subject": "Climate Change"}
+    - extract_and_validate_entity
+    - slot{"subject": "Climate Change"}
+    - slot{"requested_slot": null}
+    - utter_ask_livewire_content
+    - request_livewire_content
+    - slot{"requested_slot": "livewire_content"}
+* select{"livewire_content": "lorem ipsum dolor sit amet, consectetur adipdcing elit"}
+    - slot{"livewire_content": "lorem ipsum dolor sit amet, consectetur adipdcing elit"}
+    - extract_and_validate_entity
+    - slot{"livewire_content": "lorem ipsum dolor sit amet, consectetur adipdcing elit"}
+    - slot{"requested_slot": null}
+    - utter_ask_contact_name
+    - request_contact_name
+    - slot{"requested_slot": "contact_name"}
+* select{"contact_name": "Darth Vader"}
+    - slot{"contact_name": "Darth Vader"}
+    - extract_and_validate_entity
+    - slot{"contact_name": "Darth Vader"}
+    - slot{"requested_slot": null}
+    - utter_ask_contact_number
+    - request_contact_number
+    - slot{"requested_slot": "contact_number"}
+* select{"contact_number": "09454534566"}
+    - slot{"contact_number": "09454534566"}
+    - extract_and_validate_entity
+    - slot{"contact_number": "09454534566"}
+    - slot{"requested_slot": null}
+    - utter_ask_add_media_files
 * affirm
-  - utter_ask_vote_option
-* select{"temp": "vote option"}
-  - slot{"temp": "vote option"}
-  - action_add_to_vote_options
-  - slot{"vote_options": "['vote', 'options']"}
-  - utter_add_another
-> check_for_more
-
-## user would like to add another vote option
-> check_for_more
-* affirm
-  - utter_ask_vote_option
-* select{"temp": "vote option"}
-  - slot{"temp": "vote option"}
-  - action_add_to_vote_options
-  - slot{"vote_options": ["vote", "options"]}
-  - utter_add_another
-> check_for_more
-
-## user is done adding vote options
-> check_for_more
+    - utter_ask_media_file
+* select{"media_record_id": "34654-654-564564567-45645646"}
+    - slot{"media_record_id": "34654-654-564564567-45645646"}
+    - action_save_media_file_id
+    - slot{"media_record_ids": ["34654-654-564564567-45645646"]}
+    - utter_add_another
 * negate
-  - action_utter_vote_status
-  - utter_confirm_request
-> check_vote_correctness
-
-## request is correct, send request to server
-> check_vote_correctness
+    - utter_location_or_not
 * affirm
-  - action_create_vote_complete
-  - action_restart
-
-## request is wrong
-> check_vote_correctness
-* negate
-  - utter_negation
-  - action_restart
+    - utter_ask_livewire_location
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+    - slot{"latitude": -26.1947954}
+    - slot{"longitude": 28.036162200000035}
+    - utter_location_received
+    - action_utter_livewire_status
+    - utter_confirm_request
+* affirm
+    - action_send_livewire_to_server
+    - action_restart
 
 ## user wants to post a livewire
 > check_what_user_wants
 * create_livewire
-  - utter_confirm_livewire_intent
-  - action_get_group
+    - utter_confirm_livewire_intent
+    - action_get_group
 > check_for_more_livewire_groups
 
 ## user wants more groups
 > check_for_more_livewire_groups
 * next_page
-  - action_increment_page
-  - action_get_group
+    - action_increment_page
+    - action_get_group
 > check_for_more_livewire_groups
 
-## user has selected desired group, continue livewire flow
+# user has chosen a group
 > check_for_more_livewire_groups
 * select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_livewire_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "New Clinic Open"}
-  - action_livewire_routine
-  - slot{"subject": "New Clinic Open"}
-  - slot{"requested_slot": "livewire_content"}
-*  select{"livewire_content": "A new clinic has open within our community"}
-  - action_livewire_routine
-  - slot{"livewire_content": "A new clinic has opened within our comminity"}
-  - slot{"requested_slot": "contact_name"}
-* select{"contact_name": "Jack Ryan"}
-  - action_livewire_routine
-  - slot{"contact_name": "Jack Ryan"}
-  - slot{"requested_slot": "contact_number"}
-* select{"contact_number": "011 111 1111"}
-  - action_livewire_routine
-  - slot{"contact_number": "011 111 1111"}
-  - utter_ask_add_media_files
+    - slot{"group_uid": "Veritas"}
+    - request_subject
+    - utter_ask_subject
+    - slot{"requested_slot": "subject"}
+* select{"subject": "New School Opened"}
+    - slot{"subject": "New School Opened"}
+    - extract_and_validate_entity
+    - slot{"subject": "New School Opened"}
+    - utter_ask_livewire_content
+    - request_livewire_content
+    - slot{"requested_slot": "livewire_content"}
+* select{"livewire_content": "Lorem ipsum"}
+    - slot{"livewire_content": "Lorem ipsum"}
+    - extract_and_validate_entity
+    - slot{"livewire_content": "Lorem ipsum"}
+    - utter_ask_contact_name
+    - request_contact_name
+    - slot{"requested_slot": "contact_name"}
+* select{"contact_name": "Jon Doe"}
+    - slot{"contact_name": "Jon Doe"}
+    - extract_and_validate_entity
+    - slot{"contact_name": "Jon Doe"}
+    - utter_ask_contact_number
+    - request_contact_number
+    - slot{"requested_slot": "contact_number"}
+* select{"contact_number": "066 000 0000"}
+    - slot{"contact_number": "066 000 0000"}
+    - extract_and_validate_entity
+    - slot{"contact_number": "066 000 0000"}
+    - utter_ask_add_media_files
 > check_for_media_file
 
 ## user wants to add a media file
 > check_for_media_file
 * affirm
-  - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - action_save_media_file_id
-  - utter_add_another
-> check_for_more_media_files
+    - utter_ask_media_file
+* select{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
+    - slot{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
+    - action_save_media_file_id
+    - utter_add_another
+> check_for_media_file
 
-## user would like to add another media file
-> check_for_more_media_files
-* affirm
-  - utter_ask_media_file
-* select{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - slot{"media_file_ids": ["762aef58-4865-407a-b793-af6114ab3444"]}
-  - action_save_media_file_id
-  - utter_add_another
-> check_for_more_media_files  
-
-## user is happy with currently added files, proceed to request confirmation
-> check_for_more_media_files
-* negate
-  - action_utter_livewire_status
-  - utter_confirm_request
-> check_livewire_correctness  
-
-## user is happy without any media files
 > check_for_media_file
 * negate
-  - action_utter_livewire_status
-  - utter_confirm_request
+    - utter_location_or_not
+> check_for_location
+
+## alternatively, user is happy without any media files, check for location
+> check_for_media_file
+* negate
+    - utter_location_or_not
+> check_for_location
+
+## user would like to add livewire location
+> check_for_location
+* affirm
+    - utter_ask_livewire_location
+* select{"longitude": 28.036162200000035, "latitude": -26.1947954}
+    - slot{"latitude": -26.1947954}
+    - slot{"longitude": 28.036162200000035}
+    - utter_location_received
+    - action_utter_livewire_status
+    - utter_confirm_request
+> check_livewire_correctness
+
+## user is easy to please and is happy without livewire location
+> check_for_location
+* negate
+    - utter_location_skipped
+    - action_utter_livewire_status
+    - utter_confirm_request
 > check_livewire_correctness
 
 ## request is correct, send request to server
 > check_livewire_correctness
 * affirm
-  - action_create_livewire_complete
-  - action_restart
+    - action_send_livewire_to_server
+    - action_restart
 
 ## request is wrong
 > check_livewire_correctness
 * negate
-  - utter_negation
-  - action_restart
+    - utter_restart_action
+> restart_livewire_creation
 
-## user wants volunteers
-> check_what_user_wants
-* create_volunteer_todo
-  - utter_confirm_volunteer_intent
-  - action_get_group
-> check_for_more_volunteer_groups
-
-## user wants more groups
-> check_for_more_volunteer_groups
-* next_page
-  - action_increment_page
-  - action_get_group
-> check_for_more_volunteer_groups
-
-## user has selected desired group, continue volunteer flow
-> check_for_more_volunteer_groups
-* select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_todo_volunteer_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_volunteer_routine
-  - slot{"subject": "protest"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_volunteer_routine
-  - slot{"datetime": "later"}
-  - action_todo_volunteer_routine
-  - utter_confirm_request
-> check_volunteer_action_correctness
-
-## all is well, send to server
-> check_volunteer_action_correctness
+# user would like to make a redo
+> restart_livewire_creation
 * affirm
-  - action_create_volunteer_todo_complete
-  - action_restart
+    - utter_restarting
+    - utter_actions_menu
+    - action_restart
 
-## request is wrong
-> check_volunteer_action_correctness
+# user doesnt have it in them to try again
+> restart_livewire_creation
 * negate
-  - utter_negation
-  - action_restart
+    - utter_negation
+    - action_restart
 
-## user wants group member information
-> check_what_user_wants
-* create_info_todo
-  - utter_confirm_info_intent
-  - action_get_group
-> check_for_more_info_groups
-
-## user wants more groups
-> check_for_more_info_groups
-* next_page
-  - action_increment_page
-  - action_get_group
-> check_for_more_info_groups
-
-## user has selected desired group, continue info-todo flow
-> check_for_more_info_groups
-* select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_todo_info_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_info_routine
-  - slot{"subject": "protest"}
-  - action_todo_info_routine
-  - slot{"requested_slot": "information_required"}
-* select{"information_required": "id numbers"}
-  - action_todo_info_routine
-  - slot{"information_required": "id numbers"}
-  - slot{"requested_slot": "response_tag"}
-* select{"response_tag": "id: "}
-  - action_todo_info_routine
-  - slot{"response_tag": "id: "}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_info_routine
-  - slot{"datetime": "later"}
-  - utter_confirm_request
-> check_info_action_correctness
-
-## all clear, proceed to server
-> check_info_action_correctness
-* affirm
-  - action_create_info_todo_complete
-  - action_restart
-
-## request is wrong
-> check_info_action_correctness
-* negate
-  - utter_negation
-  - action_restart
-
-## user wants to call for action
-> check_what_user_wants
-* create_action_todo
-  - utter_confirm_action_intent
-  - action_get_group
-> check_for_more_action_groups
-
-## user wants more groups
-> check_for_more_action_groups
-* next_page
-  - action_increment_page
-  - action_get_group
-> check_for_more_action_groups
-
-## user has selected desired group, continue action flow
-> check_for_more_action_groups
-* select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_todo_action_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_action_routine
-  - slot{"subject": "protest"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_action_routine
-  - slot{"datetime": "later"}
-  - action_todo_action_routine
-  - utter_confirm_request
-> check_action_correctness
-
-## request is correct, send to server
-> check_action_correctness
-* affirm
-  - action_create_todo_action_complete
-  - action_restart
-
-## request is wrong
-> check_action_correctness
-* negate
-  - utter_negation
-  - action_restart
-
-## user seeks validation
-> check_what_user_wants
-* create_validation_todo
-  - utter_confirm_validation_intent
-  - action_get_group
-> check_for_more_validation_groups
-
-## user wants more groups
-> check_for_more_validation_groups
-* next_page
-  - action_increment_page
-  - action_get_group
-> check_for_more_validation_groups
-
-## user has selected desired group, continue validation flow
-> check_for_more_validation_groups
-* select{"group_uid": "Veritas"}
-  - slot{"group_uid": "Veritas"}
-  - action_todo_validation_routine
-  - slot{"requested_slot": "subject"}
-* select{"subject": "protest"}
-  - action_todo_validation_routine
-  - slot{"subject": "protest"}
-  - slot{"requested_slot": "datetime"}
-* select{"datetime": "later"}
-  - action_todo_validation_routine
-  - slot{"datetime": "later"}
-  - utter_confirm_request
-> check_validation_correctness
-
-## request is correct, send to server
-> check_validation_correctness
-* affirm
-  - create_validation_todo_complete
-  - action_restart
-
-## request is wrong
-> check_validation_correctness
-* negate
-  - utter_negation
-  - action_restart
+## fallback story
+* out_of_scope
+    - action_reroute_to_new_domain
+    - action_restart

@@ -1,0 +1,158 @@
+## intent:affirm
+- yes
+- of course
+- sure
+- yeah
+- ok
+- cool
+- go for it
+- yep
+- yep, will do thank you
+- I'm sure I will!
+- oh awesome!
+- Yes
+- accept
+- I accept
+- i accept
+- ok i accept
+- I changed my mind. I want to accept it
+- ok cool
+- alright
+- i will!
+- ok, I behave now
+- yop
+- oki doki
+- yes please
+- yes please!
+- amayzing
+- confirm
+- nice
+- coolio
+- definitely yes without a doubt
+- yas
+- yup
+- perfect
+- sure thing
+- absolutely
+- Oh, ok
+- Sure
+- hm, i'd like that
+- ja
+- sure!
+- yes i accept
+- amazing!
+- how nice!
+- cool!
+- yay
+- yes accept please
+- great
+- oh cool
+- yes
+- fine
+- yebo
+- Ee
+- E
+- grand
+- go ahead
+- hambisa
+- yebo, ngiyabonga
+- yebo, siyabonga
+- E, leboha
+- E, a leboha
+- E, rea leboha
+- yes that's right
+
+## intent:negate
+- Huh
+- I don't understand
+- That's not right
+- No, you don't understand
+- I don't get it
+- What
+- No man are you stupid
+- What are you on
+- This doesn't work
+- Doesn't work
+- Stupid thing
+- No that isn't right
+- I'm confused
+- What do I do next?
+- You aren't helping
+- This doesn't help
+- Doesn't work
+- Not right
+- This is bad
+- Can't make it work
+- Don't you understand?
+- What's wrong
+- Makes no sense
+
+## intent:next_page
+- load more groups
+- more groups
+- next page
+- please load more groups
+- next page please
+- show me more groups
+- show more groups
+- are there any more groups
+- make more groups appear
+- are these the only groups
+
+## intent:select
+- [A new Leader](subject)
+- [Housing permits](subject)
+- [Informal settlements](subject)
+- [FNB Stadium](location)
+- [City Hall](location)
+- [Charter House](location)
+- [Uncle Sam's place](location)
+- [Braamfontein](location)
+- [Khutso House](location)
+- [tomorrow](datetime)
+- [this friday at 3pm](datetime)
+- [next tuesday at two in the afternoon](datetime)
+- [tomorrow](datetime)
+- [this friday at 3pm](datetime)
+- [next tuesday at two in the afternoon](datetime)
+- [tomorrow](datetime)
+- [this friday at 3pm](datetime)
+- [next tuesday at two in the afternoon](datetime)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
+- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- [James Comey](contact_name)
+- [Alison Hendrix](contact_name)
+- [Jabu Kunene](contact_name)
+- [Golem](contact_name)
+- [065 000 0000](contact_number)
+- [062 345 4534](contact_number)
+- [089939584](contact_number)
+
+## intent:call_meeting
+- call a meeting
+- meeting
+- set a meeting
+- lets call a meeting
+- organise me a meeting
+- create a meeting
+- schedule a meeting
+- meeting
+- mtng
+- lets meet
+- lets do a meeting
+
+## intent:create_livewire
+- livewire
+- post a livewire
+- create a livewire
+- post livewire
+- livewire post
+- livewire
+- lets post a livewire please
+- help me make a livewire

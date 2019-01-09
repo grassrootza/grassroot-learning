@@ -16,6 +16,7 @@ intents:
   - create_livewire
   - inform
   - out_of_scope
+  - action_failed
 
 entities:
  - page
@@ -32,12 +33,13 @@ entities:
  - latitude
  - longitude
  - task_uid
- - media_file_ids
  - destination_uid
  - contact_name
  - contact_number
  - media_record_id
+ - media_record_ids
  - livewire_content
+ - temp
 
 slots:
   requested_slot:
@@ -69,9 +71,9 @@ slots:
   group_uid:
     type: unfeaturized
   latitude:
-    type: float
+    type: unfeaturized
   longitude:
-    type: float
+    type: unfeaturized
   task_uid:
     type: text
   livewire_type:
@@ -80,7 +82,7 @@ slots:
     type: unfeaturized
   media_record_id:
     type: unfeaturized
-  media_file_ids:
+  media_record_ids:
     type: unfeaturized
   destination_uid:
     type: text
@@ -90,15 +92,8 @@ slots:
     type: unfeaturized
 
 templates:
-  utter_actions_intitialiser:
-    - "Welcome to Grassroot Actions. What would you like to do?"
   utter_actions_menu:
-    - "Welcome to Grassroot Actions. Here you can set meeting, call votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
-  action_get_group:
-    - text: "Choose a group"
-      buttons:
-      - title: "group"
-        payload: '/select{"group": "group_uid"}'
+    - "Welcome to Grassroot Actions. Here you can call meetings and votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
   utter_ask_subject:
     - "What is this about?"
   utter_subject:
@@ -132,7 +127,7 @@ templates:
   utter_add_another:
     - "Would you like to add another?"
   utter_ask_contact_name:
-    - "Please provide your name or alias."
+    - "Please provide your name or alias (or enter 'me' to use your account name)."
   utter_ask_contact_number:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_ask_livewire_content:
@@ -159,6 +154,18 @@ templates:
     - "Okay, lets call for action."
   utter_confirm_validation_intent:
     - "Okay, lets create a validation task."
+  utter_restarting:
+    - "Alright, lets run through the process again."
+  utter_location_or_not:
+    - "Would you like to add a location to your Livewire?"
+  utter_ask_livewire_location:
+    - "Please paste your livewire location below."
+  utter_location_received:
+    - "I have recieved your location."
+  utter_location_skipped:
+    - "Okay. Moving on with no Livewire location."
+  utter_restart_action:
+    - "Would you like to try again?"
 
 actions:
   - utter_ask_subject
@@ -190,28 +197,38 @@ actions:
   - utter_confirm_volunteer_intent
   - utter_confirm_action_intent
   - utter_confirm_validation_intent
+  - utter_restart_livewire
+  - utter_restart_meeting
+  - utter_restarting
+  - utter_location_or_not
+  - utter_ask_livewire_location
+  - utter_location_received
+  - utter_location_skipped
+  - utter_restart_action
   - action_get_vote_option
-  - action_create_meeting_complete
-  - action_create_vote_complete
-  - action_create_group_complete
-  - action_create_volunteer_todo_complete
-  - create_validation_todo_complete
-  - action_create_todo_action_complete
-  - action_create_info_todo_complete
-  - action_create_livewire_complete
+  - action_send_meeting_to_server
+  - action_send_vote_to_server
+  - action_send_volunteer_todo_to_server
+  - create_send_validation_todo_to_server
+  - action_send_todo_action_to_server
+  - action_send_info_todo_to_server
+  - action_send_livewire_to_server
   - action_save_vote_option
-  - action_create_meeting_routine
-  - action_create_group_routine
-  - action_create_vote_routine
-  - action_todo_info_routine
-  - action_todo_volunteer_routine
-  - action_todo_validation_routine
-  - action_todo_action_routine
   - action_get_group
-  - action_livewire_routine
   - action_default_vote_options
   - action_add_to_vote_options
   - action_save_media_file_id
   - action_utter_vote_status
   - action_utter_livewire_status
+  - action_utter_meeting_status
   - action_increment_page
+  - action_custom_fallback
+  - action_reroute_to_new_domain
+  - extract_and_validate_entity
+  - request_subject
+  - request_location
+  - request_datetime
+  - request_livewire_content
+  - request_contact_name
+  - request_contact_number
+  

@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', help='The number of epochs to train', type=int, default=50)
 parser.add_argument('--aug', help='How much to augment the data', type=int, default=50)
 parser.add_argument('--batch', help='Mini batch size to use', type=int, default=10)
-parser.add_argument('--memdepth', help='Depth to apply in memorization', type=int, default=8)
+parser.add_argument('--max_history', help='Depth to apply in memorization', type=int, default=8)
 
 if __name__ == '__main__':
     utils.configure_colored_logging(loglevel="INFO")
@@ -19,18 +19,18 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    print('Training core model with args: {}'.format(args))
+    print('Training services core model with args: {}'.format(args))
 
-    agent = Agent("services_domain.yml",
-                  policies=[MemoizationPolicy(max_history=args['memdepth']), KerasPolicy()])
+    memoization_policy = MemoizationPolicy(max_history=args['max_history'])
+    lstm_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'], max_history=args['max_history'])
 
-    training_data = agent.load_data(training_data_folder)
+    agent = Agent("services_domain.yml", policies=[memoization_policy, lstm_policy])
+
+    training_data = agent.load_data(training_data_folder, augmentation_factor=args['aug'])
 
     agent.train(
             training_data,
             augmentation_factor=args['aug'],
-            epochs=args['epochs'],
-            batch_size=args['batch'],
             validation_split=0.2
     )
 

@@ -21,7 +21,7 @@ help:
 	@echo "        Visualizes bot logic"
 	@echo "    evaluate"
 	@echo "        evaluate the sanity of trained models."
-	
+
 
 train-online:
 	python3 train_online.py
@@ -30,14 +30,13 @@ train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
 
 train-core:
-	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 15 --nlu_threshold 0.0 --core_threshold 0.0 --fallback_action action_default_fallback
+	python3 train_platform_core.py --max_history 15
 
 train-core-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
-	python3 -m rasa_core.train -d actions_domain.yml -s data/core -o models/dialogue --history 10 --nlu_threshold 0.0 --core_threshold 0.0 --fallback_action action_default_fallback
-
+	python3 train_platform_core.py --max_history 15
 run-core-nlu:
-	python3 -m rasa_core.run -d models/dialogue -u models/current/nlu --endpoints endpoints.yml --verbose
+	python3 -m rasa_core.run -d models/dialogue -u models/current/platform_nlu --endpoints endpoints.yml --verbose
 
 run-core-solo:
 	python3 -m rasa_core.run -d models/dialogue --endpoints endpoints.yml --verbose
@@ -46,7 +45,7 @@ run-action-server:
 	python3 -m rasa_core_sdk.endpoint --actions platform_actions
 
 visualize:
-	python3 -m rasa_core.visualize -s data/core/ -d actions_domain.yml -o story_graph.png
+	python3 -m rasa_core.visualize -s data/core/ -d actions_domain.yml -o story_graph.html
 
 evaluate:
-	python3 -m rasa_core.evaluate -s data/core/test.md -d models/dialogue -o matrix.pdf
+	python3 -m rasa_core.evaluate --stories test.md --core models/dialogue -o results

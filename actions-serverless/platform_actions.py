@@ -630,11 +630,15 @@ class ActionSendLivewireToServer(Action):
         contactName = tracker.get_slot("contact_name")
         contactNumber =  tracker.get_slot("contact_number")
         taskUid = tracker.get_slot("task_uid")
-        livewire_type = 'INSTANT'
-        addLocation = False
-        mediaFileKeys = tracker.get_slot("media_file_ids")
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
+        livewire_type = 'INSTANT'
+        # TODO: make location required
+        if (latitude != None) and (longitude != None):
+            addLocation = True
+        else:
+            addLocation = False
+        mediaFileKeys = tracker.get_slot("media_file_ids")
         destUid = tracker.get_slot("destination_uid")
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + LIVEWIRE_PATH + tracker.sender_id

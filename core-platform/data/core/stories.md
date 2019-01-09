@@ -3,7 +3,7 @@
     - utter_actions_menu
 > check_what_user_wants
 
-## happy path 1
+## meeting happy path 1
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
@@ -30,6 +30,44 @@
     - slot{"datetime": "tomorrow"}
     - extract_and_validate_entity
     - slot{"datetime": "tomorrow"}
+    - slot{"requested_slot": null}
+    - action_utter_meeting_status
+    - utter_confirm_request
+* affirm
+    - action_send_meeting_to_server
+    - action_restart
+
+## meeting happy path 2
+* take_action
+    - utter_actions_menu
+* call_meeting
+    - utter_confirm_meeting_intent
+    - action_get_group
+* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - utter_ask_subject
+    - request_subject
+    - slot{"requested_slot": "subject"}
+* select{"subject": "Housing Permits"}
+    - slot{"subject": "Housing Permits"}
+    - extract_and_validate_entity
+    - slot{"subject": "Housing Permits"}
+    - slot{"requested_slot": null}
+    - utter_ask_location
+    - request_location
+    - slot{"requested_slot": "location"}
+* select{"location": "Khutso House"}
+    - slot{"location": "Khutso House"}
+    - extract_and_validate_entity
+    - slot{"location": "Khutso House"}
+    - slot{"requested_slot": null}
+    - utter_ask_datetime
+    - request_datetime
+    - slot{"requested_slot": "datetime"}
+* select{"datetime": "tomorrow at 9am"}
+    - slot{"datetime": "tomorrow at 9am"}
+    - extract_and_validate_entity
+    - slot{"datetime": "tomorrow at 9am"}
     - slot{"requested_slot": null}
     - action_utter_meeting_status
     - utter_confirm_request

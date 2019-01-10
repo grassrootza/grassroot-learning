@@ -30,11 +30,11 @@ train-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
 
 train-core:
-	python3 train_platform_core.py --max_history 15
+	python3 train_platform_core.py --max_history 20
 
 train-core-nlu:
 	python3 -m rasa_nlu.train -c config.yml --data data/nlu -o models --fixed_model_name platform_nlu --project current --verbose
-	python3 train_platform_core.py --max_history 15
+	python3 train_platform_core.py --max_history 20
 run-core-nlu:
 	python3 -m rasa_core.run -d models/dialogue -u models/current/platform_nlu --endpoints endpoints.yml --verbose
 

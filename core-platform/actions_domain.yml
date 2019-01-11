@@ -156,8 +156,6 @@ templates:
     - "Okay, lets create a validation task."
   utter_restarting:
     - "Alright, lets run through the process again."
-  utter_location_or_not:
-    - "Would you like to add a location to your Livewire?"
   utter_ask_livewire_location:
     - "Please paste your livewire location below."
   utter_location_received:
@@ -200,7 +198,6 @@ actions:
   - utter_restart_livewire
   - utter_restart_meeting
   - utter_restarting
-  - utter_location_or_not
   - utter_ask_livewire_location
   - utter_location_received
   - utter_location_skipped

@@ -26,12 +26,12 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    logging.info('Training platform core model with args: {}'.format(args))
+    logging.info('Training core model with args: {}'.format(args))
 
     memoization_policy = MemoizationPolicy(max_history=args['max_history'])
 
     lstm_policy = KerasPolicy(epochs=args['epochs'], batch_size=args['batch'], max_history=args['max_history'])
-    embedding_policy = EmbeddingPolicy(epochs=args['epochs'])
+    embedding_policy = EmbeddingPolicy(epoch=args['epochs'])
     training_policy = embedding_policy if args['embedding'] else lstm_policy
 
     policy_ensemble = [FormPolicy(), memoization_policy, training_policy] if args['memo'] else [FormPolicy(), training_policy]

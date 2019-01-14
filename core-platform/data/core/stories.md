@@ -7,11 +7,7 @@
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
-    - save_valid_groups
-    - slot{"valid_groups": ""}
-    - action_get_group
-* select{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
-    - slot{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
+    - utter_ask_subject
     - request_subject
     - slot{"requested_slot": "subject"}
 * select{"subject": "A new test"}
@@ -34,6 +30,9 @@
     - extract_and_validate_entity
     - slot{"datetime": "tomorrow"}
     - slot{"requested_slot": null}
+    - action_get_group
+* select{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
+    - slot{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
     - action_utter_meeting_status
     - utter_confirm_request
 * affirm
@@ -45,12 +44,6 @@
     - utter_actions_menu
 * call_meeting
     - utter_confirm_meeting_intent
-    - slot{"action": "call_meeting"}
-    - save_valid_groups
-    - slot{"valid_groups": ""}
-    - action_get_group
-* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
-    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
     - utter_ask_subject
     - request_subject
     - slot{"requested_slot": "subject"}
@@ -75,6 +68,9 @@
     - extract_and_validate_entity
     - slot{"datetime": "tomorrow at 9am"}
     - slot{"requested_slot": null}
+    - action_get_group
+* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
     - action_utter_meeting_status
     - utter_confirm_request
 * affirm
@@ -86,8 +82,6 @@
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
-    - save_valid_groups
-    - slot{"valid_groups": ""}
     - action_get_group
 > check_for_more_groups
 
@@ -155,11 +149,6 @@
 > check_what_user_wants
 * create_livewire
     - utter_confirm_livewire_intent
-    - save_valid_groups
-    - slot{"valid_groups": ""}
-    - action_get_group
-* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
-    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
     - utter_ask_subject
     - request_subject
     - slot{"requested_slot": "subject"}
@@ -206,6 +195,9 @@
     - slot{"media_record_ids": ["34654-654-564564567-45645646"]}
     - utter_add_another
 * negate
+    - action_get_group
+* select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
+    - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
     - action_utter_livewire_status
     - utter_confirm_request
 * affirm
@@ -216,24 +208,8 @@
 > check_what_user_wants
 * create_livewire
     - utter_confirm_livewire_intent
-    - save_valid_groups
-    - slot{"valid_groups": ""}
-    - action_get_group
-> check_for_more_livewire_groups
-
-## user wants more groups
-> check_for_more_livewire_groups
-* next_page
-    - action_increment_page
-    - action_get_group
-> check_for_more_livewire_groups
-
-# user has chosen a group
-> check_for_more_livewire_groups
-* select{"group_uid": "Veritas"}
-    - slot{"group_uid": "Veritas"}
-    - request_subject
     - utter_ask_subject
+    - request_subject
     - slot{"requested_slot": "subject"}
 * select{"subject": "New School Opened"}
     - slot{"subject": "New School Opened"}
@@ -280,6 +256,20 @@
 
 > check_for_media_file
 * negate
+    - action_get_group
+> check_for_more_livewire_groups
+
+## user wants more groups
+> check_for_more_livewire_groups
+* next_page
+    - action_increment_page
+    - action_get_group
+> check_for_more_livewire_groups
+
+# user has chosen a group
+> check_for_more_livewire_groups
+* select{"group_uid": "Veritas"}
+    - slot{"group_uid": "Veritas"}
     - action_utter_livewire_status
     - utter_confirm_request
 > check_livewire_correctness

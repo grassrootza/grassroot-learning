@@ -30,6 +30,8 @@ import smtplib
 
 logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s", level=logging.DEBUG)
 
+validator = EntityValidator()
+
 auth_token = os.getenv('TOKEN_X')
 logging.info('Setting auth token: %s' % auth_token)
 
@@ -38,6 +40,7 @@ DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-wes
 
 TOKEN_PATH = '/whatsapp/user/token'
 GROUP_PATH = '/group/fetch/minimal/filtered'
+GROUP_LIST_PATH = '/group/fetch/list'
 GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
 LIVEWIRE_PATH = '/livewire/create/'
 ACTION_TODO_PATH = '/task/create/todo/action/'
@@ -75,6 +78,7 @@ class ActionGetGroup(Action):
 def get_group_menu_items(sender_id, page,required_permission = permissionsMap['default']):
     full_url = BASE_URL + GROUP_PATH
     logging.info('Getting group menu items, for sender ID : %s' % sender_id)
+    # get paginated groups
     request = requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)},
                                                   params={
                                                           'pageNumber': page,
@@ -103,6 +107,29 @@ def get_group_menu_items(sender_id, page,required_permission = permissionsMap['d
         logging.error('Error: platform_actions.py: get_group_menu_items(): %s' % str(e))
         return []
     return menu_items
+
+
+class SaveValidGroups(Action):
+
+    def name(self):
+        return 'save_valid_groups'
+
+    def run(self, dispatcher, tracker, domain):
+        url = BASE_URL + GROUP_LIST_PATH
+        logging.info('Attempting to extract all valid groups.')
+        request = requests.get(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+                                    params={
+                                            'withSubgroups': False,
+                                            'requiredPermission': permissionsMap['default']
+                                           }
+                              )
+        logging.info('Got this back: %s' % request.json())
+        group_list_raw = request.json()
+        groups = []
+        for group in group_list_raw:
+            groups.append(group['groupUid'])
+        logging.info('extracted the following groups: %s' % groups)
+        return [SlotSet('valid_groups', groups)]
 
 
 def get_token(sender_id):
@@ -191,10 +218,10 @@ class ExtractValidateEntity(Action):
 
     def run(self, dispatcher, tracker, domain):
         expected_entity = tracker.get_slot('requested_slot')
-        expected_value = (tracker.latest_message)['text']
-        # run_evaluation() where need be.
-        logging.info("setting value '%s' for entity '%s'" % (expected_value, expected_entity))
-        return [SlotSet(expected_entity, expected_value), SlotSet("requested_slot", None)]
+        recieved_value = (tracker.latest_message)['text']
+        # validator.validate(dispatcher, expected_entity, recieved_value)
+        logging.info("setting value '%s' for entity '%s'" % (recieved_value, expected_entity))
+        return [SlotSet(expected_entity, recieved_value), SlotSet("requested_slot", None)]
 
 
 class ActionAcquireMeetingDetails(FormAction):

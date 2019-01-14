@@ -19,7 +19,7 @@ train-nlu:
 train-core:
 	cd ./core-services; python3 train_services_core.py # note that too high an aug factor seems to create over-fitting
 #	cd ./core-knowledge; python3 train_knowledge_core.py
-	cd ./core-platform; python3 train_platform_core.py --max_history 20
+	cd ./core-platform; python3 train_platform_core.py --max_history 15
 
 run-flask:
 	python3 app.py

@@ -108,6 +108,7 @@ def get_group_menu_items(sender_id, page,required_permission = permissionsMap['d
         return []
     return menu_items
 
+
 class SaveValidGroups(Action):
 
     def name(self):

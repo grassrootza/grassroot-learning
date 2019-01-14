@@ -7,6 +7,8 @@
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
+    - save_valid_groups
+    - slot{"valid_groups": ""}
     - action_get_group
 * select{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
     - slot{"group_uid": "a9c0bbdd-d850-45b7-a1d5-6c230f52d2c1"}
@@ -24,6 +26,7 @@
     - extract_and_validate_entity
     - slot{"location": "City Hall"}
     - slot{"requested_slot": null}
+    - utter_ask_datetime
     - request_datetime
     - slot{"requested_slot": "datetime"}
 * select{"datetime": "tomorrow"}
@@ -42,6 +45,9 @@
     - utter_actions_menu
 * call_meeting
     - utter_confirm_meeting_intent
+    - slot{"action": "call_meeting"}
+    - save_valid_groups
+    - slot{"valid_groups": ""}
     - action_get_group
 * select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
     - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
@@ -80,6 +86,8 @@
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
+    - save_valid_groups
+    - slot{"valid_groups": ""}
     - action_get_group
 > check_for_more_groups
 
@@ -147,6 +155,8 @@
 > check_what_user_wants
 * create_livewire
     - utter_confirm_livewire_intent
+    - save_valid_groups
+    - slot{"valid_groups": ""}
     - action_get_group
 * select{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
     - slot{"group_uid": "6e0c4eb1-7133-4c39-a705-eadf78f5f2ea"}
@@ -207,6 +217,8 @@
     - utter_actions_menu
 * create_livewire
     - utter_confirm_livewire_intent
+    - save_valid_groups
+    - slot{"valid_groups": ""}
     - action_get_group
 * select{"group_uid": "7a4cf877-26c0-4928-b8e1-13be36bc3fa7"}
     - slot{"group_uid": "7a4cf877-26c0-4928-b8e1-13be36bc3fa7"}
@@ -266,6 +278,8 @@
 > check_what_user_wants
 * create_livewire
     - utter_confirm_livewire_intent
+    - save_valid_groups
+    - slot{"valid_groups": ""}
     - action_get_group
 > check_for_more_livewire_groups
 

@@ -22,7 +22,6 @@
     - action_send_meeting_to_server
     - action_restart
 
-
 ## meeting happy path 2
 * take_action
     - utter_actions_menu
@@ -46,7 +45,6 @@
     - action_send_meeting_to_server
     - action_restart
 
-
 ## user wants a meeting
 * take_action
     - utter_actions_menu
@@ -63,17 +61,6 @@
 * select{"datetime": "tomorrow"}
     - slot{"datetime": "tomorrow"}
     - action_get_group
-> check_for_more_groups
-
-## user wants more groups
-> check_for_more_groups
-* next_page
-    - action_increment_page
-    - action_get_group
-> check_for_more_groups
-
-# user has chosen a group
-> check_for_more_groups
 * select{"group_uid": "Veritas"}
     - slot{"group_uid": "Veritas"}
     - action_utter_meeting_status
@@ -90,7 +77,6 @@
 * negate
     - utter_negation
     - action_restart
-
 
 ## livewire happy path 1
 > check_what_user_wants
@@ -131,7 +117,6 @@
     - action_send_livewire_to_server
     - action_restart
 
-
 ## livewire happy path 3
 * take_action
     - utter_actions_menu
@@ -155,32 +140,14 @@
     - slot{"longitude": 28.036162200000035}
     - utter_location_received
     - utter_ask_add_media_files
-> check_for_media_file
-
-## user wants to add a media file
-> check_for_media_file
 * affirm
     - utter_ask_media_file
 * select{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
     - slot{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
     - action_save_media_file_id
     - utter_add_another
-> check_for_media_file
-
-> check_for_media_file
 * negate
     - action_get_group
-> check_for_more_livewire_groups
-
-## user wants more groups
-> check_for_more_livewire_groups
-* next_page
-    - action_increment_page
-    - action_get_group
-> check_for_more_livewire_groups
-
-# user has chosen a group
-> check_for_more_livewire_groups
 * select{"group_uid": "Veritas"}
     - slot{"group_uid": "Veritas"}
     - action_utter_livewire_status

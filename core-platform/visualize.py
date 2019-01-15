@@ -12,4 +12,4 @@ if __name__ == '__main__':
                   policies=[MemoizationPolicy(), KerasPolicy()])
 
     agent.visualize("data/core/stories.md",
-                    output_file="graph.png", max_history=2)
+                    output_file="graph.html", max_history=4)

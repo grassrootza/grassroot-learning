@@ -1,9 +1,6 @@
 ## full flow of meeting
 * take_action
     - utter_actions_menu
-> check_what_user_wants
-
-## meeting happy path 1
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
@@ -24,6 +21,7 @@
 * affirm
     - action_send_meeting_to_server
     - action_restart
+
 
 ## meeting happy path 2
 * take_action
@@ -48,8 +46,10 @@
     - action_send_meeting_to_server
     - action_restart
 
+
 ## user wants a meeting
-> check_what_user_wants
+* take_action
+    - utter_actions_menu
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
@@ -78,30 +78,19 @@
     - slot{"group_uid": "Veritas"}
     - action_utter_meeting_status
     - utter_confirm_request
-> check_meeting_correctness
-
-## request is correct, send request to server
-> check_meeting_correctness
 * affirm
     - action_send_meeting_to_server
     - action_restart
-
-## request is wrong
-> check_meeting_correctness
 * negate
     - utter_restart_action
-> restart_meeting_creation
-
-> restart_meeting_creation
 * affirm
     - utter_restarting
     - utter_actions_menu
     - action_restart
-
-> restart_meeting_creation
 * negate
     - utter_negation
     - action_restart
+
 
 ## livewire happy path 1
 > check_what_user_wants
@@ -142,8 +131,10 @@
     - action_send_livewire_to_server
     - action_restart
 
+
 ## livewire happy path 3
-> check_what_user_wants
+* take_action
+    - utter_actions_menu
 * create_livewire
     - utter_confirm_livewire_intent
     - utter_ask_subject
@@ -194,29 +185,15 @@
     - slot{"group_uid": "Veritas"}
     - action_utter_livewire_status
     - utter_confirm_request
-> check_livewire_correctness
-
-## request is correct, send request to server
-> check_livewire_correctness
 * affirm
     - action_send_livewire_to_server
     - action_restart
-
-## request is wrong
-> check_livewire_correctness
 * negate
     - utter_restart_action
-> restart_livewire_creation
-
-# user would like to make a redo
-> restart_livewire_creation
 * affirm
     - utter_restarting
     - utter_actions_menu
     - action_restart
-
-# user doesnt have it in them to try again
-> restart_livewire_creation
 * negate
     - utter_negation
     - action_restart

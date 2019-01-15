@@ -45,3 +45,6 @@ core-platform/core.log
 
 # quick start bash file
 .start.sh
+
+# Some backups and test stuff that is WIP
+*.back

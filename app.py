@@ -186,7 +186,11 @@ def parse_unknown_domain(*rerouted_message):
     primary_result = nlu_result['intent']
     logging.info('NLU result on opening: %s', nlu_result)
     result_as_response = reshape_nlu_result('opening', nlu_result)
-    if (primary_result['confidence'] > CONFIDENCE_THRESHOLD):
+
+    nlu_only = request.args.get('nlu_only', default=False)
+    logging.info('Are we doing just an NLU parse? : %s', nlu_only)
+
+    if (primary_result['confidence'] > CONFIDENCE_THRESHOLD and not nlu_only):
         # since we are now pretty sure of the result, check if we can skip straight into domain
         if (primary_result['name'] in intent_domain_map):
             domain = intent_domain_map[primary_result['name']]

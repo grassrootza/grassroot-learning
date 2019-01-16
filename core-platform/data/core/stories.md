@@ -1,9 +1,6 @@
 ## full flow of meeting
 * take_action
     - utter_actions_menu
-> check_what_user_wants
-
-## meeting happy path 1
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
@@ -49,7 +46,8 @@
     - action_restart
 
 ## user wants a meeting
-> check_what_user_wants
+* take_action
+    - utter_actions_menu
 * call_meeting
     - utter_confirm_meeting_intent
     - slot{"action": "call_meeting"}
@@ -63,42 +61,19 @@
 * select{"datetime": "tomorrow"}
     - slot{"datetime": "tomorrow"}
     - action_get_group
-> check_for_more_groups
-
-## user wants more groups
-> check_for_more_groups
-* next_page
-    - action_increment_page
-    - action_get_group
-> check_for_more_groups
-
-# user has chosen a group
-> check_for_more_groups
 * select{"group_uid": "Veritas"}
     - slot{"group_uid": "Veritas"}
     - action_utter_meeting_status
     - utter_confirm_request
-> check_meeting_correctness
-
-## request is correct, send request to server
-> check_meeting_correctness
 * affirm
     - action_send_meeting_to_server
     - action_restart
-
-## request is wrong
-> check_meeting_correctness
 * negate
     - utter_restart_action
-> restart_meeting_creation
-
-> restart_meeting_creation
 * affirm
     - utter_restarting
     - utter_actions_menu
     - action_restart
-
-> restart_meeting_creation
 * negate
     - utter_negation
     - action_restart
@@ -143,7 +118,8 @@
     - action_restart
 
 ## livewire happy path 3
-> check_what_user_wants
+* take_action
+    - utter_actions_menu
 * create_livewire
     - utter_confirm_livewire_intent
     - utter_ask_subject
@@ -164,59 +140,27 @@
     - slot{"longitude": 28.036162200000035}
     - utter_location_received
     - utter_ask_add_media_files
-> check_for_media_file
-
-## user wants to add a media file
-> check_for_media_file
 * affirm
     - utter_ask_media_file
 * select{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
     - slot{"media_record_id": ["762aef58-4865-407a-b793-af6114ab3444"]}
     - action_save_media_file_id
     - utter_add_another
-> check_for_media_file
-
-> check_for_media_file
 * negate
     - action_get_group
-> check_for_more_livewire_groups
-
-## user wants more groups
-> check_for_more_livewire_groups
-* next_page
-    - action_increment_page
-    - action_get_group
-> check_for_more_livewire_groups
-
-# user has chosen a group
-> check_for_more_livewire_groups
 * select{"group_uid": "Veritas"}
     - slot{"group_uid": "Veritas"}
     - action_utter_livewire_status
     - utter_confirm_request
-> check_livewire_correctness
-
-## request is correct, send request to server
-> check_livewire_correctness
 * affirm
     - action_send_livewire_to_server
     - action_restart
-
-## request is wrong
-> check_livewire_correctness
 * negate
     - utter_restart_action
-> restart_livewire_creation
-
-# user would like to make a redo
-> restart_livewire_creation
 * affirm
     - utter_restarting
     - utter_actions_menu
     - action_restart
-
-# user doesnt have it in them to try again
-> restart_livewire_creation
 * negate
     - utter_negation
     - action_restart

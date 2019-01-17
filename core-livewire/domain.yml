@@ -1,0 +1,70 @@
+entities:
+ - subject
+ - content
+ - contact_name
+ - contact_number
+ - latitude
+ - longitude
+ - group_uid
+
+forms:
+ - livewire_basic_form
+
+intents:
+ - select
+ - take_action
+ - create_livewire
+ - affirm
+ - negate
+
+slots:
+  subject:
+    type: unfeaturized
+  content:
+    type: unfeaturized
+  contact_name:
+    type: unfeaturized
+  contact_number:
+    type: unfeaturized
+  latitude:
+    type: float
+  longitude:
+    type: float
+
+
+templates:
+  utter_actions_menu:
+    - "Welcome to Grassroot Actions. Here you can call meetings and votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
+  utter_ask_subject:
+    - "What is this about?"
+  utter_ask_content:
+    - "Please enter the main content of your livewire."
+  utter_ask_contact_name:
+    - "Please provide your name or alias (or enter 'me' to use your account name)."
+  utter_ask_contact_number:
+    - "Now provide a number for people to reach you on with regards to this livewire."
+  utter_ask_livewire_location:
+    - "Would you like to set a location for this alert? Just send us a pin, or reply 'no' to skip"
+  utter_ask_media_file:
+    - "Would you like to add some media, eg, a picture or video? Just add it from your gallery or say 'no' to skip"
+  utter_further_media_file:
+    - "Got it. Thanks. Would you like to add another file?"
+  utter_which_group:
+    - "Which Grassroot group is this alert related to?"
+  utter_goodbye:
+    - "Done! We have sent the alert. Thanks for using Grassroot, we hope we were useful"
+  
+actions:
+ - utter_actions_menu
+ - utter_ask_subject
+ - utter_ask_content
+ - utter_ask_contact_name
+ - utter_ask_contact_number
+ - utter_ask_livewire_location
+ - utter_ask_media_file
+ - utter_further_media_file
+ - utter_which_group
+ - action_get_group
+ - action_confirm_livewire
+ - action_send_livewire
+ - utter_goodbye

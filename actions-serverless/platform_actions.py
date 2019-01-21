@@ -51,6 +51,7 @@ MEETING_PATH = '/task/create/meeting/'
 VOTE_PATH = '/task/create/vote/'
 
 parentType = 'GROUP'
+sender_id = 'auto_16475'
 
 permissionsMap = {
     'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS',
@@ -65,13 +66,13 @@ class ActionGetGroup(Action):
         return 'action_get_group'
 
     def run(self, dispatcher, tracker, domain):
-        logging.info("Detected user: %s" % tracker.sender_id)
+        # logging.info("Detected user: %s" % 'auto_16475')
         logging.info("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
         current_action = tracker.get_slot("action")
         if current_action is None:
             current_action = "default"
         logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Choose a group", get_group_menu_items(tracker.sender_id, tracker.get_slot("page"), permissionsMap[current_action]))
+        dispatcher.utter_button_message("Choose a group", get_group_menu_items('auto_16475', tracker.get_slot("page"), permissionsMap[current_action]))
         return []
 
 
@@ -117,7 +118,7 @@ class SaveValidGroups(Action):
     def run(self, dispatcher, tracker, domain):
         url = BASE_URL + GROUP_LIST_PATH
         logging.info('Attempting to extract all valid groups.')
-        request = requests.get(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        request = requests.get(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                     params={
                                             'withSubgroups': False,
                                             'requiredPermission': permissionsMap['default']
@@ -240,7 +241,7 @@ class ActionAcquireMeetingDetails(FormAction):
         return 'action_create_meeting_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
@@ -257,7 +258,7 @@ class ActionUtterMeetingStatus(Action):
         return 'action_utter_meeting_status'
 
     def run(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         responses = [
                      "You have chosen %s as your location." % tracker.get_slot("location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
@@ -277,7 +278,7 @@ class ActionSendMeetingToServer(Action):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
         logging.info('Constructed url for create meeting: %s' % url)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'location': tracker.get_slot("location"),
                                          'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
@@ -343,7 +344,7 @@ class ActionUtterVoteStatus(Action):
         return 'action_utter_vote_status'
 
     def run(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         vote_options_list = tracker.get_slot("vote_options")
         vote_options = ''
         for i in range(len(vote_options_list)):
@@ -371,7 +372,7 @@ class SendVoteToServer(Action):
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + VOTE_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'title': tracker.get_slot("subject"),
                                          'time': epoch(formalize(tracker.get_slot("datetime"))),
@@ -402,7 +403,7 @@ class ActionAcquireInfoTodoDetails(FormAction):
         return 'action_todo_info_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         responses = [
                      "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
                      "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
@@ -421,7 +422,7 @@ class SendInfoTodoToServer(Action):
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + INFO_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
@@ -451,7 +452,7 @@ class ActionAcquireVolunteerDetails(FormAction):
         return 'action_todo_volunteer_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         responses = [
                      "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
                      "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
@@ -469,7 +470,7 @@ class ActionSendVolunteerTodoToServer(Action):
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + VOLUNTEER_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
@@ -498,7 +499,7 @@ class ActionAcquireValidationDetails(FormAction):
         return 'action_todo_validation_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         responses = [
                      "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
                      "You want everyone to have responded by *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
@@ -516,7 +517,7 @@ class ActionSendValidationToServer(Action):
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + VALIDATION_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
@@ -545,7 +546,7 @@ class ActionAcquireActionTodoDetails(FormAction):
         return 'action_todo_action_routine'
 
     def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         responses = [
                      "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
                      "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
@@ -563,7 +564,7 @@ class ActionSendActionTodoToServer(Action):
     def run(self, dispatcher, tracker, domain):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + ACTION_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'subject': tracker.get_slot("subject"),
                                          'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
@@ -618,10 +619,10 @@ class ActionSaveMediaFile(Action):
 class ActionUtterLivewireStatus(Action):
 
     def name(self):
-        return 'action_utter_livewire_status'
+        return 'action_confirm_livewire'
 
     def run(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), tracker.sender_id)
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
         template = [
                      "You have chosen %s as the title.",
                      "You have entered '%s' as the content.",
@@ -629,6 +630,7 @@ class ActionUtterLivewireStatus(Action):
                      "and provided %s as your contact detail.",
                      "",
                      "You would like this to appear within the group %s which has %s member(s)."
+                     "Is this correct?"
                     ]
         media_files = tracker.get_slot("media_file_ids")
         if media_files != None:
@@ -668,8 +670,8 @@ class ActionSendLivewireToServer(Action):
         mediaFileKeys = tracker.get_slot("media_file_ids")
         destUid = tracker.get_slot("destination_uid")
         groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + LIVEWIRE_PATH + tracker.sender_id
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)},
+        url = BASE_URL + LIVEWIRE_PATH + 'auto_16475'
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
                                          'headline': headline,
                                          'description': content,

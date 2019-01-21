@@ -30,6 +30,8 @@ slots:
     type: float
   longitude:
     type: float
+  group_uid:
+    type: unfeaturized
 
 
 templates:
@@ -43,6 +45,8 @@ templates:
     - "Please provide your name or alias (or enter 'me' to use your account name)."
   utter_ask_contact_number:
     - "Now provide a number for people to reach you on with regards to this livewire."
+  utter_invalid_number:
+    - "Sorry. That does not seem to be a valid number."
   utter_ask_livewire_location:
     - "Would you like to set a location for this alert? Just send us a pin, or reply 'no' to skip"
   utter_ask_media_file:
@@ -59,6 +63,7 @@ actions:
  - utter_ask_subject
  - utter_ask_content
  - utter_ask_contact_name
+ - utter_invalid_number
  - utter_ask_contact_number
  - utter_ask_livewire_location
  - utter_ask_media_file

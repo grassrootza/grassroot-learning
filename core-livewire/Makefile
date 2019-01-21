@@ -11,3 +11,6 @@ run-core:
 
 run-actions:
 	python3 -m rasa_core_sdk.endpoint --actions livewire_actions
+
+evaluate:
+	python3 -m rasa_core.evaluate --core models/dialogue --stories data/test/test.md -o results

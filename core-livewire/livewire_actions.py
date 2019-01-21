@@ -254,6 +254,23 @@ class ActionSendLiveWire(Action):
         return []
 
 
+class ActionSaveMediaFile(Action):
+
+    def name(self):
+        return 'action_save_media_file_id'
+
+    def run(self, dispatcher, tracker, domain):
+        media_file = tracker.get_slot("media_record_id")
+        logging.debug("Recieved media file: %s" % media_file)
+        current_media_files = tracker.get_slot("media_record_ids")
+        logging.debug("Current media files are: %s" % current_media_files)
+        if current_media_files == None:
+            current_media_files = []
+        current_media_files.append(media_file)
+        logging.debug("Media files now look like: %s" % tracker.get_slot("media_record_ids"))
+        return [SlotSet("media_record_ids", current_media_files)]
+
+
 def snip(text):
     """This function shortens large text data and adds ellipsis if 
        text exceeds 20 characters. Typcially used for previewing livewire content.

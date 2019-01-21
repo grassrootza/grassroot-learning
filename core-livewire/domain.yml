@@ -32,6 +32,10 @@ slots:
     type: float
   group_uid:
     type: unfeaturized
+  media_record_id:
+    type: unfeaturized
+  media_record_ids:
+    type: unfeaturized
 
 
 templates:
@@ -72,4 +76,5 @@ actions:
  - action_get_group
  - action_confirm_livewire
  - action_send_livewire
+ - action_save_media_file_id
  - utter_goodbye

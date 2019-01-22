@@ -10,7 +10,7 @@
     - utter_ask_media_file
 * negate
     - utter_which_group
-* select{"group_uid": "some_group"}
+* select{"group_uid": ""}
     - action_confirm_livewire
 * affirm
     - action_send_livewire
@@ -25,10 +25,10 @@
     - utter_ask_livewire_location
 * select{"longitude": 28.036162, "latitude": -26.2949354}
     - utter_ask_media_file
-* select{"media_record_id": "235434-345345-2345234444t-34444"}
+* select{"media_record_id": "275ee866-ed4d-403d-9332-89e5664b80dc"}
     - action_save_media_file_id
     - utter_which_group
-* select{"group_uid": "234324-234234-23425365-655673"}
+* select{"group_uid": "a6ddebb0-ae6f-4b9f-9be8-0453f1f5d903"}
     - action_confirm_livewire
 * affirm
     - action_send_livewire
@@ -45,7 +45,7 @@
     - utter_ask_media_file
 * negate
     - utter_which_group
-* select{"group_uid": "32534-34-345345345-345345-354354"}
+* select{"group_uid": "15427c2b-83ae-4a42-8aed-8d926d3923d54"}
     - action_confirm_livewire
 * affirm
     - action_send_livewire
@@ -62,10 +62,10 @@
     - utter_ask_livewire_location
 * negate
     - utter_ask_media_file
-* select{"media_record_id": "034crt34-34534c34-345vr34v-34v4"}
+* select{"media_record_id": "91f7a341-9145-4926-ab7e-f6aace72226b"}
     - action_save_media_file_id
     - utter_which_group
-* select{"group_uid": "235434-34534-43534-5345435"}
+* select{"group_uid": "54c8b420-7041-4ea0-b7ed-2fcab97fd4fd"}
     - action_confirm_livewire
 * affirm
     - action_send_livewire
@@ -80,7 +80,7 @@
     - form{"name": "livewire_basic_form"}
     - form{"name": null}
     - utter_ask_livewire_location
-* confusion
+* why_location
     - utter_explain_livewire_location
 * select{"longitude": 28.03616256756, "latitude": -26.2949354}
     - utter_ask_media_file
@@ -92,7 +92,6 @@
     - action_send_livewire
     - utter_goodbye
     - action_restart
-
 
 # sixth, user sends in city name as location
 * take_action
@@ -106,7 +105,7 @@
     - utter_explain_livewire_location
 * negate
     - utter_ask_media_file
-* select{"media_record_id": "034crt34-34534c34-345vr34v-34v4"}
+* select{"media_record_id": "e3c35c50-fa2f-425d-aa01-5070135c9ad1"}
     - utter_which_group
 * select{"group_uid": "test group"}
     - action_confirm_livewire

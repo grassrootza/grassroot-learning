@@ -1,4 +1,4 @@
-## intent:select
+- ## intent:select
 - [A new Leader](subject)
 - [Housing permits](subject)
 - [Informal settlements](subject)
@@ -6,7 +6,7 @@
 - [City Hall](location)
 - [Charter House](location)
 - [Uncle Sam's place](location)
-- [Braamfontein](location)
+- - [Braamfontein](location)
 - [Khutso House](location)
 - [tomorrow](datetime)
 - [this friday at 3pm](datetime)
@@ -14,7 +14,7 @@
 - [tomorrow](datetime)
 - [this friday at 3pm](datetime)
 - [next tuesday at two in the afternoon](datetime)
-- [tomorrow](datetime)
+- - [tomorrow](datetime)
 - [this friday at 3pm](datetime)
 - [next tuesday at two in the afternoon](datetime)
 - [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
@@ -22,7 +22,7 @@
 - [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
 - [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
 - [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
-- [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
+- - [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
 - [a52b1ffb-6808-4bc8-8675-cdc149c74445](group_uid)
 - [dd747a87-31b6-4ad6-a002-2216aed9b816](group_uid)
 - [James Comey](contact_name)
@@ -30,7 +30,7 @@
 - [Jabu Kunene](contact_name)
 - [Golem](contact_name)
 - [065 000 0000](contact_number)
-- [062 345 4534](contact_number)
+- - [062 345 4534](contact_number)
 - [089939584](contact_number)
 
 ## intent:take_action
@@ -38,7 +38,7 @@
 - action
 - I'd like to act
 - action please
-- take action
+- - take action
 - act now
 
 ## intent:affirm
@@ -46,7 +46,7 @@
 - of course
 - sure
 - yeah
-- ok
+- - ok
 - cool
 - go for it
 - yep
@@ -59,7 +59,7 @@
 - i accept
 - ok i accept
 - I changed my mind. I want to accept it
-- ok cool
+- - ok cool
 - alright
 - i will!
 - ok, I behave now
@@ -72,7 +72,7 @@
 - nice
 - coolio
 - definitely yes without a doubt
-- yas
+- - yas
 - yup
 - perfect
 - sure thing
@@ -85,7 +85,7 @@
 - yes i accept
 - amazing!
 - how nice!
-- cool!
+- - cool!
 - yay
 - yes accept please
 - great
@@ -98,7 +98,7 @@
 - grand
 - go ahead
 - hambisa
-- yebo, ngiyabonga
+- - yebo, ngiyabonga
 - yebo, siyabonga
 - E, leboha
 - E, a leboha
@@ -111,7 +111,7 @@
 - That's not right
 - No, you don't understand
 - I don't get it
-- What
+- - What
 - No man are you stupid
 - What are you on
 - This doesn't work
@@ -124,8 +124,180 @@
 - This doesn't help
 - Doesn't work
 - Not right
-- This is bad
+- - This is bad
 - Can't make it work
 - Don't you understand?
 - What's wrong
 - Makes no sense
+
+## intent:why_location
+- why do you need it
+- what do use it for
+- what for?
+- Why do you need my location
+- why location
+- location for what
+- - location?
+- for what?
+
+## intent:text_location
+- Roodepoort
+- Zeerust
+- Wolmaransstad
+- White River
+- Witbank
+- Westonaria
+- Wesselsbron
+- Welkom
+- Warrenton
+- Warmbaths
+- Vryheid
+- Vryburg
+- Volksrust
+- Virginia
+- Viljoenskroon
+- Vereeniging
+- Vanderbijlpark
+- Upington
+- Mthatha
+- Umkomaas
+- Ulundi
+- Uitenhage
+- Tzaneen
+- Thohoyandou
+- Theunissen
+- Thaba Nchu
+- Tembisa
+- Stutterheim
+- Stilfontein
+- Stanger
+- Standerton
+- Springs
+- Soweto
+- Somerset East
+- Siyabuswa
+- Senekal
+- Secunda
+- Scottburgh
+- Schweizer-Reneke
+- Sasolburg
+- Rustenburg
+- Richmond
+- Richards Bay
+- Reitz
+- Randfontein
+- Queenstown
+- Queensdale
+- Pretoria
+- Mokopane
+- Potchefstroom
+- Port Shepstone
+- Port Elizabeth
+- Port Alfred
+- Plettenberg Bay
+- Piet Retief
+- Polokwane
+- Pietermaritzburg
+- Phuthaditjhaba
+- Phalaborwa
+- Parys
+- Pampierstad
+- Oudtshoorn
+- Orkney
+- Modimolle
+- Nkowakowa
+- Nigel
+- Newcastle
+- Nelspruit
+- Mpumalanga
+- Mpophomeni
+- Mossel Bay
+- Mondlo
+- Mmabatho
+- Middelburg
+- Middelburg
+- Messina
+- Margate
+- Mabopane
+- Lydenburg
+- Louis Trichardt
+- Lichtenburg
+- Lebowakgomo
+- Lady Frere
+- Ladybrand
+- Kutloanong
+- Kruisfontein
+- Krugersdorp
+- Kroonstad
+- Kriel
+- Komatipoort
+- Kokstad
+- Knysna
+- Klerksdorp
+- Kimberley
+- Johannesburg
+- Howick
+- Hennenman
+- Hendrina
+- Heilbron
+- Heidelberg
+- Harrismith
+- Grahamstown
+- Graaff-Reinet
+- Giyani
+- George
+- Ga-Rankuwa
+- Fort Beaufort
+- Fochville
+- eSikhawini
+- Ermelo
+- Empangeni
+- eMbalenhle
+- East London
+- Durban
+- Dundee
+- Duiwelskloof
+- Driefontein
+- Delmas
+- De Aar
+- Cullinan
+- Cradock
+- Christiana
+- Carletonville
+- Butterworth
+- Bronkhorstspruit
+- Brits
+- Brakpan
+- Botshabelo
+- Bothaville
+- Boksburg
+- Bloemhof
+- Bloemfontein
+- Bhisho
+- Bethlehem
+- Bethal
+- Benoni
+- Beaufort West
+- Barberton
+- Ballitoville
+- Balfour
+- Allanridge
+- Aliwal North
+- Ekangala
+- Midrand
+- Centurion
+- Worcester
+- Stellenbosch
+- Saldanha
+- Paarl
+- Malmesbury
+- Lansdowne
+- Kraaifontein
+- Hermanus
+- Grabouw
+- Ceres
+- Cape Town
+- Atlantis
+- Rondebosch
+- Retreat
+- Diepsloot

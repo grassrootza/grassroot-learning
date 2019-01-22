@@ -267,7 +267,7 @@ class ActionSaveMediaFile(Action):
         if current_media_files == None:
             current_media_files = []
         current_media_files.append(media_file)
-        logging.debug("Media files now look like: %s" % tracker.get_slot("media_record_ids"))
+        logging.debug("Media files now look like: %s" % current_media_files)
         return [SlotSet("media_record_ids", current_media_files)]
 
 

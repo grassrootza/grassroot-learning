@@ -6,6 +6,8 @@ entities:
  - latitude
  - longitude
  - group_uid
+ - media_record_id
+ - media_record_ids
 
 forms:
  - livewire_basic_form
@@ -16,6 +18,8 @@ intents:
  - create_livewire
  - affirm
  - negate
+ - why_location
+ - text_location
 
 slots:
   subject:
@@ -53,6 +57,10 @@ templates:
     - "Sorry. That does not seem to be a valid number."
   utter_ask_livewire_location:
     - "Would you like to set a location for this alert? Just send us a pin, or reply 'no' to skip"
+  utter_explain_livewire_location:
+    - "Sorry. I did not understand the location you sent. Please attach the chosen location using Whatsapp's attach-location option."
+  utter_why_location:
+    - "We use you location to get your livewire post to other nearby news outlets, making sure everyone is informed."  
   utter_ask_media_file:
     - "Would you like to add some media, eg, a picture or video? Just add it from your gallery or say 'no' to skip"
   utter_further_media_file:
@@ -72,6 +80,8 @@ actions:
  - utter_ask_livewire_location
  - utter_ask_media_file
  - utter_further_media_file
+ - utter_why_location
+ - utter_explain_livewire_location
  - utter_which_group
  - action_get_group
  - action_confirm_livewire

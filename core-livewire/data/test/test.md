@@ -1,4 +1,4 @@
-## first happy path
+## first happy path, no location, no media file, full opening
 * take_action
     - utter_actions_menu
 * create_livewire
@@ -17,9 +17,7 @@
     - utter_goodbye
     - action_restart
 
-## second happy path with media file
-* take_action
-    - utter_actions_menu
+## second happy path, location, and media file
 * create_livewire
     - livewire_basic_form
     - form{"name": "livewire_basic_form"}
@@ -37,9 +35,7 @@
     - utter_goodbye
     - action_restart
 
-# first happy path
-* take_action
-    - utter_actions_menu
+# third, no location, no media file, but straight in (straight to livewire)
 * create_livewire
     - livewire_basic_form
     - form{"name": "livewire_basic_form"}
@@ -56,7 +52,7 @@
     - utter_goodbye
     - action_restart
 
-## second happy path with media file
+## fourth, no location, but media file
 * take_action
     - utter_actions_menu
 * create_livewire
@@ -64,7 +60,7 @@
     - form{"name": "livewire_basic_form"}
     - form{"name": null}
     - utter_ask_livewire_location
-* select{"longitude": 28.0365675162, "latitude": -26.2949354}
+* negate
     - utter_ask_media_file
 * select{"media_record_id": "034crt34-34534c34-345vr34v-34v4"}
     - action_save_media_file_id
@@ -76,7 +72,7 @@
     - utter_goodbye
     - action_restart
 
-# first happy path
+# fifth, some confusion on location
 * take_action
     - utter_actions_menu
 * create_livewire
@@ -84,6 +80,8 @@
     - form{"name": "livewire_basic_form"}
     - form{"name": null}
     - utter_ask_livewire_location
+* confusion
+    - utter_explain_livewire_location
 * select{"longitude": 28.03616256756, "latitude": -26.2949354}
     - utter_ask_media_file
 * negate
@@ -94,3 +92,26 @@
     - action_send_livewire
     - utter_goodbye
     - action_restart
+
+
+# sixth, user sends in city name as location
+* take_action
+    - utter_actions_menu
+* create_livewire
+    - livewire_basic_form
+    - form{"name": "livewire_basic_form"}
+    - form{"name": null}
+    - utter_ask_livewire_location
+* text_location
+    - utter_explain_livewire_location
+* negate
+    - utter_ask_media_file
+* select{"media_record_id": "034crt34-34534c34-345vr34v-34v4"}
+    - utter_which_group
+* select{"group_uid": "test group"}
+    - action_confirm_livewire
+* affirm
+    - action_send_livewire
+    - utter_goodbye
+    - action_restart
+    

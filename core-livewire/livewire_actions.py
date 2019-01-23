@@ -108,7 +108,10 @@ class ActionGetGroup(Action):
         if current_action is None:
             current_action = "default"
         logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Choose a group", get_group_menu_items('auto_16475', tracker.get_slot("page"), permissionsMap[current_action]))
+        dispatcher.utter_button_message("Choose a group",
+                                        get_group_menu_items(get_sender_id(tracker.sender_id),
+                                                             tracker.get_slot("page"),
+                                                             permissionsMap[current_action]))
         return []
 
 
@@ -182,7 +185,7 @@ class ActionConfirmLiveWire(Action):
 
     def run(self, dispatcher, tracker, domain):
         logging.info('Confirming LiveWire action')
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), get_sender_id(tracker.sender_id))
         template = [
                      "You have chosen %s as the title.",
                      "You have entered '%s' as the content.",
@@ -229,8 +232,8 @@ class ActionSendLiveWire(Action):
         mediaFileKeys = tracker.get_slot("media_file_ids")
         destUid = tracker.get_slot("destination_uid")
         groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + LIVEWIRE_PATH + 'auto_16475'
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
+        url = BASE_URL + LIVEWIRE_PATH + get_sender_id(tracker.sender_id)
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(get_sender_id(tracker.sender_id))},
                                  params={
                                          'headline': headline,
                                          'description': content,
@@ -269,6 +272,15 @@ class ActionSaveMediaFile(Action):
         current_media_files.append(media_file)
         logging.debug("Media files now look like: %s" % current_media_files)
         return [SlotSet("media_record_ids", current_media_files)]
+
+
+def get_sender_id(tracker_value):
+    logging.info("Current sender id is %s " % tracker_value)
+    if tracker_value == 'default':
+        logging.warn('Changing tracker value to privileged user.')
+        return 'auto_16475'
+    else:
+        return tracker_value
 
 
 def snip(text):

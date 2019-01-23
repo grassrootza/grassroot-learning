@@ -23,7 +23,7 @@
     - form{"name": "livewire_basic_form"}
     - form{"name": null}
     - utter_ask_livewire_location
-* select{"longitude": 28.036162, "latitude": -26.2949354}
+* select{"longitude": 35.4727402464, "latitude": -38.60409879348954}
     - utter_ask_media_file
 * select{"media_record_id": "275ee866-ed4d-403d-9332-89e5664b80dc"}
     - action_save_media_file_id
@@ -41,7 +41,7 @@
     - form{"name": "livewire_basic_form"}
     - form{"name": null}
     - utter_ask_livewire_location
-* select{"longitude": 28.0361645672, "latitude": -26.2949354}
+* select{"longitude": 29.97956439506, "latitude": -38.775087447469545}
     - utter_ask_media_file
 * negate
     - utter_which_group
@@ -82,7 +82,7 @@
     - utter_ask_livewire_location
 * why_location
     - utter_explain_livewire_location
-* select{"longitude": 28.03616256756, "latitude": -26.2949354}
+* select{"longitude": 20.27707859759183, "latitude": -22.204827094275448}
     - utter_ask_media_file
 * negate
     - utter_which_group

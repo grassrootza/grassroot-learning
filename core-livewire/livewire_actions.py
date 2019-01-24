@@ -1,10 +1,4 @@
 import logging
-import phonenumbers
-from phonenumbers import carrier
-from phonenumbers.phonenumberutil import number_type
-import requests
-import json
-import os
 
 from typing import Dict, Text, Any, List, Union
 
@@ -14,6 +8,14 @@ from rasa_core_sdk.executor import CollectingDispatcher
 from rasa_core_sdk.forms import FormAction, REQUESTED_SLOT
 from rasa_core_sdk.events import SlotSet
 from rasa_core_sdk import ActionExecutionRejection
+
+from phonenumbers.phonenumberutil import number_type
+from phonenumbers import carrier
+from datetime import datetime
+import phonenumbers
+import requests
+import json
+import os
 
 auth_token = os.getenv('TOKEN_X')
 logging.info('Setting auth token: %s' % auth_token)
@@ -26,10 +28,177 @@ GROUP_PATH = '/group/fetch/minimal/filtered'
 GROUP_LIST_PATH = '/group/fetch/list'
 GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
 LIVEWIRE_PATH = '/livewire/create/'
+MEETING_PATH = '/task/create/meeting/'
+
+parentType = 'GROUP'
 
 permissionsMap = {
     'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS'
 }
+
+
+##########################################
+#               UTILITIES                #
+##########################################
+
+class ActionGetGroup(Action):
+    def name(self):
+        return 'action_get_group'
+
+    def run(self, dispatcher, tracker, domain):
+        logging.info('Initiating get group ...')
+        logging.info("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
+        current_action = tracker.get_slot("action")
+        if current_action is None:
+            current_action = "default"
+        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
+        dispatcher.utter_button_message("Choose a group",
+                                        get_group_menu_items(get_sender_id(tracker.sender_id),
+                                                             tracker.get_slot("page"),
+                                                             permissionsMap[current_action]))
+        return []
+
+
+def get_group_name(groupUid, sender_id):
+    response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
+                            headers={'Authorization': 'Bearer ' + get_token(sender_id)})
+    logging.debug('Got this back from group name retrieval: %s' % response.content)
+    if response.ok:
+        data = json.loads(response.text)
+        group_name = data['name']
+        member_count = data['memberCount']
+        return group_name, member_count
+    return '', ''
+
+
+def get_group_menu_items(sender_id, page,required_permission = permissionsMap['default']):
+    full_url = BASE_URL + GROUP_PATH
+    logging.info('Getting group menu items, for sender ID : %s' % sender_id)
+    # get paginated groups
+    request = requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)},
+                                                  params={
+                                                          'pageNumber': page,
+                                                          'requiredPermission': required_permission
+                                                         }
+                          )
+    raw_json = json.loads(request.text)
+    logging.info('Sent group-fetch url: %s' % request.url)
+    logging.info("Content of response, raw: %s" % raw_json)
+    try:
+        page_content = raw_json['content']
+        logging.info('Page content: %s' % page_content)
+        menu_items = []
+        logging.info('How many groups do we have? %d' % len(page_content))
+        for group in range(len(page_content)):
+            menu_items.append({
+                               'title': page_content[group]['name'],
+                               'payload': 'group_uid::' + page_content[group]['groupUid']
+                              })
+        if raw_json['last'] == False:
+            menu_items.append({
+                               'title': 'Load more groups',
+                               'payload': '/next_page'
+                              })
+    except KeyError as e:
+        logging.error('Error: platform_actions.py: get_group_menu_items(): %s' % str(e))
+        # rollbar.report_exc_info()
+        return []
+    return menu_items
+
+
+def get_token(sender_id):
+    request_token = requests.post(BASE_URL + TOKEN_PATH, headers={'Authorization': 'Bearer ' + auth_token},\
+                                    params={'userId': '%s' % sender_id}).text
+    logging.debug('request_token: %s' % request_token)
+    if request_token.startswith('{'):
+        request_token = json.loads(request_token)
+        logging.debug("request token successfully converted to %s" % type(request_token))
+        if isinstance(request_token, dict):
+            if request_token['status'] == 403:
+                request_token['file_path'] = os.path.realpath(__file__)
+                error_message = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
+                        \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
+                # error_alert(error_message, inspect.stack()[0][3])
+                logging.error("Error during token retrieval.")
+    else:
+        return request_token
+
+
+def get_sender_id(tracker_value):
+    logging.info("Current sender id is %s " % tracker_value)
+    if tracker_value == 'default':
+        logging.warn('Changing tracker value to privileged user.')
+        return 'auto_16475'
+    else:
+        return tracker_value
+
+
+def snip(text):
+    """This function shortens large text data and adds ellipsis if 
+       text exceeds 20 characters. Typcially used for previewing livewire content.
+
+        params:
+             text: type -> string;
+    """
+
+    if text != None and len(text) > 20:
+        return text[:20] + "..."
+    else:
+        return text
+
+
+def formalize(datetime_string):
+    """This function converts arbitrary date-strings to a standard format.
+
+        params:
+            date_string: arbitrary date string (e.g., 'tomorrow at 3', 'next year on the first monday of May at 4pm')
+    """
+
+    try:
+        response = requests.get(DATETIME_URL, params={
+                                                      'date_string': datetime_string
+                                                     })
+        logging.info('constructed datetime url: %s' % response.url)
+        logging.debug('datetime engine returned: %s' % response.content)
+        return response.content.decode('ascii')
+    except Exception as e:
+        logging.error('platform_actions: formalize: %s' % e)
+        # rollbar.report_exc_info()
+        return datetime_string
+
+
+def epoch(formalized_datetime):
+    """This function converts the output of formalize() to epoch milisecond.
+
+        params:
+            formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
+    """
+
+    utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+    return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+
+
+def human_readable_time(formalized_datetime):
+    """This function translates the output of formalize() to a more humanly
+       explicit format.
+
+        params:
+            formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
+    """
+
+    try:
+        datetime_obj = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+        human_readable_time = datetime.strftime(datetime_obj, '%b %d, %Y at %H:%M')
+        return human_readable_time
+    except Exception as e:
+        logging.error('platform_actions: human_readable_time: %s ' % e)
+        # rollbar.report_exc_info()
+        return formalized_datetime
+
+
+##########################################
+#                LIVEWIRE                #
+##########################################
 
 class LiveWireBasicFormAction(FormAction):
     """Form action to fill out basic details for a LiveWire alert"""
@@ -95,88 +264,6 @@ class LiveWireBasicFormAction(FormAction):
     def submit(self, dispatcher, tracker, domain):
         logging.critical("Completed form")
         return []
-
-
-class ActionGetGroup(Action):
-    def name(self):
-        return 'action_get_group'
-
-    def run(self, dispatcher, tracker, domain):
-        logging.info('Initiating get group ...')
-        logging.info("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
-        current_action = tracker.get_slot("action")
-        if current_action is None:
-            current_action = "default"
-        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Choose a group",
-                                        get_group_menu_items(get_sender_id(tracker.sender_id),
-                                                             tracker.get_slot("page"),
-                                                             permissionsMap[current_action]))
-        return []
-
-
-def get_group_name(groupUid, sender_id):
-    response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
-                            headers={'Authorization': 'Bearer ' + get_token(sender_id)})
-    logging.debug('Got this back from group name retrieval: %s' % response.content)
-    if response.ok:
-        data = json.loads(response.text)
-        group_name = data['name']
-        member_count = data['memberCount']
-        return group_name, member_count
-    return '', ''
-
-
-def get_group_menu_items(sender_id, page,required_permission = permissionsMap['default']):
-    full_url = BASE_URL + GROUP_PATH
-    logging.info('Getting group menu items, for sender ID : %s' % sender_id)
-    # get paginated groups
-    request = requests.get(full_url, headers={'Authorization': 'Bearer ' + get_token(sender_id)},
-                                                  params={
-                                                          'pageNumber': page,
-                                                          'requiredPermission': required_permission
-                                                         }
-                          )
-    raw_json = json.loads(request.text)
-    logging.info('Sent group-fetch url: %s' % request.url)
-    logging.info("Content of response, raw: %s" % raw_json)
-    try:
-        page_content = raw_json['content']
-        logging.info('Page content: %s' % page_content)
-        menu_items = []
-        logging.info('How many groups do we have? %d' % len(page_content))
-        for group in range(len(page_content)):
-            menu_items.append({
-                               'title': page_content[group]['name'],
-                               'payload': 'group_uid::' + page_content[group]['groupUid']
-                              })
-        if raw_json['last'] == False:
-            menu_items.append({
-                               'title': 'Load more groups',
-                               'payload': '/next_page'
-                              })
-    except KeyError as e:
-        logging.error('Error: platform_actions.py: get_group_menu_items(): %s' % str(e))
-        return []
-    return menu_items
-
-
-def get_token(sender_id):
-    request_token = requests.post(BASE_URL + TOKEN_PATH, headers={'Authorization': 'Bearer ' + auth_token},\
-                                    params={'userId': '%s' % sender_id}).text
-    logging.debug('request_token: %s' % request_token)
-    if request_token.startswith('{'):
-        request_token = json.loads(request_token)
-        logging.debug("request token successfully converted to %s" % type(request_token))
-        if isinstance(request_token, dict):
-            if request_token['status'] == 403:
-                request_token['file_path'] = os.path.realpath(__file__)
-                error_message = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
-                        \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
-                # error_alert(error_message, inspect.stack()[0][3])
-                logging.error("Error during token retrieval.")
-    else:
-        return request_token
 
 
 class ActionConfirmLiveWire(Action):
@@ -274,24 +361,68 @@ class ActionSaveMediaFile(Action):
         return [SlotSet("media_record_ids", current_media_files)]
 
 
-def get_sender_id(tracker_value):
-    logging.info("Current sender id is %s " % tracker_value)
-    if tracker_value == 'default':
-        logging.warn('Changing tracker value to privileged user.')
-        return 'auto_16475'
-    else:
-        return tracker_value
+##########################################
+#                MEETING                 #
+##########################################
 
 
-def snip(text):
-    """This function shortens large text data and adds ellipsis if 
-       text exceeds 20 characters. Typcially used for previewing livewire content.
+class MeetingBasicFormAction(FormAction):
+    """Form action to fill out basic details for a Meeting action"""
 
-        params:
-             text: type -> string;
-    """
+    def name(self):
+        # type: () -> Text
+        return "meeting_basic_form"
+    
+    @staticmethod
+    def required_slots(tracker):
+        # type: () -> List[Text]
+        logging.info("Returning required slot set")
+        return ["subject", "meeting_location", "datetime"]
 
-    if text != None and len(text) > 20:
-        return text[:20] + "..."
-    else:
-        return text
+    def slot_mappings(self):
+        return {"subject": self.from_text(), "meeting_location": self.from_text(), "datetime": self.from_text()}
+
+    def submit(self, dispatcher, tracker, domain):
+        logging.critical("Completed form")
+        return []
+
+
+class ActionConfirmMeeting(Action):
+
+    def name(self):
+        return 'action_confirm_meeting'
+
+    def run(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), get_sender_id(tracker.sender_id))
+        responses = [
+                     "You have chosen %s as your location." % tracker.get_slot("location"),
+                     "You have chosen %s as your subject." % tracker.get_slot("subject"),
+                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
+                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
+                    ]
+        dispatcher.utter_message(' '.join(responses))
+        return []
+
+
+class ActionSendMeeting(Action):
+
+    def name(self):
+        return 'action_send_meeting'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
+        logging.info('Constructed url for create meeting: %s' % url)
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
+                                 params={
+                                         'location': tracker.get_slot("location"),
+                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'subject': tracker.get_slot("subject"),
+                                         })
+        logging.info('Constructed url for create meeting: %s' % response.url)
+        logging.info('Dispatched to platform, response: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
+        return []

@@ -6,6 +6,7 @@ entities:
  - latitude
  - longitude
  - meeting_location
+ - meeting_time
  - group_uid
  - media_record_id
  - media_record_ids
@@ -18,6 +19,7 @@ intents:
  - select
  - take_action
  - create_livewire
+ - call_meeting
  - affirm
  - negate
  - why_location
@@ -44,7 +46,8 @@ slots:
     type: unfeaturized
   media_record_ids:
     type: unfeaturized
-
+  meeting_time:
+    type: unfeaturized
 
 templates:
   utter_actions_menu:
@@ -59,7 +62,7 @@ templates:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_invalid_number:
     - "Sorry. That does not seem to be a valid number."
-  utter_ask_datetime:
+  utter_ask_meeting_time:
     - "When would you like the meeting to happen?"
   utter_ask_meeting_location:
     - "Where would you like to have the meeting?"
@@ -81,7 +84,7 @@ templates:
 actions:
  - utter_actions_menu
  - utter_ask_subject
- - utter_ask_datetime
+ - utter_ask_meeting_time
  - utter_ask_content
  - utter_ask_contact_name
  - utter_invalid_number

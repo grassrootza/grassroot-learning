@@ -377,10 +377,10 @@ class MeetingBasicFormAction(FormAction):
     def required_slots(tracker):
         # type: () -> List[Text]
         logging.info("Returning required slot set")
-        return ["subject", "meeting_location", "datetime"]
+        return ["subject", "meeting_location", "meeting_time"]
 
     def slot_mappings(self):
-        return {"subject": self.from_text(), "meeting_location": self.from_text(), "datetime": self.from_text()}
+        return {"subject": self.from_text(), "meeting_location": self.from_text(), "meeting_time": self.from_text()}
 
     def submit(self, dispatcher, tracker, domain):
         logging.critical("Completed form")
@@ -395,9 +395,9 @@ class ActionConfirmMeeting(Action):
     def run(self, dispatcher, tracker, domain):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), get_sender_id(tracker.sender_id))
         responses = [
-                     "You have chosen %s as your location." % tracker.get_slot("location"),
+                     "You have chosen %s as your location." % tracker.get_slot("meeting_location"),
                      "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
+                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("meeting_time"))),
                      "You have chosen %s as your group which has %s members." % (group_name, member_count)
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -415,8 +415,8 @@ class ActionSendMeeting(Action):
         logging.info('Constructed url for create meeting: %s' % url)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
                                  params={
-                                         'location': tracker.get_slot("location"),
-                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
+                                         'location': tracker.get_slot("meeting_location"),
+                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("meeting_time"))),
                                          'subject': tracker.get_slot("subject"),
                                          })
         logging.info('Constructed url for create meeting: %s' % response.url)

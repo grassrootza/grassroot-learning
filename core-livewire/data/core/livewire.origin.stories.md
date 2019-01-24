@@ -78,8 +78,6 @@
 
 
 ## fifth happy path, no media file, user enquires on location then refuses to provide it
-* take_action
-    - utter_actions_menu
 * create_livewire
     - livewire_basic_form
     - form{"name": "livewire_basic_form"}
@@ -120,8 +118,6 @@
     - action_restart
 
 ## seventh happy path, no media file, user enquires on location, enters text location, then correct location
-* take_action
-    - utter_actions_menu
 * create_livewire
     - livewire_basic_form
     - form{"name": "livewire_basic_form"}
@@ -167,8 +163,6 @@
     - action_restart
 
 ## ninth happy path, with media file, wrong location format, then right format
-* take_action
-    - utter_actions_menu
 * create_livewire
     - livewire_basic_form
     - form{"name": "livewire_basic_form"}

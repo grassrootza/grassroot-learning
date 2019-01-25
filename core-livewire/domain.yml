@@ -80,6 +80,8 @@ templates:
     - "Got it. Thanks. Would you like to add another file?"
   utter_which_group:
     - "Which Grassroot group is this alert related to?"
+  utter_which_meeting_group:
+    - "What group will be meeting?"
   utter_goodbye:
     - "Done! We have sent the alert. Thanks for using Grassroot, we hope we were useful"
   
@@ -99,6 +101,7 @@ actions:
  - utter_why_location
  - utter_explain_livewire_location
  - utter_which_group
+ - utter_which_meeting_group
  - action_get_group
  - action_confirm_livewire
  - action_send_livewire

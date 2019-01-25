@@ -274,6 +274,7 @@ class MeetingBasicFormAction(FormAction):
 
     def submit(self, dispatcher, tracker, domain):
         logging.critical("Completed form")
+        dispatcher.utter_template('utter_which_meeting_group', tracker)
         return []
 
 
@@ -334,7 +335,7 @@ class ActionGetGroup(Action):
         if current_action is None:
             current_action = "default"
         logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Which Grassroot group is this related to?",
+        dispatcher.utter_button_message("Choose one (use a number or the group name): ",
                                         get_group_menu_items(get_sender_id(tracker.sender_id),
                                                              tracker.get_slot("page"),
                                                              permissionsMap[current_action]))

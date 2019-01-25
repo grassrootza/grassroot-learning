@@ -14,3 +14,6 @@ run-actions:
 
 evaluate:
 	python3 -m rasa_core.evaluate --core models/dialogue --stories data/test/test.md -o results
+
+train-interactive:
+	python3 -m rasa_core.train interactive -o models/dialogue -d domain.yml -c policy.yml -s data/core/ --nlu models/nlu/current --endpoints endpoints.yml

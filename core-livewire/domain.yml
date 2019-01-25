@@ -62,6 +62,8 @@ templates:
     - "Now provide a number for people to reach you on with regards to this livewire."
   utter_invalid_number:
     - "Sorry. That does not seem to be a valid number."
+  utter_invalid_time:
+    - "That does not seem to be a valid time. Lets try again."
   utter_ask_meeting_time:
     - "When would you like the meeting to happen?"
   utter_ask_meeting_location:
@@ -88,6 +90,7 @@ actions:
  - utter_ask_content
  - utter_ask_contact_name
  - utter_invalid_number
+ - utter_invalid_time
  - utter_ask_contact_number
  - utter_ask_livewire_location
  - utter_ask_meeting_location

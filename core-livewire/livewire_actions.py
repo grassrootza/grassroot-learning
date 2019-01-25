@@ -334,7 +334,7 @@ class ActionGetGroup(Action):
         if current_action is None:
             current_action = "default"
         logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Choose a group",
+        dispatcher.utter_button_message("Which Grassroot group is this related to?",
                                         get_group_menu_items(get_sender_id(tracker.sender_id),
                                                              tracker.get_slot("page"),
                                                              permissionsMap[current_action]))

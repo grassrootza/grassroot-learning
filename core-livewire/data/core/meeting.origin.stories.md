@@ -5,7 +5,7 @@
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
-    - utter_which_group
+    - action_get_group
 * select{"group_uid": "test_group"}
     - action_confirm_meeting
 * affirm
@@ -18,7 +18,7 @@
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
-    - utter_which_group
+    - action_get_group
 * select{"group_uid": "test_group"}
     - action_confirm_meeting
 * affirm

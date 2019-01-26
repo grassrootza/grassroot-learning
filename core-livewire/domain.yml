@@ -65,7 +65,7 @@ templates:
   utter_invalid_time:
     - "That does not seem to be a valid time. Lets try again."
   utter_invalid_tense:
-    - "Sorry. It is not yet possible to meet in the past. Please invent a time machine or enter a date that is yet in the future."
+    - "Sorry. It is not yet possible to meet in the past. Please enter a date that is yet in the future."
   utter_ask_meeting_time:
     - "When would you like the meeting to happen?"
   utter_ask_meeting_location:

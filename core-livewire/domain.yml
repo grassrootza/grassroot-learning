@@ -64,6 +64,8 @@ templates:
     - "Sorry. That does not seem to be a valid number."
   utter_invalid_time:
     - "That does not seem to be a valid time. Lets try again."
+  utter_invalid_tense:
+    - "Sorry. It is not yet possible to meet in the past. Please invent a time machine or enter a date that is yet in the future."
   utter_ask_meeting_time:
     - "When would you like the meeting to happen?"
   utter_ask_meeting_location:
@@ -81,7 +83,7 @@ templates:
   utter_which_group:
     - "Which Grassroot group is this alert related to?"
   utter_which_meeting_group:
-    - "What group will be meeting?"
+    - "Which Grassroot group is this meeting related to?"
   utter_goodbye:
     - "Done! We have sent the alert. Thanks for using Grassroot, we hope we were useful"
   
@@ -93,6 +95,7 @@ actions:
  - utter_ask_contact_name
  - utter_invalid_number
  - utter_invalid_time
+ - utter_invalid_tense
  - utter_ask_contact_number
  - utter_ask_livewire_location
  - utter_ask_meeting_location

@@ -37,6 +37,7 @@ permissionsMap = {
     'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS'
 }
 
+
 ##########################################
 #                LIVEWIRE                #
 ##########################################
@@ -224,7 +225,9 @@ class MeetingBasicFormAction(FormAction):
         return ["subject", "meeting_location", "meeting_time"]
 
     def slot_mappings(self):
-        return {"subject": self.from_text(), "meeting_location": self.from_text(), "meeting_time": self.from_text()}
+        return {"subject": self.from_text(),
+                "meeting_location": self.from_text(),
+                "meeting_time": self.from_text()}
 
     def validate(self,
                  dispatcher: CollectingDispatcher,
@@ -257,27 +260,26 @@ class MeetingBasicFormAction(FormAction):
         for slot, value in slot_values.items():
             logging.info("Now validating: %s: %s" % (slot, value))
             if slot == 'meeting_time':
-                try:
-                    return_value = epoch(formalize(value))
-                except Exception as e:
-                    logging.warn(e)
-                    return_value = b'ERROR_PARSING'
-                    # rollbar.report_exc_info()
-                logging.info('Got this back during meeting_time validation: %s' % return_value)
-                if return_value == b'ERROR_PARSING':
+                return_value = epoch(formalize(value))
+                logging.info("Processing time value returned: %s" % return_value)
+                if return_value != 'ERROR_PARSING':
+                    if return_value < epoch(str(datetime.now())[:16].replace(' ', 'T')):
+                        dispatcher.utter_template('utter_invalid_tense', tracker)
+                        slot_values[slot] = None
+                else:
                     dispatcher.utter_template('utter_invalid_time', tracker)
-                    # validation failed, set slot to None
                     slot_values[slot] = None
-
+                
         # validation succeed, set the slots values to the extracted values
         return [SlotSet(slot, value) for slot, value in slot_values.items()]
 
     def submit(self, dispatcher, tracker, domain):
         logging.critical("Completed form")
-        dispatcher.utter_template('utter_which_meeting_group', tracker)
+        # dispatcher.utter_template('utter_which_meeting_group', tracker)
         return []
 
 
+"You would like to meet to discuss the subject of %s at %s on %s with the membebrs of %s"
 class ActionConfirmMeeting(Action):
 
     def name(self):
@@ -286,10 +288,10 @@ class ActionConfirmMeeting(Action):
     def run(self, dispatcher, tracker, domain):
         group_name, member_count = get_group_name(tracker.get_slot("group_uid"), get_sender_id(tracker.sender_id))
         responses = [
-                     "You have chosen %s as your location." % tracker.get_slot("meeting_location"),
-                     "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You would like to meet on *%s*." % human_readable_time(formalize(tracker.get_slot("meeting_time"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count),
+                     "You would like to meet to discuss the subject of %s" % tracker.get_slot("subject"),
+                     "at %s" % tracker.get_slot("meeting_location"),
+                     "on *%s*" % human_readable_time(formalize(tracker.get_slot("meeting_time"))),
+                     "with the members of %s (which has %s members)." % (group_name, member_count),
                      "Is this correct?"
                     ]
         dispatcher.utter_message(' '.join(responses))
@@ -334,7 +336,8 @@ class ActionGetGroup(Action):
         current_action = tracker.get_slot("action")
         if current_action is None:
             current_action = "default"
-        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
+        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action,
+                     permissionsMap[current_action]))
         dispatcher.utter_button_message("Choose one (use a number or the group name): ",
                                         get_group_menu_items(get_sender_id(tracker.sender_id),
                                                              tracker.get_slot("page"),
@@ -456,9 +459,13 @@ def epoch(formalized_datetime):
         params:
             formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
     """
-
-    utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
-    return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+    try:
+        utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+        return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+    except Exception as e:
+        logging.error(e)
+        # rollbar.report_exc_info()
+        return formalized_datetime
 
 
 def human_readable_time(formalized_datetime):

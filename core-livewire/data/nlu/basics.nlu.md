@@ -301,3 +301,12 @@
 - Rondebosch
 - Retreat
 - Diepsloot
+
+## intent:next_page
+- load more groups
+- more groups please
+- more groups
+- mre grps
+- where are my other groups
+- these arent all my groups
+- show me more groups

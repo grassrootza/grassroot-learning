@@ -345,6 +345,20 @@ class ActionGetGroup(Action):
         return []
 
 
+class ActionIncrementPage(Action):
+
+    def name(self):
+        return 'action_increment_page'
+
+    def run(self, dispatcher, tracker, domain):
+        current_page = tracker.get_slot("page")
+        if current_page == None:
+            current_page = 0
+        current_page += 1
+        logging.debug("Now loading group page: %s" % current_page)
+        return [SlotSet("page", current_page)]
+
+
 def get_group_name(groupUid, sender_id):
     response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
                             headers={'Authorization': 'Bearer ' + get_token(sender_id)})

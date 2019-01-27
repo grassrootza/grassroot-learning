@@ -10,6 +10,7 @@ entities:
  - group_uid
  - media_record_id
  - media_record_ids
+ - page
 
 forms:
  - livewire_basic_form
@@ -24,6 +25,7 @@ intents:
  - negate
  - why_location
  - text_location
+ - next_page
 
 slots:
   subject:
@@ -47,6 +49,8 @@ slots:
   media_record_ids:
     type: unfeaturized
   meeting_time:
+    type: unfeaturized
+  page:
     type: unfeaturized
 
 templates:
@@ -111,4 +115,5 @@ actions:
  - action_save_media_file_id
  - action_confirm_meeting
  - action_send_meeting
+ - action_increment_page
  - utter_goodbye

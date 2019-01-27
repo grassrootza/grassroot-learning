@@ -51,7 +51,7 @@ slots:
 
 templates:
   utter_actions_menu:
-    - "Welcome to Grassroot Actions. Here you can call meetings and votes, post livewires, gather group member information (such as addresses and phone numbers), call for action, find volunteers, and validate an action. What would you like to do?"
+    - "Welcome to Grassroot Actions. Here you can post livewires and call meetings. What would you like to do?"
   utter_ask_subject:
     - "What is this about?"
   utter_ask_content:

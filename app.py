@@ -25,7 +25,7 @@ application = Flask(__name__)
 # Now load up the various interpreters and agents
 opening_nlu = RasaNLUInterpreter('./nlu-opening/models/current/opening_nlu')
 service_nlu = RasaNLUInterpreter('./core-services/models/current/services_nlu')
-platform_nlu = RasaNLUInterpreter('./core-livewire/models/nlu/current')
+platform_nlu = RasaNLUInterpreter('./core-livewire/models/current/platform_nlu')
 
 services_actions_endpoint = os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 platform_actions_endpoint = os.getenv('PLATFORM_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')

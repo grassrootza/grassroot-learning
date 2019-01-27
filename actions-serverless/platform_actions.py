@@ -1,39 +1,25 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+import logging
 
 from typing import Dict, Text, Any, List, Union
 
-from rasa_core_sdk import ActionExecutionRejection
+from rasa_core_sdk import Action
 from rasa_core_sdk import Tracker
 from rasa_core_sdk.executor import CollectingDispatcher
 from rasa_core_sdk.forms import FormAction, REQUESTED_SLOT
-from rasa_core_sdk import Action
 from rasa_core_sdk.events import SlotSet
+from rasa_core_sdk import ActionExecutionRejection
 
-from platform_utils import *
-
+from phonenumbers.phonenumberutil import number_type
+from phonenumbers import carrier
 from datetime import datetime
-from difflib import SequenceMatcher
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
+import phonenumbers
 import requests
-import inspect
-import logging
+# import rollbar
 import json
-import uuid
 import os
-import smtplib
-
-
-logging.basicConfig(format="[NLULOGS] %(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s", level=logging.DEBUG)
-
-validator = EntityValidator()
 
 auth_token = os.getenv('TOKEN_X')
-logging.info('Setting auth token: %s' % auth_token)
+# logging.info('Setting auth token: %s' % auth_token)
 
 BASE_URL = os.getenv('PLATFORM_BASE_URL', 'https://staging.grassroot.org.za/v2/api')
 DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-west-1.amazonaws.com/production')
@@ -43,37 +29,332 @@ GROUP_PATH = '/group/fetch/minimal/filtered'
 GROUP_LIST_PATH = '/group/fetch/list'
 GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
 LIVEWIRE_PATH = '/livewire/create/'
-ACTION_TODO_PATH = '/task/create/todo/action/'
-VOLUNTEER_TODO_PATH = '/task/create/todo/volunteer/'
-VALIDATION_TODO_PATH = '/task/create/todo/confirmation/'
-INFO_TODO_PATH = '/task/create/todo/information/'
 MEETING_PATH = '/task/create/meeting/'
-VOTE_PATH = '/task/create/vote/'
 
 parentType = 'GROUP'
-sender_id = 'auto_16475'
 
 permissionsMap = {
-    'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS',
-    'create_meeting': 'GROUP_PERMISSION_CREATE_GROUP_MEETING',
-    'call_vote': 'GROUP_PERMISSION_CREATE_GROUP_VOTE'
+    'default': 'GROUP_PERMISSION_UPDATE_GROUP_DETAILS'
 }
 
 
-class ActionGetGroup(Action):
+##########################################
+#                LIVEWIRE                #
+##########################################
 
+class LiveWireBasicFormAction(FormAction):
+    """Form action to fill out basic details for a LiveWire alert"""
+
+    def name(self):
+        # type: () -> Text
+        return "livewire_basic_form"
+    
+    @staticmethod
+    def required_slots(tracker):
+        # type: () -> List[Text]
+        logging.info("Returning required slot set")
+        return ["subject", "content", "contact_name", "contact_number"]
+
+    def slot_mappings(self):
+        return {"subject": self.from_text(), "content": self.from_text(), "contact_name": self.from_text(), 
+            "contact_number": self.from_text()}
+
+    def validate(self,
+                 dispatcher: CollectingDispatcher,
+                 tracker: Tracker,
+                 domain: Dict[Text, Any]) -> List[Dict]:
+        """Validate extracted requested slot
+            else reject the execution of the form action
+        """
+        # extract other slots that were not requested
+        # but set by corresponding entity
+        slot_values = self.extract_other_slots(dispatcher, tracker, domain)
+
+        # extract requested slot
+        slot_to_fill = tracker.get_slot(REQUESTED_SLOT)
+        if slot_to_fill:
+            slot_values.update(self.extract_requested_slot(dispatcher,
+                                                           tracker, domain))
+            if not slot_values:
+                # reject form action execution
+                # if some slot was requested but nothing was extracted
+                # it will allow other policies to predict another action
+                raise ActionExecutionRejection(self.name(),
+                                               "Failed to validate slot {0} "
+                                               "with action {1}"
+                                               "".format(slot_to_fill,
+                                                         self.name()))
+
+        # we'll check when validation failed in order
+        # to add appropriate utterances
+        for slot, value in slot_values.items():
+            logging.info("Now validating: %s: %s" % (slot, value))
+            if slot == 'contact_number':
+                try:
+                    is_number = carrier._is_mobile(number_type(phonenumbers.parse(value, "ZA")))
+                except phonenumbers.phonenumberutil.NumberParseException as e:
+                    logging.warn(e)
+                    is_number = False
+                if is_number == False:
+                    dispatcher.utter_template('utter_invalid_number', tracker)
+                    # validation failed, set slot to None
+                    slot_values[slot] = None
+
+        # validation succeed, set the slots values to the extracted values
+        return [SlotSet(slot, value) for slot, value in slot_values.items()]
+    
+    def submit(self, dispatcher, tracker, domain):
+        logging.critical("Completed form")
+        return []
+
+
+class ActionConfirmLiveWire(Action):
+    def name(self):
+        return 'action_confirm_livewire'
+
+    def run(self, dispatcher, tracker, domain):
+        logging.info('Confirming LiveWire action')
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), get_sender_id(tracker.sender_id))
+        template = [
+                     "You have chosen %s as the title.",
+                     "You have entered '%s' as the content.",
+                     "You have chosen %s as the livewire's contact name",
+                     "and provided %s as the contact number.",
+                     "",
+                     "You would like this to appear within the group %s which has %s member(s)."
+                     "Is this correct?"
+                    ]
+        media_files = tracker.get_slot("media_record_ids")
+        if media_files != None:
+            if len(media_files) > 1:
+        	    template[4] = "You have also included %s media files." % len(media_files)
+            else: 
+                if len(media_files) == 1:
+                    template[4] = "You have also included an image to this livewire."
+        else:
+        	template.pop(4)
+        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), snip(tracker.get_slot("content")),
+                                                get_contact_name(tracker.get_slot("contact_name")),
+                                                tracker.get_slot("contact_number"),
+                                                group_name, member_count)
+        dispatcher.utter_message(livewire_status)
+        return []
+
+
+class ActionSendLiveWire(Action):
+    def name(self):
+        return 'action_send_livewire'
+
+    def run(self, dispatcher, tracker, domain):
+        logging.info('Sending LiveWire')
+        headline = tracker.get_slot("subject")
+        content = tracker.get_slot("content")
+        contact_name = tracker.get_slot("contact_name")
+        if contact_name.strip().lower() == 'me':
+            contact_name = None
+        contact_number =  tracker.get_slot("contact_number")
+        task_uid = tracker.get_slot("task_uid")
+        latitude = tracker.get_slot("latitude")
+        longitude = tracker.get_slot("longitude")
+        livewire_type = 'INSTANT'
+        if (latitude != None) and (longitude != None):
+            add_location = True
+        else:
+            add_location = False
+        media_file_keys = tracker.get_slot("media_file_ids")
+        dest_uid = tracker.get_slot("destination_uid")
+        group_uid = tracker.get_slot("group_uid")
+        url = BASE_URL + LIVEWIRE_PATH + get_sender_id(tracker.sender_id)
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(get_sender_id(tracker.sender_id))},
+                                 params={
+                                         'headline': headline,
+                                         'description': content,
+                                         'contactName': contact_name,
+                                         'contactNumber': contact_number,
+                                         'groupUid': group_uid,
+                                         'taskUid': task_uid,
+                                         'type': livewire_type,
+                                         'addLocation': add_location,
+                                         'mediaFileKeys': media_file_keys,
+                                         'latitude': latitude,
+                                         'longitude': longitude,
+                                         'destUid': dest_uid
+                                         })
+        logging.info('Contructed livewire url: %s' % response.url)
+        logging.info('Received response from platform: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
+        return []
+
+
+class ActionSaveMediaFile(Action):
+
+    def name(self):
+        return 'action_save_media_file_id'
+
+    def run(self, dispatcher, tracker, domain):
+        media_file = tracker.get_slot("media_record_id")
+        logging.debug("Recieved media file: %s" % media_file)
+        current_media_files = tracker.get_slot("media_record_ids")
+        logging.debug("Current media files are: %s" % current_media_files)
+        if current_media_files == None:
+            current_media_files = []
+        current_media_files.append(media_file)
+        logging.debug("Media files now look like: %s" % current_media_files)
+        return [SlotSet("media_record_ids", current_media_files)]
+
+
+##########################################
+#                MEETING                 #
+##########################################
+
+
+class MeetingBasicFormAction(FormAction):
+    """Form action to fill out basic details for a Meeting action"""
+
+    def name(self):
+        # type: () -> Text
+        return "meeting_basic_form"
+    
+    @staticmethod
+    def required_slots(tracker):
+        # type: () -> List[Text]
+        logging.info("Returning required slot set")
+        return ["subject", "meeting_location", "meeting_time"]
+
+    def slot_mappings(self):
+        return {"subject": self.from_text(),
+                "meeting_location": self.from_text(),
+                "meeting_time": self.from_text()}
+
+    def validate(self,
+                 dispatcher: CollectingDispatcher,
+                 tracker: Tracker,
+                 domain: Dict[Text, Any]) -> List[Dict]:
+        """Validate extracted requested slot
+            else reject the execution of the form action
+        """
+        # extract other slots that were not requested
+        # but set by corresponding entity
+        slot_values = self.extract_other_slots(dispatcher, tracker, domain)
+
+        # extract requested slot
+        slot_to_fill = tracker.get_slot(REQUESTED_SLOT)
+        if slot_to_fill:
+            slot_values.update(self.extract_requested_slot(dispatcher,
+                                                           tracker, domain))
+            if not slot_values:
+                # reject form action execution
+                # if some slot was requested but nothing was extracted
+                # it will allow other policies to predict another action
+                raise ActionExecutionRejection(self.name(),
+                                               "Failed to validate slot {0} "
+                                               "with action {1}"
+                                               "".format(slot_to_fill,
+                                                         self.name()))
+
+        # we'll check when validation failed in order
+        # to add appropriate utterances
+        for slot, value in slot_values.items():
+            logging.info("Now validating: %s: %s" % (slot, value))
+            if slot == 'meeting_time':
+                return_value = epoch(formalize(value))
+                logging.info("Processing time value returned: %s" % return_value)
+                if return_value != 'ERROR_PARSING':
+                    if return_value < epoch(str(datetime.now())[:16].replace(' ', 'T')):
+                        dispatcher.utter_template('utter_invalid_tense', tracker)
+                        slot_values[slot] = None
+                else:
+                    dispatcher.utter_template('utter_invalid_time', tracker)
+                    slot_values[slot] = None
+                
+        # validation succeed, set the slots values to the extracted values
+        return [SlotSet(slot, value) for slot, value in slot_values.items()]
+
+    def submit(self, dispatcher, tracker, domain):
+        logging.critical("Completed form")
+        # dispatcher.utter_template('utter_which_meeting_group', tracker)
+        return []
+
+
+"You would like to meet to discuss the subject of %s at %s on %s with the membebrs of %s"
+class ActionConfirmMeeting(Action):
+
+    def name(self):
+        return 'action_confirm_meeting'
+
+    def run(self, dispatcher, tracker, domain):
+        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), get_sender_id(tracker.sender_id))
+        responses = [
+                     "You would like to meet to discuss the subject of %s" % tracker.get_slot("subject"),
+                     "at %s" % tracker.get_slot("meeting_location"),
+                     "on *%s*" % human_readable_time(formalize(tracker.get_slot("meeting_time"))),
+                     "with the members of %s (which has %s members)." % (group_name, member_count),
+                     "Is this correct?"
+                    ]
+        dispatcher.utter_message(' '.join(responses))
+        return []
+
+
+class ActionSendMeeting(Action):
+
+    def name(self):
+        return 'action_send_meeting'
+
+    def run(self, dispatcher, tracker, domain):
+        groupUid = tracker.get_slot("group_uid")
+        url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
+        logging.info('Constructed url for create meeting: %s' % url)
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
+                                 params={
+                                         'location': tracker.get_slot("meeting_location"),
+                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("meeting_time"))),
+                                         'subject': tracker.get_slot("subject"),
+                                         })
+        logging.info('Constructed url for create meeting: %s' % response.url)
+        logging.info('Dispatched to platform, response: %s' % response.text)
+        if response.status_code == 200:
+            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+        else:
+            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
+        return []
+
+
+##########################################
+#               UTILITIES                #
+##########################################
+
+class ActionGetGroup(Action):
     def name(self):
         return 'action_get_group'
 
     def run(self, dispatcher, tracker, domain):
-        # logging.info("Detected user: %s" % 'auto_16475')
+        logging.info('Initiating get group ...')
         logging.info("Greetings. Page value is currently set to %s" % tracker.get_slot("page"))
         current_action = tracker.get_slot("action")
         if current_action is None:
             current_action = "default"
-        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action, permissionsMap[current_action]))
-        dispatcher.utter_button_message("Choose a group", get_group_menu_items('auto_16475', tracker.get_slot("page"), permissionsMap[current_action]))
+        logging.info("Fetching groups, action = %s, required permission = %s" % (current_action,
+                     permissionsMap[current_action]))
+        dispatcher.utter_button_message("Choose one (use a number or the group name): ",
+                                        get_group_menu_items(get_sender_id(tracker.sender_id),
+                                                             tracker.get_slot("page"),
+                                                             permissionsMap[current_action]))
         return []
+
+
+def get_group_name(groupUid, sender_id):
+    response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
+                            headers={'Authorization': 'Bearer ' + get_token(sender_id)})
+    logging.debug('Got this back from group name retrieval: %s' % response.content)
+    if response.ok:
+        data = json.loads(response.text)
+        group_name = data['name']
+        member_count = data['memberCount']
+        return group_name, member_count
+    return '', ''
 
 
 def get_group_menu_items(sender_id, page,required_permission = permissionsMap['default']):
@@ -106,31 +387,9 @@ def get_group_menu_items(sender_id, page,required_permission = permissionsMap['d
                               })
     except KeyError as e:
         logging.error('Error: platform_actions.py: get_group_menu_items(): %s' % str(e))
+        # rollbar.report_exc_info()
         return []
     return menu_items
-
-
-class SaveValidGroups(Action):
-
-    def name(self):
-        return 'save_valid_groups'
-
-    def run(self, dispatcher, tracker, domain):
-        url = BASE_URL + GROUP_LIST_PATH
-        logging.info('Attempting to extract all valid groups.')
-        request = requests.get(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                    params={
-                                            'withSubgroups': False,
-                                            'requiredPermission': permissionsMap['default']
-                                           }
-                              )
-        logging.info('Got this back: %s' % request.json())
-        group_list_raw = request.json()
-        groups = []
-        for group in group_list_raw:
-            groups.append(group['groupUid'])
-        logging.info('extracted the following groups: %s' % groups)
-        return [SlotSet('valid_groups', groups)]
 
 
 def get_token(sender_id):
@@ -145,564 +404,33 @@ def get_token(sender_id):
                 request_token['file_path'] = os.path.realpath(__file__)
                 error_message = "Greetings.\n\nplatform_actions.py has failed to retrieve auth token.\n Details: %s\
                         \n\nThis may be due to an expired token.\n\nRegards\n\nCore-Actions" % request_token
-                error_alert(error_message, inspect.stack()[0][3])
+                # error_alert(error_message, inspect.stack()[0][3])
+                logging.error("Error during token retrieval.")
     else:
         return request_token
 
-            
-def error_alert(error_message, function):
-    try:
-        message = MIMEMultipart()
-        message['From'] = os.getenv('ALERT_EMAIL', 'grassrootnlu@gmail.com')
-        message['To'] = os.getenv('DEVELOPER', '')
-        message['Subject'] = "Token Trouble"
-        message.attach(MIMEText(
-                                error_message,
-                                'plain'
-                               ))
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(
-                     message['From'],
-                     os.getenv(
-                               'ALERT_PWD',
-                                   ''
-                     ))
-        text = message.as_string()
-        server.sendmail(
-                        message['From'],
-                        message['To'], text
-                       )
-        server.quit()
-        logging.debug('developer notified.')
-        return ''
-    except Exception as e:
-        logging.error("platform_actions: error_alert:" 
-                      " failed to notify developer about function %s() failure."
-                      " Details %s" % (
-                                       function,
-                                       e
-                                      ))
-        return ''
 
-
-def get_group_name(groupUid, sender_id):
-    response = requests.get(BASE_URL + GROUP_NAME_PATH + groupUid,
-                            headers={'Authorization': 'Bearer ' + get_token(sender_id)})
-    logging.debug('Got this back from group name retrieval: %s' % response.content)
-    if response.ok:
-        data = json.loads(response.text)
-        group_name = data['name']
-        member_count = data['memberCount']
-        return group_name, member_count
-    return '', ''
-
-
-class ActionIncrementPage(Action):
-
-    def name(self):
-        return 'action_increment_page'
-
-    def run(self, dispatcher, tracker, domain):
-        current_page = tracker.get_slot("page")
-        if current_page == None:
-            current_page = 0
-        current_page += 1
-        logging.debug("Now loading group page: %s" % current_page)
-        return [SlotSet("page", current_page)] 
-
-
-class ExtractValidateEntity(Action):
-
-    def name(self):
-        return 'extract_and_validate_entity'
-
-    def run(self, dispatcher, tracker, domain):
-        expected_entity = tracker.get_slot('requested_slot')
-        recieved_value = (tracker.latest_message)['text']
-        # validator.validate(dispatcher, expected_entity, recieved_value)
-        logging.info("setting value '%s' for entity '%s'" % (recieved_value, expected_entity))
-        return [SlotSet(expected_entity, recieved_value), SlotSet("requested_slot", None)]
-
-
-class ActionAcquireMeetingDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "location",
-                "subject",
-                "datetime"
-               ]
-
-    def name(self):
-        return 'action_create_meeting_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        responses = [
-                     "You have chosen %s as your location." % tracker.get_slot("location"),
-                     "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
-                    ]
-        dispatcher.utter_message(' '.join(responses))
-        return []
-
-
-class ActionUtterMeetingStatus(Action):
-
-    def name(self):
-        return 'action_utter_meeting_status'
-
-    def run(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        responses = [
-                     "You have chosen %s as your location." % tracker.get_slot("location"),
-                     "You have chosen %s as your subject." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
-                    ]
-        dispatcher.utter_message(' '.join(responses))
-        return []
-
-
-class ActionSendMeetingToServer(Action):
-
-    def name(self):
-        return 'action_send_meeting_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
-        logging.info('Constructed url for create meeting: %s' % url)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'location': tracker.get_slot("location"),
-                                         'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("datetime"))),
-                                         'subject': tracker.get_slot("subject"),
-                                         })
-        logging.info('Constructed url for create meeting: %s' % response.url)
-        logging.info('Dispatched to platform, response: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []
-
-
-class ActionAcquireVoteDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "subject",
-                "datetime"
-               ]
-
-    def name(self):
-        return 'action_create_vote_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        return []
-
-
-class ActionSetDefaultVoteOptions(Action):
-
-    def name(self):
-        return 'action_default_vote_options'
-
-    def run(self, dispatcher, tracker, domain):
-        return [SlotSet("vote_options", ["Yes", "No"])]
-
-
-class ActionAddToVoteOptions(Action):
-    
-    def name(self):
-        return 'action_add_to_vote_options'
-
-    def run(self, dispatcher, tracker, domain):
-        vote_option = (tracker.latest_message)['text']
-        logging.debug("Found vote option: %s" % vote_option)
-        dispatcher.utter_message("Vote option '%s' recieved." % vote_option)
-        current_options = tracker.get_slot("vote_options")
-        logging.debug("Found pre-existing options: %s" % current_options)
-        if current_options == None:
-            current_options = []
-        current_options.append(vote_option)
-        logging.debug("New vote options: %s" % current_options)
-        return [SlotSet("vote_options", current_options)]        
-
-
-class ActionUtterVoteStatus(Action):
-
-    def name(self):
-        return 'action_utter_vote_status'
-
-    def run(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        vote_options_list = tracker.get_slot("vote_options")
-        vote_options = ''
-        for i in range(len(vote_options_list)):
-            if i != len(vote_options_list) - 1:
-                vote_options = vote_options + str(vote_options_list[i]) + ', '
-            else:
-                vote_options = vote_options + 'and ' + str(vote_options_list[i])
-        template = [
-                    "You have chosen %s as your subject of your vote",
-                    "and want the %s member(s) of %s to vote between %s",
-                    "by *%s*."
-                   ]
-        vote_status = ' '.join(template) % (tracker.get_slot("subject"),
-                                            member_count, group_name,
-                                            vote_options, human_readable_time(formalize(tracker.get_slot("datetime"))))
-        dispatcher.utter_message(vote_status)
-        return []
-
-
-class SendVoteToServer(Action):
-
-    def name(self):
-        return 'action_send_vote_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + VOTE_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'title': tracker.get_slot("subject"),
-                                         'time': epoch(formalize(tracker.get_slot("datetime"))),
-                                         'voteOptions': json.dumps(tracker.get_slot("vote_options")),
-                                        })
-        logging.info('Contructed url for create vote: %s' % response.url)
-        logging.info('Received response from platform: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []
-
-
-class ActionAcquireInfoTodoDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "subject",
-                "datetime",
-                "response_tag"
-               ]
-
-    def name(self):
-        return 'action_todo_info_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        responses = [
-                     "You have chosen %s as the subject of this todo." % tracker.get_slot("subject"),
-                     "You would like participant responses to be tagged with a '%s'" % tracker.get_slot("response_tag"),
-                     "Participants may respond until *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
-                    ]
-        dispatcher.utter_message(' '.join(responses))
-        return []
-
-
-class SendInfoTodoToServer(Action):
-
-    def name(self):
-        return 'action_send_info_todo_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + INFO_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime"))),
-                                         'responseTag': tracker.get_slot("response_tag")
-                                        })
-        logging.info('Contructed url for create information todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []        
-
-
-class ActionAcquireVolunteerDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "subject",
-                "datetime"
-               ]
-
-    def name(self):
-        return 'action_todo_volunteer_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        responses = [
-                     "You have chosen %s the subject of this volunteer task." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
-                    ]
-        dispatcher.utter_message(' '.join(responses))
-        return []
-
-
-class ActionSendVolunteerTodoToServer(Action):
-
-    def name(self):
-        return 'action_send_volunteer_todo_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + VOLUNTEER_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                        })
-        logging.info('Contructed url for create volunteer todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []
-
-
-class ActionAcquireValidationDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "subject",
-                "datetime"
-               ]
-
-    def name(self):
-        return 'action_todo_validation_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        responses = [
-                     "You have chosen %s as subject of validation." % tracker.get_slot("subject"),
-                     "You want everyone to have responded by *%s*." % human_readable_time(formalize(tracker.get_slot("datetime"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
-                    ]
-        dispatcher.utter_message(' '.join(responses))
-        return []
-
-
-class ActionSendValidationToServer(Action):
-
-    def name(self):
-        return 'action_send_validation_todo_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + VALIDATION_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                        })
-        logging.info('Contructed url for create validation todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []
-
-
-class ActionAcquireActionTodoDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "subject",
-                "datetime"
-               ]
-
-    def name(self):
-        return 'action_todo_action_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        responses = [
-                     "You have chosen %s as the subject for this action." % tracker.get_slot("subject"),
-                     "You want this to happen *%s*" % human_readable_time(formalize(tracker.get_slot("datetime"))),
-                     "You have chosen %s as your group which has %s members." % (group_name, member_count)
-                   ]
-        dispatcher.utter_message(' '.join(responses))
-        return []
-
-
-class ActionSendActionTodoToServer(Action):
-
-    def name(self):
-        return 'action_send_action_todo_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + ACTION_TODO_PATH + '%s/%s' % (parentType, groupUid)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'subject': tracker.get_slot("subject"),
-                                         'dueDateTime': epoch(formalize(tracker.get_slot("datetime")))
-                                         })
-        logging.info('Contructed url for create action todo: %s' % response.url)
-        logging.info('Received response from platform: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []
-
-
-
-class ActionAcquireLivewireDetails(FormAction):
-
-    @staticmethod
-    def required_slots(tracker: Tracker) -> List[Text]:
-        """A list of required slots that the form has to fill"""
-
-        return [
-                "subject",
-                "livewire_content",
-                "contact_name",
-                "contact_number"
-               ]
-
-    def name(self):
-        return 'action_livewire_routine'
-
-    def submit(self, dispatcher, tracker, domain):
-        return []
-
-
-class ActionSaveMediaFile(Action):
-
-    def name(self):
-        return 'action_save_media_file_id'
-
-    def run(self, dispatcher, tracker, domain):
-        media_file = tracker.get_slot("media_record_id")
-        logging.debug("Recieved media file: %s" % media_file)
-        current_media_files = tracker.get_slot("media_record_ids")
-        logging.debug("Current media files are: %s" % current_media_files)
-        if current_media_files == None:
-            current_media_files = []
-        current_media_files.append(media_file)
-        logging.debug("Media files now look like: %s" % tracker.get_slot("media_file_ids"))
-        return [SlotSet("media_record_ids", current_media_files)]
-
-
-class ActionUtterLivewireStatus(Action):
-
-    def name(self):
-        return 'action_confirm_livewire'
-
-    def run(self, dispatcher, tracker, domain):
-        group_name, member_count = get_group_name(tracker.get_slot("group_uid"), 'auto_16475')
-        template = [
-                     "You have chosen %s as the title.",
-                     "You have entered '%s' as the content.",
-                     "You have identified yourself as %s",
-                     "and provided %s as your contact detail.",
-                     "",
-                     "You would like this to appear within the group %s which has %s member(s)."
-                     "Is this correct?"
-                    ]
-        media_files = tracker.get_slot("media_file_ids")
-        if media_files != None:
-            if len(media_files) > 1:
-        	    template[4] = "You have also included %s media files." % len(media_files)
-            else: 
-                if len(media_files) == 1:
-                    template[4] = "You have also included an image to this livewire."
-        else:
-        	template.pop(4)
-        livewire_status = ' '.join(template) % (tracker.get_slot("subject"), snip(tracker.get_slot("livewire_content")),
-                                                tracker.get_slot("contact_name"), tracker.get_slot("contact_number"),
-                                                group_name, member_count)
-        dispatcher.utter_message(livewire_status)
-        return []
-
-
-class ActionSendLivewireToServer(Action):
-
-    def name(self):
-        return 'action_send_livewire_to_server'
-
-    def run(self, dispatcher, tracker, domain):
-        headline = tracker.get_slot("subject")
-        content = tracker.get_slot("livewire_content")
-        contactName = tracker.get_slot("contact_name")
-        contactNumber =  tracker.get_slot("contact_number")
-        taskUid = tracker.get_slot("task_uid")
-        latitude = tracker.get_slot("latitude")
-        longitude = tracker.get_slot("longitude")
-        livewire_type = 'INSTANT'
-        # TODO: make location required
-        if (latitude != None) and (longitude != None):
-            addLocation = True
-        else:
-            addLocation = False
-        mediaFileKeys = tracker.get_slot("media_file_ids")
-        destUid = tracker.get_slot("destination_uid")
-        groupUid = tracker.get_slot("group_uid")
-        url = BASE_URL + LIVEWIRE_PATH + 'auto_16475'
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
-                                 params={
-                                         'headline': headline,
-                                         'description': content,
-                                         'contactName': contactName,
-                                         'contactNumber': contactNumber,
-                                         'groupUid': groupUid,
-                                         'taskUid': taskUid,
-                                         'type': livewire_type,
-                                         'addLocation': addLocation,
-                                         'mediaFileKeys': mediaFileKeys,
-                                         'latitude': latitude,
-                                         'longitude': longitude,
-                                         'destUid': destUid
-                                         })
-        logging.info('Contructed livewire url: %s' % response.url)
-        logging.info('Received response from platform: %s' % response.text)
-        if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
-        else:
-            dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
-        return []
-
-
-class ActionRerouteMessage(Action):
-
-    def name(self):
-        return 'action_reroute_to_new_domain'
-
-    def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message('DUM_SPIRO_SPERO')
-        return []
+def get_sender_id(tracker_value):
+    logging.info("Current sender id is %s " % tracker_value)
+    if tracker_value == 'default':
+        logging.warn('Changing tracker value to privileged user.')
+        return 'auto_16475'
+    else:
+        return tracker_value
+
+
+def snip(text):
+    """This function shortens large text data and adds ellipsis if 
+       text exceeds 20 characters. Typcially used for previewing livewire content.
+
+        params:
+             text: type -> string;
+    """
+
+    if text != None and len(text) > 20:
+        return text[:20] + "..."
+    else:
+        return text
 
 
 def formalize(datetime_string):
@@ -721,7 +449,7 @@ def formalize(datetime_string):
         return response.content.decode('ascii')
     except Exception as e:
         logging.error('platform_actions: formalize: %s' % e)
-        error_alert(e, inspect.stack()[0][3])
+        # rollbar.report_exc_info()
         return datetime_string
 
 
@@ -731,9 +459,13 @@ def epoch(formalized_datetime):
         params:
             formalized_datetime: date-string of format YYYY-mm-ddTHH:MM
     """
-
-    utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
-    return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+    try:
+        utc_time = datetime.strptime(formalized_datetime, '%Y-%m-%dT%H:%M')
+        return int((utc_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+    except Exception as e:
+        logging.error(e)
+        # rollbar.report_exc_info()
+        return formalized_datetime
 
 
 def human_readable_time(formalized_datetime):
@@ -750,18 +482,12 @@ def human_readable_time(formalized_datetime):
         return human_readable_time
     except Exception as e:
         logging.error('platform_actions: human_readable_time: %s ' % e)
+        # rollbar.report_exc_info()
         return formalized_datetime
 
 
-def snip(text):
-    """This function shortens large text data and adds ellipsis if 
-       text exceeds 20 characters. Typcially used for previewing livewire content.
-
-        params:
-             text: type -> string;
-    """
-
-    if text != None and len(text) > 20:
-        return text[:20] + "..."
+def get_contact_name(user_input):
+    if user_input.strip().lower() == 'me':
+        return 'your account name'
     else:
-        return text
+        return user_input

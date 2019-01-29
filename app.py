@@ -25,7 +25,7 @@ application = Flask(__name__)
 # Now load up the various interpreters and agents
 opening_nlu = RasaNLUInterpreter('./nlu-opening/models/current/opening_nlu')
 service_nlu = RasaNLUInterpreter('./core-services/models/current/services_nlu')
-platform_nlu = RasaNLUInterpreter('./core-platform/models/current/platform_nlu')
+platform_nlu = RasaNLUInterpreter('./core-livewire/models/current/platform_nlu')
 
 services_actions_endpoint = os.getenv('SERVICE_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
 platform_actions_endpoint = os.getenv('PLATFORM_ACTION_ENDPOINT_URL', 'http://localhost:5055/webhook')
@@ -46,7 +46,7 @@ intent_domain_map = {
 domain_agents = {
     "service": Agent.load('core-services/models/dialogue', interpreter = service_nlu, action_endpoint = EndpointConfig(services_actions_endpoint)),
     # "knowledge":  Agent.load('core-knowledge/models/dialogue', interpreter = RasaNLUInterpreter('core-knowledge/models/current/knowledge_nlu')),
-    "action" : Agent.load('core-platform/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
+    "action" : Agent.load('core-livewire/models/dialogue', interpreter = platform_nlu, action_endpoint = EndpointConfig(platform_actions_endpoint))
 }
 
 CONFIDENCE_THRESHOLD = 0.7
@@ -186,7 +186,11 @@ def parse_unknown_domain(*rerouted_message):
     primary_result = nlu_result['intent']
     logging.info('NLU result on opening: %s', nlu_result)
     result_as_response = reshape_nlu_result('opening', nlu_result)
-    if (primary_result['confidence'] > CONFIDENCE_THRESHOLD):
+
+    nlu_only = request.args.get('nlu_only', default=False)
+    logging.info('Are we doing just an NLU parse? : %s', nlu_only)
+
+    if (primary_result['confidence'] > CONFIDENCE_THRESHOLD and not nlu_only):
         # since we are now pretty sure of the result, check if we can skip straight into domain
         if (primary_result['name'] in intent_domain_map):
             domain = intent_domain_map[primary_result['name']]

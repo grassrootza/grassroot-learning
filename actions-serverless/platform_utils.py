@@ -65,3 +65,24 @@ class RequestLivewireContent(Action):
 
     def run(self, dispatcher, tracker, domain):
         return [SlotSet("requested_slot", "livewire_content")]
+
+class EntityValidator(object):
+
+    def validate(self, dispatcher, requested_slot, entity):
+
+        if requested_slot == 'location':
+            if valid_format(entity):
+                return True
+            else:
+                dispatcher.utter_message('Sorry. That does not seem to be a valid location.')
+                return False
+
+        else:
+            return 
+
+
+def valid_format(entity):
+    if (entity.startswith('/select{')) and (entity.endswith('}')):
+        return True
+    else:
+        return False

@@ -23,7 +23,9 @@ core-platform/models/
 core-platform/rasa_core.log
 core-platform/__pycache__/
 core-platform/story_graph.html
+core-platform/graph.html
 core-platform/story_graph.dot
+core-livewire/story_graph.dot
 core-platform/story_graph.png
 core-platform/core.log
 
@@ -45,3 +47,6 @@ core-platform/core.log
 
 # quick start bash file
 .start.sh
+
+# Some backups and test stuff that is WIP
+*.back

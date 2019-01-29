@@ -183,7 +183,7 @@ class ActionSendLiveWire(Action):
         logging.info('Contructed livewire url: %s' % response.url)
         logging.info('Received response from platform: %s' % response.text)
         if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+            dispatcher.utter_message('Done! We have sent the alert. Thanks for using Grassroot, we hope we were useful.')
         else:
             dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []
@@ -316,7 +316,7 @@ class ActionSendMeeting(Action):
         logging.info('Constructed url for create meeting: %s' % response.url)
         logging.info('Dispatched to platform, response: %s' % response.text)
         if response.status_code == 200:
-            dispatcher.utter_message('We are making it happen for you. Thank you for using our service.')
+            dispatcher.utter_message('Your meeting has been set and members have been alerted. Thank you for using Grassroot.')
         else:
             dispatcher.utter_message('I seem to have trouble processing your request. Please try again later.')
         return []

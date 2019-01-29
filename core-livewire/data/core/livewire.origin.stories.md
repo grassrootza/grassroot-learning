@@ -15,7 +15,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## second happy path with media file
@@ -36,7 +35,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## third happy path, no location, with media file
@@ -57,7 +55,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## fourth happy path, no location, with media file
@@ -77,7 +74,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 
@@ -98,7 +94,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## sixth happy path, no media file, user enquires on location then provides it
@@ -120,7 +115,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## seventh happy path, no media file, user enquires on location, enters text location, then correct location
@@ -142,7 +136,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## eighth happy path, with media file, user enquires on location, enters text location, then correct location
@@ -167,7 +160,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## ninth happy path, with media file, wrong location format, then right format
@@ -188,7 +180,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## tenth happy path, no media file, user enquires on location then refuses to provide it, loads multiple group pages
@@ -211,7 +202,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 #eleventh happy path
@@ -239,7 +229,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## twelfth happy path
@@ -270,7 +259,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 13th happy path
@@ -307,7 +295,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 14th happy path
@@ -344,7 +331,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 15th happy path
@@ -370,7 +356,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 16th happy path
@@ -399,7 +384,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 16th happy path
@@ -419,7 +403,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 17th happy path
@@ -450,7 +433,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 18th happy path
@@ -486,7 +468,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 19th happy path
@@ -512,7 +493,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 20th happy path
@@ -557,7 +537,6 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 
 ## 21st happy path
@@ -604,6 +583,5 @@
     - action_confirm_livewire
 * affirm
     - action_send_livewire
-    - utter_goodbye
     - action_restart
 

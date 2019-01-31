@@ -34,6 +34,7 @@ COPY nlu-opening nlu-opening
 COPY core-services core-services
 COPY core-platform core-platform
 COPY core-knowledge core-knowledge
+COPY core-livewire core-livewire
 
 # EXPOSE 5000
 

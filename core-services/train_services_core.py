@@ -6,7 +6,7 @@ from rasa_core.policies.keras_policy import KerasPolicy
 from rasa_core.policies.memoization import MemoizationPolicy
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--epochs', help='The number of epochs to train', type=int, default=50)
+parser.add_argument('--epochs', help='The number of epochs to train', type=int, default=30)
 parser.add_argument('--aug', help='How much to augment the data', type=int, default=50)
 parser.add_argument('--batch', help='Mini batch size to use', type=int, default=10)
 parser.add_argument('--max_history', help='Depth to apply in memorization', type=int, default=8)

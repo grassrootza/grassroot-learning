@@ -307,7 +307,7 @@ class ActionSendMeeting(Action):
         groupUid = tracker.get_slot("group_uid")
         url = BASE_URL + MEETING_PATH + '%s/%s' % (parentType, groupUid)
         logging.info('Constructed url for create meeting: %s' % url)
-        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token('auto_16475')},
+        response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(get_sender_id(tracker.sender_id))},
                                  params={
                                          'location': tracker.get_slot("meeting_location"),
                                          'dateTimeEpochMillis': epoch(formalize(tracker.get_slot("meeting_time"))),

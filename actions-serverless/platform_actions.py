@@ -161,9 +161,10 @@ class ActionSendLiveWire(Action):
             add_location = True
         else:
             add_location = False
-        media_file_keys = tracker.get_slot("media_file_ids")
+        media_record_ids = tracker.get_slot("media_record_ids")
         dest_uid = tracker.get_slot("destination_uid")
         group_uid = tracker.get_slot("group_uid")
+        logging.info('Media record IDs to server : %s' % media_record_ids)
         url = BASE_URL + LIVEWIRE_PATH + get_sender_id(tracker.sender_id)
         response = requests.post(url, headers={'Authorization': 'Bearer ' + get_token(get_sender_id(tracker.sender_id))},
                                  params={
@@ -175,7 +176,7 @@ class ActionSendLiveWire(Action):
                                          'taskUid': task_uid,
                                          'type': livewire_type,
                                          'addLocation': add_location,
-                                         'mediaFileKeys': media_file_keys,
+                                         'mediaRecordIds': media_record_ids,
                                          'latitude': latitude,
                                          'longitude': longitude,
                                          'destUid': dest_uid

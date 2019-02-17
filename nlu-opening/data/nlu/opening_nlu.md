@@ -41,6 +41,8 @@
 - Start again
 - reset
 - Reset
+- resert
+- Resert
 
 ## intent:find_services
 - izwi lami

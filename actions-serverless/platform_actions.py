@@ -378,7 +378,7 @@ class ActionCheckForGroups(Action):
             groups = response.json()
             if not groups:
                 logging.info("User has no groups. Restarting dialogue.")
-                dispatcher.utter_message("You don't seem to be part of any groups. Join one to use this feature.")
+                # dispatcher.utter_message("You don't seem to be part of any groups. Join one to use this feature.")
                 self.customRestarted(tracker)
             else:
                 logging.info("User has groups. Proceeding with actions")
@@ -580,3 +580,4 @@ def get_contact_number(tracker_value):
         return 'your account number/email'
     else:
         return tracker_value
+

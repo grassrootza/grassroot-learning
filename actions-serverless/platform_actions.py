@@ -128,10 +128,10 @@ class ActionConfirmLiveWire(Action):
                      "You have chosen %s as the title.",
                      "You have entered '%s' as the content.",
                      "You have chosen %s as the livewire's contact name",
-                     "and provided %s as the contact number.",
+                     "and provided %s as the contact detail.",
                      "",
                      "You would like this to appear within the group %s which has %s member(s)."
-                     "Is this correct?"
+                     " Is this correct?"
                     ]
         media_files = tracker.get_slot("media_record_ids")
         if media_files != None:
@@ -374,10 +374,15 @@ class ActionCheckForGroups(Action):
                                 headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)})
         logging.debug('User groups: %s' % response.json())
         if response.status_code == 200:
+            logging.info("Group extraction successful.")
             groups = response.json()
             if not groups:
+                logging.info("User has no groups. Restarting dialogue.")
                 dispatcher.utter_message("You don't seem to be part of any groups. Join one to use this feature.")
                 self.customRestarted(tracker)
+            else:
+                logging.info("User has groups. Proceeding with actions")
+                # dispatcher.utter_message("Okay, lets get started.")
         return []
 
 

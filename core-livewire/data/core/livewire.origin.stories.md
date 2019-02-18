@@ -628,15 +628,3 @@
 * affirm
     - action_send_livewire
     - action_restart
-
-## user has no groups, path 1
-* take_action
-    - utter_actions_menu
-* create_livewire
-    - action_check_for_groups
-    - action_restart
-
-## user has no groups, path 2
-* create_livewire
-    - action_check_for_groups
-    - action_restart

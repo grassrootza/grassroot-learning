@@ -114,15 +114,3 @@
 * affirm
     - action_send_meeting
     - action_restart
-
-## user has no groups, path 1, meeting
-* take_action
-    - utter_actions_menu
-* call_meeting
-    - action_check_for_groups
-    - action_restart
-
-## user has no groups, path 2, meeting
-* call_meeting
-    - action_check_for_groups
-    - action_restart

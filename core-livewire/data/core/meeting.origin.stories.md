@@ -2,6 +2,8 @@
 * take_action
     - utter_actions_menu
 * call_meeting
+    - action_check_for_groups
+    - utter_confirm_meeting
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
@@ -24,6 +26,8 @@
 
 ## meeting, second happy path
 * call_meeting
+    - action_check_for_groups
+    - utter_confirm_meeting
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
@@ -45,6 +49,8 @@
 * take_action
     - utter_actions_menu
 * call_meeting
+    - action_check_for_groups
+    - utter_confirm_meeting
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
@@ -61,6 +67,8 @@
 
 ## meeting, 4th happy path
 * call_meeting
+    - action_check_for_groups
+    - utter_confirm_meeting
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
@@ -79,6 +87,8 @@
 * take_action
     - utter_actions_menu
 * call_meeting
+    - action_check_for_groups
+    - utter_confirm_meeting
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
@@ -92,6 +102,8 @@
 
 ## meeting, sixth happy path
 * call_meeting
+    - action_check_for_groups
+    - utter_confirm_meeting
     - meeting_basic_form
     - form{"name": "meeting_basic_form"}
     - form{"name": null}
@@ -101,4 +113,16 @@
     - action_confirm_meeting
 * affirm
     - action_send_meeting
+    - action_restart
+
+## user has no groups, path 1, meeting
+* take_action
+    - utter_actions_menu
+* call_meeting
+    - action_check_for_groups
+    - action_restart
+
+## user has no groups, path 2, meeting
+* call_meeting
+    - action_check_for_groups
     - action_restart

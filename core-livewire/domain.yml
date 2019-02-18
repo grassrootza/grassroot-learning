@@ -56,6 +56,10 @@ slots:
 templates:
   utter_actions_menu:
     - "Welcome to Grassroot Actions. Here you can post livewires and call meetings. What would you like to do?"
+  utter_confirm_livewire:
+    - "Okay, lets make a livewire post."
+  utter_confirm_meeting:
+    - "Okay, lets call a meeting."
   utter_ask_subject:
     - "What is this about?"
   utter_ask_content:
@@ -109,6 +113,9 @@ actions:
  - utter_explain_livewire_location
  - utter_which_group
  - utter_which_meeting_group
+ - utter_confirm_livewire
+ - utter_confirm_meeting
+ - action_check_for_groups
  - action_get_group
  - action_confirm_livewire
  - action_send_livewire

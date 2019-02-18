@@ -8,6 +8,7 @@ from rasa_core_sdk.executor import CollectingDispatcher
 from rasa_core_sdk.forms import FormAction, REQUESTED_SLOT
 from rasa_core_sdk.events import SlotSet
 from rasa_core_sdk import ActionExecutionRejection
+from rasa_core.events import Event, Restarted
 
 from phonenumbers.phonenumberutil import number_type
 from phonenumbers import carrier
@@ -25,6 +26,7 @@ BASE_URL = os.getenv('PLATFORM_BASE_URL', 'https://staging.grassroot.org.za/v2/a
 DATETIME_URL = os.getenv('DATE_TIME_URL', 'https://61r14lq1l9.execute-api.eu-west-1.amazonaws.com/production')
 
 TOKEN_PATH = '/whatsapp/user/token'
+USER_ID_PATH = '/whatsapp/user/id'
 GROUP_PATH = '/group/fetch/minimal/filtered'
 GROUP_LIST_PATH = '/group/fetch/list'
 GROUP_NAME_PATH = '/group/fetch/minimal/specified/'
@@ -88,7 +90,14 @@ class LiveWireBasicFormAction(FormAction):
         # we'll check when validation failed in order
         # to add appropriate utterances
         for slot, value in slot_values.items():
+            logging.debug('slot value items: {}'.format(slot_values.items()))
             logging.info("Now validating: %s: %s" % (slot, value))
+
+            if slot == 'contact_name':
+                if value.lower() == 'me':
+                    return [SlotSet("contact_number", "me")] + \
+                           [SlotSet(slot, value) for slot, value in slot_values.items()]
+
             if slot == 'contact_number':
                 try:
                     is_number = carrier._is_mobile(number_type(phonenumbers.parse(value, "ZA")))
@@ -96,8 +105,8 @@ class LiveWireBasicFormAction(FormAction):
                     logging.warn(e)
                     is_number = False
                 if is_number == False:
-                    dispatcher.utter_template('utter_invalid_number', tracker)
                     # validation failed, set slot to None
+                    dispatcher.utter_template('utter_invalid_number', tracker)
                     slot_values[slot] = None
 
         # validation succeed, set the slots values to the extracted values
@@ -135,7 +144,7 @@ class ActionConfirmLiveWire(Action):
         	template.pop(4)
         livewire_status = ' '.join(template) % (tracker.get_slot("subject"), snip(tracker.get_slot("content")),
                                                 get_contact_name(tracker.get_slot("contact_name")),
-                                                tracker.get_slot("contact_number"),
+                                                get_contact_number(tracker.get_slot("contact_number")),
                                                 group_name, member_count)
         dispatcher.utter_message(livewire_status)
         return []
@@ -149,10 +158,11 @@ class ActionSendLiveWire(Action):
         logging.info('Sending LiveWire')
         headline = tracker.get_slot("subject")
         content = tracker.get_slot("content")
+        contact_number =  tracker.get_slot("contact_number")
         contact_name = tracker.get_slot("contact_name")
         if contact_name.strip().lower() == 'me':
             contact_name = None
-        contact_number =  tracker.get_slot("contact_number")
+            contact_number = None
         task_uid = tracker.get_slot("task_uid")
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
@@ -326,6 +336,52 @@ class ActionSendMeeting(Action):
 #               UTILITIES                #
 ##########################################
 
+
+class ActionCheckForGroups(Action):
+
+    class customRestarted(Event):
+        """Conversation should start over & history wiped.
+        As a side effect the ``Tracker`` will be reinitialised."""
+        
+        type_name = "restart"
+
+        def __init__(self, tracker):
+            self.tracker = tracker
+
+        def __hash__(self):
+            return hash(32143124312)
+
+        def __eq__(self, other):
+            return isinstance(other, Restarted)
+
+        def __str__(self):
+            return "customRestarted()"
+
+        def as_story_string(self):
+            return self.type_name
+
+        def apply_to(self, tracker):
+            #from rasa_core.actions.action import ACTION_LISTEN_NAME
+            self.tracker._reset()
+            logging.info('successfully reset slot. restarting...')
+            self.tracker.trigger_followup_action("action_restart")
+
+    def name(self):
+        return 'action_check_for_groups'
+
+    def run(self, dispatcher, tracker, domain):
+        response = requests.get(BASE_URL + GROUP_LIST_PATH,
+                                headers={'Authorization': 'Bearer ' + get_token(tracker.sender_id)})
+        logging.debug('User groups: %s' % response.json())
+        if response.status_code == 200:
+            groups = response.json()
+            if not groups:
+                dispatcher.utter_message("You don't seem to be part of any groups. Join one to use this feature.")
+                self.customRestarted(tracker)
+        return []
+
+
+
 class ActionGetGroup(Action):
     def name(self):
         return 'action_get_group'
@@ -404,6 +460,13 @@ def get_group_menu_items(sender_id, page,required_permission = permissionsMap['d
         # rollbar.report_exc_info()
         return []
     return menu_items
+
+
+def get_user_id(phonenumber):
+    response = requests.post(BASE_URL + USER_ID_PATH, headers={'Authorization': 'Bearer ' + auth_token},\
+                                    params={'msisdn': '%s' % phonenumber})
+    logging.info('Got this back from user id query: %s' % response.content)
+
 
 
 def get_token(sender_id):
@@ -500,8 +563,15 @@ def human_readable_time(formalized_datetime):
         return formalized_datetime
 
 
-def get_contact_name(user_input):
-    if user_input.strip().lower() == 'me':
+def get_contact_name(tracker_value):
+    if tracker_value.strip().lower() == 'me':
         return 'your account name'
     else:
-        return user_input
+        return tracker_value
+
+
+def get_contact_number(tracker_value):
+    if tracker_value.strip().lower() == 'me':
+        return 'your account number/email'
+    else:
+        return tracker_value

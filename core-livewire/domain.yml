@@ -1,4 +1,6 @@
 entities:
+ - has_groups
+ - init_time
  - subject
  - content
  - contact_name
@@ -28,6 +30,10 @@ intents:
  - next_page
 
 slots:
+  has_groups:
+    type: bool
+  init_time:
+    type: float
   subject:
     type: unfeaturized
   content:
@@ -57,9 +63,9 @@ templates:
   utter_actions_menu:
     - "Welcome to Grassroot Actions. Here you can post livewires and call meetings. What would you like to do?"
   utter_confirm_livewire:
-    - "Okay, lets make a livewire post."
+    - "Lets make a livewire post."
   utter_confirm_meeting:
-    - "Okay, lets call a meeting."
+    - "Lets call a meeting."
   utter_ask_subject:
     - "What is this about?"
   utter_ask_content:
@@ -123,4 +129,5 @@ actions:
  - action_confirm_meeting
  - action_send_meeting
  - action_increment_page
+ - action_capture_time
  - utter_goodbye

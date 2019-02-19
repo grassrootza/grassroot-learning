@@ -17,6 +17,7 @@ import phonenumbers
 import requests
 # import rollbar
 import json
+import time
 import os
 
 auth_token = os.getenv('TOKEN_X')
@@ -336,35 +337,17 @@ class ActionSendMeeting(Action):
 #               UTILITIES                #
 ##########################################
 
+class ActionCaptureTime(Action):
+
+    def name(self):
+        return "action_capture_time"
+
+    def run(self, dispatcher, tracker, domain):
+        t = time.time()
+        return [SlotSet("init_time", t)]
+
 
 class ActionCheckForGroups(Action):
-
-    class customRestarted(Event):
-        """Conversation should start over & history wiped.
-        As a side effect the ``Tracker`` will be reinitialised."""
-        
-        type_name = "restart"
-
-        def __init__(self, tracker):
-            self.tracker = tracker
-
-        def __hash__(self):
-            return hash(32143124312)
-
-        def __eq__(self, other):
-            return isinstance(other, Restarted)
-
-        def __str__(self):
-            return "customRestarted()"
-
-        def as_story_string(self):
-            return self.type_name
-
-        def apply_to(self, tracker):
-            #from rasa_core.actions.action import ACTION_LISTEN_NAME
-            self.tracker._reset()
-            logging.info('successfully reset slot. restarting...')
-            self.tracker.trigger_followup_action("action_restart")
 
     def name(self):
         return 'action_check_for_groups'
@@ -378,13 +361,13 @@ class ActionCheckForGroups(Action):
             groups = response.json()
             if not groups:
                 logging.info("User has no groups. Restarting dialogue.")
-                # dispatcher.utter_message("You don't seem to be part of any groups. Join one to use this feature.")
-                self.customRestarted(tracker)
+                dispatcher.utter_message("You don't seem to be part of any groups. To get the full benefits of this feature, join a group.")
+                # tracker.travel_back_in_time(tracker.get_slot("init_time"))
+                return []
             else:
                 logging.info("User has groups. Proceeding with actions")
                 # dispatcher.utter_message("Okay, lets get started.")
-        return []
-
+                return [SlotSet("has_groups", True)]
 
 
 class ActionGetGroup(Action):
